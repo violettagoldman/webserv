@@ -1,22 +1,46 @@
-#ifndef LOCATION_HPP
-# define LOCATION_HPP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Location.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
+/*   Updated: 2020/12/17 17:57:46 by ashishae         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-# include <string>
+#include "Location.hpp"
 
-class Location {
+Location::Location()
+{
+	pattern = "/";
+	root = "/var/www/";
+}
 
-public:
-	Location();
-	~Location();
-	Location(const Location &copy);
-	Location &operator= (const Location &operand);
+Location::~Location()
+{
+}
 
-private:
-	std::string pattern;
+std::string Location::getPattern(void) const
+{
+	return this->pattern;
+}
 
-	// Для начала только root
-	std::string root;
+std::string Location::getRoot(void) const
+{
+	return this->root;
+}
 
-};
 
-#endif
+// Location::Location(const Location &copy)
+// {
+	
+// }
+
+// Location::Location &operator= (const Location &operand)
+// {
+	
+
+// }
+
