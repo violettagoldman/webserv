@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2020/12/17 18:01:05 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/03 15:25:12 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ bool exception_thrown = false;
 
 void check(int expression);
 
-#define TEST_EXCEPTION(expression, exceptionType) { \
+#define TEST_EXCEPTION(expression, exceptionType, exceptionString) { \
 	exception_thrown = false; \
 	try \
 	{ \
@@ -32,6 +32,7 @@ void check(int expression);
 	catch (const exceptionType &e) \
 	{ \
 		exception_thrown = true; \
+		check((!strcmp(e.what(), exceptionString))); \
 	} \
 	check(exception_thrown == true); \
 }
@@ -53,17 +54,52 @@ void check(int expression)
 }
 
 #include "Config.hpp"
+#include "Reader.hpp"
 
 int main(void)
 {
-	out("Config | Default config");
-	Config default_config;
+	// out("Config | Default config");
+	// Config default_config;
+	Reader r("nginx.conf");
 
-	check(default_config.getListenIp() == 80);
-	check(default_config.getServerName().size() == 1);
-	check(default_config.getServerName()[0] == "localhost");
-	check(default_config.getLocations().size() == 1);
-	check(default_config.getLocations()[0].getPattern() == "/");
-	check(default_config.getLocations()[0].getRoot() == "/var/www/");
+	std::vector<Config> configVector = r.getConfigVector();
+	check(configVector.size() == 2);
+	check(configVector[0].getListenIp() == 80);
+	check(configVector[0].getServerName().size() == 2);
+	check(configVector[0].getServerName()[0] == "domain1.com");
+	check(configVector[0].getServerName()[1] == "www.domain1.com");
+	check(configVector[0].getLocations().size() == 1);
+	check(configVector[0].getLocations()[0].getPattern() == "/");
+	check(configVector[0].getLocations()[0].getRoot() == "/var/www/");
+	
+	check(configVector[1].getListenIp() == 443);
+	check(configVector[1].getServerName().size() == 2);
+	check(configVector[1].getServerName()[0] == "domain2.com");
+	check(configVector[1].getServerName()[1] == "www.domain2.com");
+	check(configVector[1].getLocations().size() == 1);
+	check(configVector[1].getLocations()[0].getPattern() == "/app/");
+	check(configVector[1].getLocations()[0].getRoot() == "/var/www/");
+
+	TEST_EXCEPTION(Reader r2("missing_listen.conf"), Config::DirectiveNotFound,\
+					"A required directive wasn't found in a context.");
+
+	TEST_EXCEPTION(Reader r2("missing_root.conf"), Location::DirectiveNotFound,\
+					"A required directive wasn't found in a context.");
+	
+	TEST_EXCEPTION(Reader r2("syntaxerror.conf"), Reader::SyntaxError,\
+					"The config file contains a syntax error.");
+
+					
+	
+
+
+	// check(default_config.getListenIp() == 80);
+	// check(default_config.getServerName().size() == 1);
+	// check(default_config.getServerName()[0] == "localhost");
+	// check(default_config.getLocations().size() == 1);
+	// check(default_config.getLocations()[0].getPattern() == "/");
+	// check(default_config.getLocations()[0].getRoot() == "/var/www/");
+
+	
 	
 }
