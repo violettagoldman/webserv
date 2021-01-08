@@ -8,7 +8,6 @@ int main(void)
     int     i;
     Server  s; 
     int	    clients[30]; //change to vector later
-    int     addrlen;
     fd_set  fds;
     char    buffer[1024];
     int     new_socket;
@@ -23,9 +22,7 @@ int main(void)
 
     s.setup();
     s.listen();
-    // s.accept();
 
-    addrlen = sizeof(s._address); 
 	std::cout << "Waiting for connections ...\n"; 
 		
 	while(1) 
@@ -52,15 +49,9 @@ int main(void)
 		// wait for an activity on one of the sockets
 		select( max_sd + 1 , &fds , NULL , NULL , NULL);
 		if (FD_ISSET(s.getFd(), &fds)) 
-		{ 
-			if ((new_socket = accept(s.getFd(), 
-					(struct sockaddr *)&s._address, (socklen_t*)&addrlen))<0) 
-			{ 
-				perror("accept"); 
-				exit(EXIT_FAILURE); 
-			} 
-			// //send new connection greeting message 
-			send(new_socket, "Hello from the server\n", strlen("Hello from the server\n"), 0); 
+		{
+			new_socket = s.accept();
+			s.send(new_socket, "Hello from the server\n");
 			for (i = 0; i < 30; i++) 
 			{ 
 				//if position is empty 

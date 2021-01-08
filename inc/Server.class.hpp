@@ -21,10 +21,9 @@ class Server
 		int				accept(void);
 		int				listen(void);
 		std::string		recieve(void);
-		int				send(void);
+		int				send(int fd, std::string message) const;
 		int				shutdown(void);
 		int				close(void);
-		// struct sockaddr_in	getAddress(void) const;
 		std::string		getHost(void) const;
 		std::string		getPort(void) const;
 		int				getFd(void) const;
@@ -37,7 +36,6 @@ class Server
 		std::string 			_host;
 		std::string 			_port;
 		int						_fd;
-		// struct sockaddr_in		_address;
 };
 
 #endif

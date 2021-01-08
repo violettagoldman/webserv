@@ -59,7 +59,7 @@ int			Server::setup(void)
 */
 int			Server::run(void)
 {
-	
+	return (0);
 }
 
 /*
@@ -86,13 +86,14 @@ int			Server::accept(void)
 	int	addrlen;
 	int newSocket;
 
-	if ((_fd = ::accept(newSocket, (struct sockaddr *)&_address,
+	addrlen = sizeof(_address); 
+	if ((newSocket = ::accept(_fd, (struct sockaddr *)&_address,
 		(socklen_t *)&addrlen)) == -1)
 	{
 		std::cerr << "Couldn't accept the connection" << std::endl;
 		return (-1);
 	}
-	return (0);
+	return (newSocket);
 }
 
 /*
@@ -119,11 +120,12 @@ std::string			Server::recieve(void)
 * This method is used to write in the socket
 * @return int Error code
 */
-int			Server::send(void)
+int			Server::send(int fd, std::string message) const
 {
 	
-	// if (::send(_socket, resp.c_str(), resp.size(), 0) == -1)
-	// 	std::cerr << "Could not send response." << std::endl;
+	if (::send(fd, message.c_str(), message.size(), 0) == -1)
+		std::cerr << "Could not send response" << std::endl;
+	return (0);
 }
 
 /*
@@ -132,7 +134,7 @@ int			Server::send(void)
 */
 int			Server::shutdown(void)
 {
-	
+	return (0);
 }
 
 /*
@@ -144,6 +146,7 @@ int			Server::close(void)
 	// if (_socket > 0)
 	// 	::close(_fd);
 	// _socket = -1;
+	return (0);
 }
 
 std::string		Server::getHost(void) const
@@ -160,11 +163,6 @@ int			Server::getFd(void) const
 {
 	return (_fd);
 }
-
-// struct sockaddr_in	Server::getAddress(void) const
-// {
-// 	return (_address);
-// }
 
 void			Server::setHost(std::string host)
 {
