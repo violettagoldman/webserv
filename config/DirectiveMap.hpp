@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/02 17:05:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/02 17:30:01 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/11 18:24:44 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class DirectiveMap {
 
 public:
 	DirectiveMap(std::vector<std::string>);
+	// DirectiveMap(std::string);
 	// DirectiveMap();
 	// ~DirectiveMap();
 	// DirectiveMap(const DirectiveMap &copy);

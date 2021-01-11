@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/03 15:08:28 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/11 18:36:57 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@
 
 typedef struct LocationBlock {
 	std::string pattern;
-	std::vector<std::string> block;
+	std::string block;
 } locationBlock;
 
+std::string get_block(std::string file, size_t start);
 
 // Global configuration object
 
@@ -35,7 +36,8 @@ class Config {
 public:
 	// Config(int listenIp, std::vector<std::string> serverName,
 	// 	std::vector<Location> locations);
-	Config(std::vector<std::string> configBlock);
+	// Config(std::vector<std::string> configBlock);
+	Config(std::string configBlock);
 	// Config();
 	~Config();
 	// Пока сойдут implicit-версии
@@ -54,8 +56,8 @@ public:
 
 private:
 
-	void readDirectives(std::vector<std::string> block);
-	void readLocations(std::vector<std::string> block);
+	// void readDirectives(std::vector<std::string> block);
+	void readLocations(std::string block);
 	std::string read_or_throw(std::string key);
 	
 	

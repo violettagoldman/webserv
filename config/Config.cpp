@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:43 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/06 19:48:57 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/11 18:44:47 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,15 @@ std::string Config::read_or_throw(std::string key)
 	return ret;
 }
 
-void Config::readDirectives(std::vector<std::string> bag)
-{
-	DirectiveMap dm(bag);
-	this->directives = dm.getMap();
-}
+/*
+** Read the block-level directives into a map
+** @param block A string containing a block
+*/
+// void Config::readDirectives(std::string block)
+// {
+// 	DirectiveMap dm(bag);
+// 	this->directives = dm.getMap();
+// }
 
 /*
 ** Erases all the whitespace characters in the end of a string
@@ -96,55 +100,94 @@ void trimWhitespace(std::string &s)
 ** @param input A server context block
 ** @ret std::vector<locationBlock> a vector of locations
 */
-std::vector<locationBlock> read_child_blocks(std::vector<std::string> input)
-{
-	std::vector<locationBlock> ret;
-	locationBlock newLocation;
+// std::vector<locationBlock> read_child_blocks(std::vector<std::string> input)
+// {
+// 	std::vector<locationBlock> ret;
+// 	locationBlock newLocation;
 
-	std::cout << "Reading child blocks" << std::endl;
+// 	std::cout << "Reading child blocks" << std::endl;
 
-	for (int i = 0; i < input.size(); i++)
+// 	for (int i = 0; i < input.size(); i++)
+// 	{
+// 		if (input[i].find('{') != std::string::npos)
+// 		{
+// 			while (i < input.size())
+// 			{
+// 				if (input[i].find("location") != std::string::npos)
+// 				{
+// 					// Grab pattern;
+// 					size_t pattern_begin = input[i].find("location") + 9;
+// 					size_t pattern_end = input[i].find('{', pattern_begin);
+// 					newLocation.pattern = input[i].substr(pattern_begin, pattern_end - pattern_begin);
+// 					trimWhitespace(newLocation.pattern);
+					
+// 					// For now, whatever is left in the block is location.
+// 					for (int j = i+1; j < input.size(); j++)
+// 					{
+// 						newLocation.block.push_back(input[j]);
+// 					}
+// 					ret.push_back(newLocation);
+					
+// 				}
+// 				i++;
+// 			}
+// 		}
+// 	}
+// 	return ret;
+// }
+
+
+
+std::string read_directive(std::string block, std::string key) {
+	size_t start = block.find(key, 0) + key.size();
+
+	if (start == std::string::npos)
 	{
-		if (input[i].find('{') != std::string::npos)
-		{
-			while (i < input.size())
-			{
-				if (input[i].find("location") != std::string::npos)
-				{
-					// Grab pattern;
-					size_t pattern_begin = input[i].find("location") + 9;
-					size_t pattern_end = input[i].find('{', pattern_begin);
-					newLocation.pattern = input[i].substr(pattern_begin, pattern_end - pattern_begin);
-					trimWhitespace(newLocation.pattern);
-					
-					// For now, whatever is left in the block is location.
-					for (int j = i+1; j < input.size(); j++)
-					{
-						newLocation.block.push_back(input[j]);
-					}
-					ret.push_back(newLocation);
-					
-				}
-				i++;
-
-
-				
-				// if (input[i].find('}') != std::string::npos)
-				// {
-				// 	ret.push_back(newLocation);
-				// 	newLocation.block.clear();
-				// 	newLocation.pattern = "";
-				// 	break;
-				// }
-				// newLocation.block.push_back(input[i]);
-			}
-		}
+		std::cout << "Looking for key: " << key << "in block " << block << std::endl;
+		throw 42;
 	}
-	return ret;
+
+	while(start < block.size() && isspace(block[start]))
+	{
+		start++;
+	}
+	size_t end = block.find(';', start);
+	// TODO find missing semicolons
+	std::cout << "Key: " << key << ", value: |" << block.substr(start, end-start) << "|" << std::endl;
+	return block.substr(start, end-start);
 }
 
-void Config::readLocations(std::vector<std::string> block) {
-	std::vector<locationBlock> locationBlocks = read_child_blocks(block);
+/*
+** 
+*/
+std::vector<locationBlock> getLocationBlocks(std::string block)
+{
+	// std::vector<std::string> v;
+	std::vector<locationBlock> ret;
+
+	size_t pos = 0;
+	size_t start;
+
+	locationBlock newLocation;
+
+	while ((start = block.find("location ", pos)) != std::string::npos)
+	{
+		size_t pattern_begin = start + 9;
+		size_t pattern_end = block.find('{', pattern_begin);
+		newLocation.pattern = block.substr(pattern_begin, pattern_end - pattern_begin);
+		trimWhitespace(newLocation.pattern);
+		
+		newLocation.block = get_block(block, start);
+
+		ret.push_back(newLocation);
+		pos = start+1;
+	}
+	return ret;
+
+}
+
+void Config::readLocations(std::string block) {
+	std::vector<locationBlock> locationBlocks = getLocationBlocks(block);
 	locationBlock lb;
 	for (int i = 0; i < locationBlocks.size(); i++)
 	{
@@ -158,15 +201,15 @@ void Config::readLocations(std::vector<std::string> block) {
 ** @param bag A vector of strings, where each string is a line from a single
 ** 				server context.
 */
-Config::Config(std::vector<std::string> block)
+Config::Config(std::string block)
 {
-	readDirectives(block);
-	readLocations(block);
+	// readDirectives(block);
+	// readLocations(block);
 	std::cout << "Read config" << std::endl;
 	
 	// TODO: redo atoi....
-	this->listenIp = atoi(read_or_throw("listen").c_str());
-	this->serverName = split(read_or_throw("server_name"), ' ');
+	this->listenIp = atoi(read_directive(block, "listen").c_str());
+	this->serverName = split(read_directive(block, "server_name"), ' ');
 }
 
 // Config::Config(int _listenIp, std::vector<std::string> _serverName,

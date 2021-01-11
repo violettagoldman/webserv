@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/02 17:07:58 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/02 17:29:02 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/11 18:25:00 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,55 @@ DirectiveMap::DirectiveMap(std::vector<std::string> block)
 		}
 	}
 }
+
+/*
+** Split a string s, separated by delimiter c
+** @param s String that needs to be splitted
+** @param c The delimiter
+** @ret std::vector<std::string> the vector of resulting separated strings
+*/
+// std::vector<std::string> split(std::string s, char c)
+// {
+// 	std::vector<std::string> ret;
+// 	int i = 0;
+// 	size_t pos;
+// 	while ((pos = s.find(c, i)) != std::string::npos)
+// 	{
+// 		ret.push_back(s.substr(i, pos-i));
+// 		i = pos+1;
+// 	}
+// 	ret.push_back(s.substr(i));
+// 	return ret;
+// }
+
+// /*
+// ** Get directives from a block.
+// ** At this moment, we only read the directives before the first nested block
+// ** i.e. the first location block inside a server block
+// ** @param bag — a vector of strings representing each line in config file
+// */
+// DirectiveMap::DirectiveMap(std::string block)
+// {
+// 	directive dir;
+
+
+// 	std::vector<std::string> lines = split(block, '\n');
+
+
+// 	for (int i = 0; i < lines.size(); i++)
+// 	{
+// 		if (lines[i].find('{') != std::string::npos)
+// 		{
+// 			return;
+// 		}
+// 		if (lines[i].size() > 2)
+// 		{
+// 			dir = read_directive(lines[i]);
+// 			this->map[dir.title] = dir.value;
+// 			std::cout << "Read directive " << dir.title << " with value " << dir.value << std::endl;
+// 		}
+// 	}
+// }
 
 dirmap DirectiveMap::getMap(void) const
 {

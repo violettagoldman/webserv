@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/03 15:14:04 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/11 18:38:52 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,13 @@
 
 # include "DirectiveMap.hpp"
 
+std::string read_directive(std::string block, std::string key);
+
 class Location {
 
 public:
 	// Location();
-	Location(std::string pattern, std::vector<std::string> block);
+	Location(std::string pattern, std::string block);
 	// Location(std::string pattern, std::string action_type, std::string value);
 	~Location();
 	

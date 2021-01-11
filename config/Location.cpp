@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/03 15:14:51 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/11 18:39:41 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,26 +56,21 @@ const char* Location::DirectiveNotFound::what() const throw()
 ** @param lb The locationBlock object that contains the captured location.
 ** @ret Location The resulting Location object.
 */
-Location::Location(std::string pattern, std::vector<std::string> block)
+Location::Location(std::string pattern, std::string block)
 {
-	DirectiveMap dm(block);
-	dirmap directives = dm.getMap();
+	// DirectiveMap dm(block);
+	// dirmap directives = dm.getMap();
 	std::string tmp;
-	std::cout << "Block: " << std::endl;
-	for (int i = 0; i < block.size(); i++)
-	{
-		std::cout << block[i] << std::endl;
-	}
-	if ((tmp = directives["root"]) != "")
-	{
+	// std::cout << "Block: " << std::endl;
+	// for (int i = 0; i < block.size(); i++)
+	// {
+	// 	std::cout << block[i] << std::endl;
+	// }
+
 		// return Location(lb.pattern, "root", tmp);
-		this->pattern = pattern;
-		this->root = tmp;
-	}
-	else
-	{
-		throw DirectiveNotFound();
-	}
+
+	this->pattern = pattern;
+	this->root = read_directive(block, "root");
 	
 }
 
