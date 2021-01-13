@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 16:35:08 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/11 18:26:16 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 14:37:23 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include "get_next_line/get_next_line.h"
 
-#define BUFFER_SIZE 64
 
 /*
 ** Read the whole file in a single
@@ -100,21 +100,4 @@ std::vector<std::string> get_server_blocks(std::string file)
 		pos = start+1;
 	}
 	return v;
-}
-
-int main(void)
-{
-	std::string filename = "nginx.conf";
-
-	// std::cout << read_file(filename) << std::endl;
-	std::string s = read_file(filename);
-	std::vector<std::string> vs = get_server_blocks(s);
-	
-	for (int i = 0; i < vs.size(); ++i)
-	{
-		std::cout << "<Block>" << std::endl;
-		std::cout << vs[i] << std::endl;
-		std::cout << "</Block>" << std::endl;
-	}
-	
 }

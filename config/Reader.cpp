@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/11 18:04:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 15:57:54 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,19 +143,157 @@ std::vector<std::string> get_server_blocks(std::string file)
 	return v;
 }
 
+enum parserMode
+{
+	idle = 0,
+	server = 1,
+	location = 2,
+};
+
+// void parse_location( )
+
+std::string getDirective(size_t needle, std::string line)
+{
+	while (isspace(line[needle]))
+	{
+		needle++;
+	}
+	// TODO: exception if no ;
+	return line.substr(needle, line.find(";", needle)-needle);
+}
+
+// Находим конец 
+// TODO: вернуть указатель на конец блока, чтобы можно было что-нибудь дописать
+// после конца контекста
+bool blockEnded(char *line, std::stack<char> &foundBrackets)
+{
+	std::string l(line);
+	for (int i = 0; i < l.size(); i++)
+	{
+		if (l[i] == '{')
+		{
+			foundBrackets.push('{');
+		}
+		else if (l[i] == '}')
+		{
+			if (foundBrackets.top() == '}')
+			{
+				foundBrackets.pop();
+				if (foundBrackets.empty())
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+void Reader::parse_location_line()
+{
+	std::string lineString(line);
+	size_t needle;
+
+	if ((needle = lineString.find("root")) != std::string::npos)
+	{
+		lp.root = getDirective(needle+4, lineString);
+	}
+	else if ((needle = lineString.find("location")) != std::string::npos)
+	{
+		std::string pattern = lineString.substr(needle+8, lineString.find(";", needle+8)-needle+8);
+		trimWhitespace(pattern);
+		lp.pattern = pattern;
+	}
+}
+
+void Reader::parse_location()
+{
+	std::stack<char> foundBrackets;
+
+	do
+	{
+		if (blockEnded(line, foundBrackets))
+		{
+			break;
+		}
+		parse_location_line();
+	}
+	while ((ret = get_next_line(fd, &line)));
+	// return Config(cp.listenIp, cp.serverName, cp.locations);
+	// configVector.push_back(Config(cp.listenIp, cp.serverName, cp.locations));
+	cp.locations.push_back(Location(lp.pattern, lp.root));
+}
+
+// Забираем информацию из строк
+void Reader::parse_server_line()
+{
+	std::string lineString(line);
+	size_t needle;
+
+	if ((needle = lineString.find("listen")) != std::string::npos)
+	{
+		cp.listenIp = std::atoi(getDirective(needle+7, lineString).c_str());
+	}
+	else if ((needle = lineString.find("server_name")) != std::string::npos)
+	{
+		cp.serverName = split(getDirective(
+			needle+12, lineString), ' ');
+	}
+	else if ((needle = lineString.find("location")) != std::string::npos)
+	{
+		parse_location();
+	}
+}
+
+
+// Отбираем строки
+void Reader::parse_server()
+{
+	std::stack<char> foundBrackets;
+	do
+	{
+		if (blockEnded(line, foundBrackets))
+		{
+			break;
+		}
+		parse_server_line();
+	}
+	while ((ret = get_next_line(fd, &line)));
+	// return Config(cp.listenIp, cp.serverName, cp.locations);
+	configVector.push_back(Config(cp.listenIp, cp.serverName, cp.locations));
+}
+
+// Находим начало контекста
+void Reader::parse()
+{
+	std::string l;
+
+	while ((ret = get_next_line(fd, &line)))
+	{
+		l.assign(line);
+		if (l.find("server") != std::string::npos)
+		{
+			parse_server();
+		}
+	}
+	std::cout << line << std::endl;
+}
+
+
 /*
 ** Create a Reader object for a given file
 */
 Reader::Reader(std::string filename)
 {
-	std::string content =  read_file(filename);
-	std::vector<std::string> server_blocks = get_server_blocks(content);
+	// std::string content =  read_file(filename);
+	// std::vector<std::string> server_blocks = get_server_blocks(content);
 
-	for (int i = 0; i < server_blocks.size(); ++i)
-	{
-		configVector.push_back(Config(server_blocks[i]));
-		/* code */
-	}
+	// for (int i = 0; i < server_blocks.size(); ++i)
+	// {
+	// 	configVector.push_back(Config(server_blocks[i]));
+	// 	/* code */
+	// }
+
 	
 	// std::ifstream myfile(filename);
 	// if (myfile.is_open())
@@ -170,11 +308,35 @@ Reader::Reader(std::string filename)
 	// 	myfile.close();
 	// }
 		
+
+	int fd = open(filename.c_str(), O_RDONLY);
+
+	while ((ret = get_next_line(fd, &line)))
+	{
+		parse_line(fd, line, configVector);
+	}
 }
 
 std::vector<Config> Reader::getConfigVector(void) const
 {
 	return configVector;
+}
+
+
+
+int main(void)
+{
+	std::string filename = "nginx.conf";
+
+	Reader r(filename);
+	// std::cout << read_file(filename) << std::endl;
+	// std::string s = read_file(filename);
+	// std::vector<std::string> vs = get_server_blocks(s);
+	
+
+	
+	// std::cout << line << std::endl;
+	
 }
 
 

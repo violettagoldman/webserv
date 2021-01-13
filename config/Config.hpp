@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/11 18:36:57 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 15:00:36 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ std::string get_block(std::string file, size_t start);
 class Config {
 
 public:
-	// Config(int listenIp, std::vector<std::string> serverName,
-	// 	std::vector<Location> locations);
+	Config(int listenIp, std::vector<std::string> serverName,
+		std::vector<Location> locations);
 	// Config(std::vector<std::string> configBlock);
 	Config(std::string configBlock);
 	// Config();
