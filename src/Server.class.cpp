@@ -1,4 +1,4 @@
-#include "Server.class.hpp"
+#include "../inc/Server.class.hpp"
 
 Server::Server(void)
 {
@@ -43,7 +43,7 @@ int			Server::setup(void)
 		return (-1);
 	}
 	_address.sin_family = AF_INET;
-	_address.sin_addr.s_addr = INADDR_ANY; //change by ft custom function 
+	_address.sin_addr.s_addr = INADDR_ANY; //change by ft custom function
 	_address.sin_port = htons(8888); //same
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
@@ -86,7 +86,7 @@ int			Server::accept(void)
 	int	addrlen;
 	int newSocket;
 
-	addrlen = sizeof(_address); 
+	addrlen = sizeof(_address);
 	if ((newSocket = ::accept(_fd, (struct sockaddr *)&_address,
 		(socklen_t *)&addrlen)) == -1)
 	{
@@ -112,6 +112,7 @@ std::string			Server::recieve(void)
 		if ((res = recv(_fd, buffer, 4095, 0)) == -1)
 			std::cerr << "Coudn't recieve the request" << std::endl;
 		request += std::string(buffer);
+
 	// }
 	return (request);
 }
@@ -122,7 +123,7 @@ std::string			Server::recieve(void)
 */
 int			Server::send(int fd, std::string message) const
 {
-	
+
 	if (::send(fd, message.c_str(), message.size(), 0) == -1)
 		std::cerr << "Could not send response" << std::endl;
 	return (0);
