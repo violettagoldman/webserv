@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/11 18:48:01 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 11:34:34 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ int main(void)
 
 	std::vector<Config> configVector = r.getConfigVector();
 	check(configVector.size() == 2);
-	std::cout << configVector[0].getListenIp() << std::endl;
 	check(configVector[0].getListenIp() == 80);
 	check(configVector[0].getServerName().size() == 2);
 	check(configVector[0].getServerName()[0] == "domain1.com");
@@ -85,8 +84,11 @@ int main(void)
 	check(configVector[1].getServerName().size() == 2);
 	check(configVector[1].getServerName()[0] == "domain2.com");
 	check(configVector[1].getServerName()[1] == "www.domain2.com");
+	
 	check(configVector[1].getLocations().size() == 1);
+
 	check(configVector[1].getLocations()[0].getPattern() == "/app/");
+
 	check(configVector[1].getLocations()[0].getRoot() == "/var/www/");
 
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), Config::DirectiveNotFound,\

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/13 19:12:02 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 11:33:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,11 @@
 # include <cstdlib>
 
 # include "get_next_line/get_next_line.hpp"
+# include "Config.hpp"
+# include "Location.hpp"
+
 
 std::vector<std::string> split(std::string s, char c);
-
-// # define BUFFER_SIZE 64
-
-# include "Config.hpp"
-
-# include "Location.hpp"
 
 typedef struct sConfigPrototype
 {
@@ -63,8 +60,6 @@ public:
 	//~Reader();
 	//Reader(const Reader &copy);
 	//Reader &operator= (const Reader &operand);
-	// std::string read_or_throw(std::string key);
-	// std::string read_file(std::string filename);
 	std::vector<Config> getConfigVector(void) const;
 
 	class SyntaxError: public std::exception
@@ -72,7 +67,11 @@ public:
 		public:
 		virtual const char* what() const throw();
 	};
-	
+	class DirectiveNotFound: public std::exception
+	{
+		public:
+		virtual const char* what() const throw();
+	};
 
 private:
 	int fd;
@@ -80,10 +79,6 @@ private:
 	char *line;
 
 	std::vector<Config> configVector;
-	std::vector<std::string> lines;
-	std::vector<std::string> currentBlock;
-	dirmap currentDirectives;
-	int get_block(std::ifstream &myfile);
 
 	configPrototype cp;
 	locationPrototype lp;

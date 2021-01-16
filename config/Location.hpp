@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/13 19:16:55 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 11:32:30 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@
 # include <string>
 # include <vector>
 # include <exception>
-
-# include "DirectiveMap.hpp"
 
 std::string read_directive(std::string block, std::string key);
 
@@ -34,12 +32,6 @@ public:
 
 	std::string getPattern(void) const;
 	std::string getRoot(void) const;
-
-	class DirectiveNotFound: public std::exception
-	{
-		public:
-		virtual const char* what() const throw();
-	};
 
 private:
 	std::string pattern;

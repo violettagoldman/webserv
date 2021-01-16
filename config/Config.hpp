@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/13 15:00:36 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 11:32:03 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <ctype.h>
 
 # include "Location.hpp"
-# include "DirectiveMap.hpp"
+
 
 typedef struct LocationBlock {
 	std::string pattern;
@@ -37,7 +37,6 @@ public:
 	Config(int listenIp, std::vector<std::string> serverName,
 		std::vector<Location> locations);
 	// Config(std::vector<std::string> configBlock);
-	Config(std::string configBlock);
 	// Config();
 	~Config();
 	// Пока сойдут implicit-версии
@@ -47,22 +46,11 @@ public:
 	std::vector<std::string> getServerName(void) const;
 	std::vector<Location> getLocations(void) const;
 
-	class DirectiveNotFound: public std::exception
-	{
-		public:
-		virtual const char* what() const throw();
-	};
+
 	
 
 private:
-
-	// void readDirectives(std::vector<std::string> block);
-	void readLocations(std::string block);
-	std::string read_or_throw(std::string key);
-	
-	
 	int listenIp;
-	dirmap directives;
 	std::vector<std::string> serverName;
 	std::vector<Location> locations;
 };
