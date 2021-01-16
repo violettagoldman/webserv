@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:26:41 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:45:10 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ int main(void)
 	check(configVector[1].getServerName().size() == 2);
 	check(configVector[1].getServerName()[0] == "domain2.com");
 	check(configVector[1].getServerName()[1] == "www.domain2.com");
+	check(configVector[1].getClientMaxBodySize() == 1024);
 	
 	check(configVector[1].getLocations().size() == 1);
 

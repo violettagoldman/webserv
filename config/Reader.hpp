@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 14:03:36 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:38:41 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct sConfigPrototype
 	std::string listenHost;
 	std::vector<std::string> serverName;
 	std::vector<Location> locations;
+	int clientMaxBodySize;
 }	configPrototype;
 
 typedef struct sLocationPrototype

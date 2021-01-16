@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 14:18:19 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:39:31 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@
 
 // Global configuration object
 
-// TODO: listen host
-// TODO: limit client body size
+// TODO: limit client body size in http context
+// TODO: limit client body size in location context
+// TODO: http context
 // TODO: http methods for route
 // TODO: directory listing on/off (autoindex)
 // TODO: default file (index)
@@ -34,7 +35,7 @@ class Config {
 
 public:
 	Config(int listenIp, std::string listenHost, std::vector<std::string> serverName,
-		std::vector<Location> locations);
+		std::vector<Location> locations, int clientMaxBodySize);
 	// Config(std::vector<std::string> configBlock);
 	// Config();
 	~Config();
@@ -45,12 +46,14 @@ public:
 	std::string getListenHost(void) const;
 	std::vector<std::string> getServerName(void) const;
 	std::vector<Location> getLocations(void) const;
+	int getClientMaxBodySize(void) const;
 
 
 	
 
 private:
 	int listenIp;
+	int clientMaxBodySize;
 	std::string listenHost;
 	std::vector<std::string> serverName;
 	std::vector<Location> locations;
