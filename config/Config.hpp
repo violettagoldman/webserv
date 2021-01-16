@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 11:32:03 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 13:21:10 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,14 @@
 
 # include "Location.hpp"
 
-
-typedef struct LocationBlock {
-	std::string pattern;
-	std::string block;
-} locationBlock;
-
-std::string get_block(std::string file, size_t start);
-
 // Global configuration object
+
+// TODO: listen host
+// TODO: limit client body size
+// TODO: http methods for route
+// TODO: directory listing on/off (autoindex)
+// TODO: default file (index)
+// TODO: cgi
 
 class Config {
 

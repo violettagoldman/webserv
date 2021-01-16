@@ -6,36 +6,11 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 11:34:05 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 12:10:45 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Reader.hpp"
-
-/*
-** This exception should be thrown where a config omits a required
-** directive, for example, serverName or listen.
-** Its functionality may be extended to specify the context and the 
-** directive that is missing, as well as the line number.
-** @ret Exception description.
-*/
-const char* Reader::SyntaxError::what() const throw()
-{
-	return "The config file contains a syntax error.";
-}
-
-
-// ** This exception should be thrown where a config omits a required
-// ** directive, for example, serverName or listen.
-// ** Its functionality may be extended to specify the context and the 
-// ** directive that is missing, as well as the line number.
-// ** @ret Exception description.
-
-// const char* Config::DirectiveNotFound::what() const throw()
-// {
-// 	return "A required directive wasn't found in a context.";
-// }
-
 
 /*
 ** Erases all the whitespace characters in the end of a string
@@ -51,7 +26,6 @@ void trimWhitespace(std::string &s)
 		it--;
 	}
 }
-
 
 /*
 ** Split a string s, separated by delimiter c
@@ -199,7 +173,6 @@ void Reader::parse_server_line()
 			needle+12, lineString), ' ');
 	}
 }
-
 
 /*
 ** Parse a server context.

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 11:33:26 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 12:10:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 # include <string>
 # include <vector>
 # include <map>
-# include <exception>
 
 # include <string>
 # include <fcntl.h>
@@ -51,7 +50,6 @@ typedef struct sLocationPrototype
 }	locationPrototype;
 
 void trimWhitespace(std::string &s);
-typedef std::vector<std::string> strarr;
 
 class Reader {
 
@@ -61,17 +59,6 @@ public:
 	//Reader(const Reader &copy);
 	//Reader &operator= (const Reader &operand);
 	std::vector<Config> getConfigVector(void) const;
-
-	class SyntaxError: public std::exception
-	{
-		public:
-		virtual const char* what() const throw();
-	};
-	class DirectiveNotFound: public std::exception
-	{
-		public:
-		virtual const char* what() const throw();
-	};
 
 private:
 	int fd;
