@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:45:06 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:50:45 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,12 @@ void Reader::parse_location_line()
 	{
 		lp.pattern = parse_pattern(lineString);
 	}
+	else if ((needle = lineString.find(
+				"client_max_body_size")) != std::string::npos)
+	{
+		cp.clientMaxBodySize = std::atoi(
+			getDirective(needle+20, lineString).c_str());
+	}
 }
 
 /*
@@ -184,7 +190,8 @@ void Reader::parse_server_line()
 	else if ((needle = lineString.find(
 				"client_max_body_size")) != std::string::npos)
 	{
-		cp.clientMaxBodySize = std::atoi(getDirective(needle+20, lineString).c_str());
+		cp.clientMaxBodySize = std::atoi(
+			getDirective(needle+20, lineString).c_str());
 	}
 }
 

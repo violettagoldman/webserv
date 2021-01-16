@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:39:31 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:49:17 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@
 
 // Global configuration object
 
-// TODO: limit client body size in http context
-// TODO: limit client body size in location context
 // TODO: http context
+// TODO: limit client body size in http context
+
+
 // TODO: http methods for route
 // TODO: directory listing on/off (autoindex)
 // TODO: default file (index)

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:45:10 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:48:43 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ int main(void)
 	Reader r("nginx.conf");
 
 	std::vector<Config> configVector = r.getConfigVector();
-	check(configVector.size() == 2);
+	check(configVector.size() == 3);
+
 	check(configVector[0].getListenIp() == 80);
 	check(configVector[0].getListenHost() == "");
 	check(configVector[0].getServerName().size() == 2);
@@ -80,6 +81,8 @@ int main(void)
 	check(configVector[0].getLocations().size() == 1);
 	check(configVector[0].getLocations()[0].getPattern() == "/");
 	check(configVector[0].getLocations()[0].getRoot() == "/var/www/");
+	check(configVector[0].getClientMaxBodySize() == 0);
+
 	check(configVector[1].getListenHost() == "127.0.0.1");
 	check(configVector[1].getListenIp() == 443);
 	check(configVector[1].getServerName().size() == 2);
@@ -92,6 +95,8 @@ int main(void)
 	check(configVector[1].getLocations()[0].getPattern() == "/app/");
 
 	check(configVector[1].getLocations()[0].getRoot() == "/var/www/");
+
+	check(configVector[2].getClientMaxBodySize() == 42);
 
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), Config::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
