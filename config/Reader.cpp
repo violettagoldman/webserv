@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/13 15:57:54 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 19:40:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,7 @@ bool blockEnded(char *line, std::stack<char> &foundBrackets)
 		}
 		else if (l[i] == '}')
 		{
-			if (foundBrackets.top() == '}')
+			if (foundBrackets.top() == '{')
 			{
 				foundBrackets.pop();
 				if (foundBrackets.empty())
@@ -221,7 +221,7 @@ void Reader::parse_location()
 	while ((ret = get_next_line(fd, &line)));
 	// return Config(cp.listenIp, cp.serverName, cp.locations);
 	// configVector.push_back(Config(cp.listenIp, cp.serverName, cp.locations));
-	cp.locations.push_back(Location(lp.pattern, lp.root));
+	cp.locations.push_back(Location(lp.pattern, "root", lp.root));
 }
 
 // Забираем информацию из строк
@@ -229,6 +229,8 @@ void Reader::parse_server_line()
 {
 	std::string lineString(line);
 	size_t needle;
+
+	std::cout << "server line " << lineString << std::endl;
 
 	if ((needle = lineString.find("listen")) != std::string::npos)
 	{
@@ -249,16 +251,27 @@ void Reader::parse_server_line()
 // Отбираем строки
 void Reader::parse_server()
 {
+	std::cout << "Parsing server" << std::endl;
 	std::stack<char> foundBrackets;
+	std::string ls;
 	do
 	{
 		if (blockEnded(line, foundBrackets))
 		{
 			break;
 		}
+		ls.assign(line);
+		// TODO на лок надо переходить тут
+		if (ls.find("location") != std::string::npos)
+			foundBrackets.pop();
 		parse_server_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
+	std::cout << "Creating server: " << cp.listenIp << std::endl;
+	for (int i = 0; i < cp.serverName.size(); i++)
+	{
+		std::cout << cp.serverName[i] << std::endl;
+	}
 	// return Config(cp.listenIp, cp.serverName, cp.locations);
 	configVector.push_back(Config(cp.listenIp, cp.serverName, cp.locations));
 }
@@ -268,14 +281,13 @@ void Reader::parse()
 {
 	std::string l;
 
-	while ((ret = get_next_line(fd, &line)))
+	l.assign(line);
+	// std::cout << "Parse: " << line << std::endl;
+	if (l.find("server") != std::string::npos)
 	{
-		l.assign(line);
-		if (l.find("server") != std::string::npos)
-		{
-			parse_server();
-		}
+		this->parse_server();
 	}
+
 	std::cout << line << std::endl;
 }
 
@@ -309,11 +321,13 @@ Reader::Reader(std::string filename)
 	// }
 		
 
-	int fd = open(filename.c_str(), O_RDONLY);
+	fd = open(filename.c_str(), O_RDONLY);
 
 	while ((ret = get_next_line(fd, &line)))
 	{
-		parse_line(fd, line, configVector);
+		// parse_line(fd, line, configVector);
+		std::cout << "Preparing to parse: " << line << std::endl;
+		parse();
 	}
 }
 

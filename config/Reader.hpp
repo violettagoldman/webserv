@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/13 15:54:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 19:12:02 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct sLocationPrototype
 
 }	locationPrototype;
 
+void trimWhitespace(std::string &s);
 typedef std::vector<std::string> strarr;
 
 class Reader {
@@ -65,7 +66,6 @@ public:
 	// std::string read_or_throw(std::string key);
 	// std::string read_file(std::string filename);
 	std::vector<Config> getConfigVector(void) const;
-	void trimWhitespace(std::string &s);
 
 	class SyntaxError: public std::exception
 	{

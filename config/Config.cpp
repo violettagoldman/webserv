@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:43 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/13 15:41:40 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 19:11:25 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,13 +212,13 @@ Config::Config(std::string block)
 	this->serverName = split(read_directive(block, "server_name"), ' ');
 }
 
-// Config::Config(int _listenIp, std::vector<std::string> _serverName,
-// 				std::vector<Location> _locations)
-// {
-// 	listenIp = _listenIp;
-// 	serverName = _serverName;
-// 	locations = _locations;
-// }
+Config::Config(int _listenIp, std::vector<std::string> _serverName,
+				std::vector<Location> _locations)
+{
+	listenIp = _listenIp;
+	serverName = _serverName;
+	locations = _locations;
+}
 
 Config::~Config()
 {

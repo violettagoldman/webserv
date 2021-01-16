@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/11 18:38:52 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 19:16:55 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class Location {
 public:
 	// Location();
 	Location(std::string pattern, std::string block);
-	// Location(std::string pattern, std::string action_type, std::string value);
+	Location(std::string pattern, std::string action_type, std::string value);
 	~Location();
 	
 	// Location(const Location &copy);

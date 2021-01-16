@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/11 18:39:41 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/13 19:17:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@
 // **		("root" for example). Has to be supported.
 // ** @param value The value for the action ("/var/www" for example)
 // */
-// Location::Location(std::string _pattern, std::string action_type, std::string value)
-// {
-// 	if (action_type == "root")
-// 	{
-// 		this->pattern = _pattern;
-// 		this->root = value;
-// 	}
-// 	else
-// 		throw 42;
-// }
+Location::Location(std::string _pattern, std::string action_type, std::string value)
+{
+	if (action_type == "root")
+	{
+		this->pattern = _pattern;
+		this->root = value;
+	}
+	else
+		throw 42;
+}
 
 /*
 ** This exception should be thrown where a config omits a required
