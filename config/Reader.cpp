@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 12:10:45 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 15:27:04 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,19 @@ void trimWhitespace(std::string &s)
 	{
 		s.erase(it);
 		it--;
+	}
+}
+
+/*
+** Erases all the whitespace characters in the beginning of a string
+** @param s The input string
+*/
+void trimWhitespaceStart(std::string &s)
+{
+	std::string::iterator it = s.begin();
+	while (isspace(*it))
+	{
+		s.erase(it);
 	}
 }
 
@@ -69,43 +82,15 @@ std::string getDirective(size_t needle, std::string line)
 	return line.substr(needle, line.find(";", needle)-needle);
 }
 
-// Legacy
-// Находим конец 
-// TODO: вернуть указатель на конец блока, чтобы можно было что-нибудь дописать
-// после конца контекста
-bool blockEnded(char *line, std::stack<char> &foundBrackets)
-{
-	std::string l(line);
-	for (int i = 0; i < l.size(); i++)
-	{
-		if (l[i] == '{')
-		{
-			foundBrackets.push('{');
-		}
-		else if (l[i] == '}')
-		{
-			if (foundBrackets.top() == '{')
-			{
-				foundBrackets.pop();
-				if (foundBrackets.empty())
-				{
-					return true;
-				}
-			}
-		}
-	}
-	return false;
-}
-
 /*
-** Parse a pattern from a line that starts a location.
+** Parse a pattern from the first line of a location block.
 ** From this line:
 **
 ** location /app { ... }
 **
-** It will return "/app".
-** @param line The line containing the pattern
-** @ret std::string The pattern
+** The function will return "/app".
+** @param line The line containing the pattern.
+** @ret std::string The pattern.
 */
 std::string parse_pattern(std::string line)
 {
@@ -118,12 +103,10 @@ std::string parse_pattern(std::string line)
 }
 
 /*
-** Read the pattern and the directives from the location block into the
-** locationPrototype.
+** Parse a single location line, filling the locationPrototype member.
 */
 void Reader::parse_location_line()
 {
-	std::string lineString(line);
 	size_t needle;
 
 	if ((needle = lineString.find("root")) != std::string::npos)
@@ -138,12 +121,11 @@ void Reader::parse_location_line()
 
 /*
 ** Get next lines until the end of the location context, and parse
-** the location context into the locationPrototype. Once the block ends,
+** the location context into locationPrototype. Once the block ends,
 ** create Location and add it to the configPrototype's locations vector.
 */
 void Reader::parse_location()
 {
-	std::string lineString;
 	do
 	{
 		lineString.assign(line);
@@ -157,7 +139,34 @@ void Reader::parse_location()
 	cp.locations.push_back(Location(lp.pattern, "root", lp.root));
 }
 
-// Забираем информацию из строк
+// TODO: rewrite atoi
+/*
+** Parse the listen directive into the configPrototype member.
+** @param needle The position where the directive starts (the index of 'l').
+*/
+void Reader::parse_listen(size_t needle)
+{
+	size_t valueStart = needle + 7;
+	size_t hostEnd;
+	if ((hostEnd = lineString.find(":")) != std::string::npos)
+	{
+		cp.listenHost = lineString.substr(valueStart, hostEnd - valueStart);
+		trimWhitespaceStart(cp.listenHost);
+		size_t valueEnd = lineString.find(";", hostEnd);
+		cp.listenIp = std::atoi(
+			lineString.substr(hostEnd+1, valueEnd - hostEnd).c_str());
+	}
+	else
+	{
+		cp.listenHost = "";
+		cp.listenIp = std::atoi(getDirective(valueStart, lineString).c_str());
+	}
+}
+
+/*
+** Parse a single line in the server context, filling the configPrototype
+** member.
+*/
 void Reader::parse_server_line()
 {
 	std::string lineString(line);
@@ -165,7 +174,7 @@ void Reader::parse_server_line()
 
 	if ((needle = lineString.find("listen")) != std::string::npos)
 	{
-		cp.listenIp = std::atoi(getDirective(needle+7, lineString).c_str());
+		parse_listen(needle);
 	}
 	else if ((needle = lineString.find("server_name")) != std::string::npos)
 	{
@@ -175,46 +184,49 @@ void Reader::parse_server_line()
 }
 
 /*
-** Parse a server context.
-** This function passes all the lines that are inside the server context
-** to the parse_server_line function, and checks if the block has ended.
-** If the block has ended, it adds the parsed server block to the 
-** configVector and returns.
+** Reset the configPrototype member into its default state.
+*/
+void Reader::resetConfigPrototype()
+{
+	cp.listenIp = -1;
+	cp.listenHost = "";
+	cp.locations.clear();
+	cp.serverName.clear();
+}
+
+/*
+** Parse a server context, passing lines to parse_server_line until
+** the context ends, then create the Config object and add it to
+** configVector member.
 */
 void Reader::parse_server()
 {
-	std::stack<char> foundBrackets;
-	std::string ls;
-	if (!cp.locations.empty())
-		cp.locations.clear();
+	resetConfigPrototype();
+
 	do
 	{
-		ls.assign(line);
-		if (ls.find("}") != std::string::npos)
+		lineString.assign(line);
+		if (lineString.find("}") != std::string::npos)
 		{
 			break;
 		}
-		if (ls.find("location") != std::string::npos)
+		if (lineString.find("location") != std::string::npos)
 			parse_location();
 		else
 			parse_server_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
 	// TODO: check cp
-	configVector.push_back(Config(cp.listenIp, cp.serverName, cp.locations));
+	configVector.push_back(Config(cp.listenIp, cp.listenHost, cp.serverName, cp.locations));
 }
 
 /*
-** Parse the config.
-** This function tries to find a server context. If it succeeds, it passes
-** execution to the parse_server function.
+** Parse the file, reading server blocks into Config objects in configVector
+** member.
 */
 void Reader::parse()
 {
-	std::string l;
-
-	l.assign(line);
-	if (l.find("server") != std::string::npos)
+	if (lineString.find("server") != std::string::npos)
 	{
 		this->parse_server();
 	}
@@ -223,7 +235,7 @@ void Reader::parse()
 
 /*
 ** Create a Reader object for a given file.
-** @param filename The filename of the file has to be parsed
+** @param filename Filename of the file to parse.
 */
 Reader::Reader(std::string filename)
 {
@@ -232,13 +244,14 @@ Reader::Reader(std::string filename)
 
 	while ((ret = get_next_line(fd, &line)))
 	{
+		lineString.assign(line);
 		parse();
 	}
 }
 
 
 /*
-** A getter for the configVector attribute
+** Getter for the configVector attribute.
 ** @ret std::vector<Config> The vector of parsed Configs
 */
 std::vector<Config> Reader::getConfigVector(void) const

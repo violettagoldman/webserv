@@ -6,17 +6,18 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:43 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 11:34:27 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/16 14:18:36 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
 
-Config::Config(int _listenIp, std::vector<std::string> _serverName,
+Config::Config(int _listenIp, std::string _listenHost, std::vector<std::string> _serverName,
 				std::vector<Location> _locations)
 {
 	listenIp = _listenIp;
+	listenHost = _listenHost;
 	serverName = _serverName;
 	locations = _locations;
 }
@@ -28,6 +29,11 @@ Config::~Config()
 int Config::getListenIp(void) const
 {
 	return this->listenIp;
+}
+
+std::string Config::getListenHost(void) const
+{
+	return this->listenHost;
 }
 
 std::vector<std::string> Config::getServerName(void) const
