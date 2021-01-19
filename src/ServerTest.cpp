@@ -80,7 +80,7 @@ int main(void)
 				}
 				else
 				{
-					std::cout << "Open sd\n";
+					// std::cout << "Request method is " << request.getMethod() << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;
 				//

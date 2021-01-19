@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/14 20:32:50 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/18 12:46:24 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,14 +83,76 @@ int Request::isMethod(std::string check)
 	return -1;
 }
 
+void uri_handler(std::string str)
+{
+	std::string scheme;
+	std::string authority;
+	std::string path;
+	std::string query;
+	std::string fragment;
+	std::size_t fragment_pos;
+	std::size_t query_pos;
+
+	if ((fragment_pos = str.find("#")) != std::string::npos)
+	{
+		fragment = str.substr(fragment_pos + 1);
+		str.erase(fragment_pos);
+	}
+	if ((query_pos = str.find("?")) != std::string::npos)
+	{
+		query = str.substr(query_pos + 1);
+		str.erase(query_pos);
+	}
+	std::cout << fragment << std::endl;
+	std::cout << query;
+}
+
+int Request::startLineReader(std::string line)
+{
+	std::vector<std::string> elements;
+
+	if (line.find("  ") != std::string::npos)
+		return 400;
+	elements = split(line);
+	if (elements.size() != 3 || elements[2] != "HTTP/1.1")
+		return 404;
+
+	if (isMethod(elements[0]) == -1)
+		return 501;
+	_method = elements[0];
+	uri_handler(elements[1]);
+	return 0;
+}
+
+std::string Request::getMethod(void)
+{
+	return _method;
+}
+#include <sys/socket.h>
 int Request::read_request(int sd)
 {
 	char *line;
-	int ret;
+	char headers[1000001];
+	int ret = 0;
+	int bytes;
+	if ((ret = get_next_line(sd, &line)) == 0)
+		return 0;
+	// std::string toRead(line);
 
-	ret = get_next_line(sd, &line);
-	// std::cout << line;
-	std::string toRead(line);
-	std::cout << "From gnl" << toRead;
-	return ret;
+	// _error = startLineReader(line);
+	bytes = recv(sd, headers, 100000000, 0);
+	std::cout << bytes << "bytes\n";
+	if (bytes == 0)
+		return 0;
+
+	std::cout << headers << "headers\n";
+	// std::string buf_ = std::string(headers, bytes);
+	// std::cout << buf_ << std::endl;
+	// while ((ret = get_next_line(sd, &line)))
+	// {
+	// 	std::cout << line;
+	// }
+	// std::cout << "From gnl" << toRead;
+
+	return bytes;
 }
