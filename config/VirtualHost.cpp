@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.cpp                                         :+:      :+:    :+:   */
+/*   VirtualHost.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:43 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:33:29 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 18:01:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#include "VirtualHost.hpp"
 
 
-Config::Config(int _listenIp, std::string _listenHost,
+VirtualHost::VirtualHost(int _listenIp, std::string _listenHost,
 				std::vector<std::string> _serverName,
 				std::vector<Location> _locations,
 				int _clientMaxBodySize, bool _autoindex)
@@ -26,7 +26,7 @@ Config::Config(int _listenIp, std::string _listenHost,
 	autoindex = _autoindex;
 }
 
-Config::Config(configPrototype cp)
+VirtualHost::VirtualHost(virtualHostPrototype cp)
 {
 	listenIp = cp.listenIp;
 	listenHost = cp.listenHost;
@@ -36,46 +36,46 @@ Config::Config(configPrototype cp)
 	autoindex = cp.autoindex;
 }
 
-Config::~Config()
+VirtualHost::~VirtualHost()
 {
 }
 
-int Config::getListenIp(void) const
+int VirtualHost::getListenIp(void) const
 {
 	return this->listenIp;
 }
 
-std::string Config::getListenHost(void) const
+std::string VirtualHost::getListenHost(void) const
 {
 	return this->listenHost;
 }
 
-std::vector<std::string> Config::getServerName(void) const
+std::vector<std::string> VirtualHost::getServerName(void) const
 {
 	return this->serverName;
 }
 
-std::vector<Location> Config::getLocations(void) const
+std::vector<Location> VirtualHost::getLocations(void) const
 {
 	return this->locations;
 }
 
-int Config::getClientMaxBodySize(void) const
+int VirtualHost::getClientMaxBodySize(void) const
 {
 	return this->clientMaxBodySize;
 }
 
-bool Config::getAutoindex(void) const
+bool VirtualHost::getAutoindex(void) const
 {
 	return this->autoindex;
 }
 
-// Config::Config(const Config &copy)
+// VirtualHost::VirtualHost(const VirtualHost &copy)
 // {
 	
 // }
 
-// Config::Config &operator= (const Config &operand)
+// VirtualHost::VirtualHost &operator= (const VirtualHost &operand)
 // {
 	
 // }

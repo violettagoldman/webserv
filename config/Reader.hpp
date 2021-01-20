@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:44:11 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 18:02:04 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 # include <cstdlib>
 
 # include "get_next_line/get_next_line.hpp"
-# include "Config.hpp"
+# include "VirtualHost.hpp"
 # include "Location.hpp"
 
 
@@ -44,7 +44,7 @@ public:
 	//~Reader();
 	//Reader(const Reader &copy);
 	//Reader &operator= (const Reader &operand);
-	std::vector<Config> getConfigVector(void) const;
+	std::vector<VirtualHost> getVirtualHostVector(void) const;
 
 private:
 	int fd;
@@ -53,9 +53,9 @@ private:
 
 	std::string lineString;
 
-	std::vector<Config> configVector;
+	std::vector<VirtualHost> virtualHostVector;
 
-	configPrototype cp;
+	virtualHostPrototype cp;
 	locationPrototype lp;
 	
 	void parse();
@@ -64,7 +64,7 @@ private:
 	void parse_location();
 	void parse_location_line();
 	void parse_listen(size_t needle);
-	void resetConfigPrototype();
+	void resetVirtualHostPrototype();
 	void resetLocationPrototype();
 
 };

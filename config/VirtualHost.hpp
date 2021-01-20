@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.hpp                                         :+:      :+:    :+:   */
+/*   VirtualHost.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:53:02 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 18:01:51 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_HPP
-# define CONFIG_HPP
+#ifndef VIRTUALHOST_HPP
+# define VIRTUALHOST_HPP
 
 # include <vector>
 # include <string>
@@ -21,7 +21,7 @@
 
 # include "Location.hpp"
 
-// Global configuration object
+// Global VirtualHost object
 
 // TODO: http context
 // TODO: limit client body size in http context
@@ -31,7 +31,7 @@
 // TODO: default file (index)
 // TODO: cgi
 
-typedef struct sConfigPrototype
+typedef struct sVirtualHostPrototype
 {
 	int listenIp;
 	std::string listenHost;
@@ -39,20 +39,20 @@ typedef struct sConfigPrototype
 	std::vector<Location> locations;
 	int clientMaxBodySize;
 	bool autoindex;
-}	configPrototype;
+}	virtualHostPrototype;
 
-class Config {
+class VirtualHost {
 
 public:
-	Config(int listenIp, std::string listenHost, std::vector<std::string> serverName,
+	VirtualHost(int listenIp, std::string listenHost, std::vector<std::string> serverName,
 		std::vector<Location> locations, int clientMaxBodySize, bool autoindex);
-	Config(configPrototype cp);
-	// Config(std::vector<std::string> configBlock);
-	// Config();
-	~Config();
+	VirtualHost(virtualHostPrototype cp);
+	// VirtualHost(std::vector<std::string> VirtualHostBlock);
+	// VirtualHost();
+	~VirtualHost();
 	// Пока сойдут implicit-версии
-	// Config(const Config &copy);
-	// Config &operator= (const Config &operand);
+	// VirtualHost(const VirtualHost &copy);
+	// VirtualHost &operator= (const VirtualHost &operand);
 	int getListenIp(void) const;
 	std::string getListenHost(void) const;
 	std::vector<std::string> getServerName(void) const;

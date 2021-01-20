@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:52:50 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 18:02:29 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void Reader::resetLocationPrototype()
 /*
 ** Get next lines until the end of the location context, and parse
 ** the location context into locationPrototype. Once the block ends,
-** create Location and add it to the configPrototype's locations vector.
+** create Location and add it to the virtualHostPrototype's locations vector.
 */
 void Reader::parse_location()
 {
@@ -171,7 +171,7 @@ void Reader::parse_location()
 
 // TODO: rewrite atoi
 /*
-** Parse the listen directive into the configPrototype member.
+** Parse the listen directive into the virtualHostPrototype member.
 ** @param needle The position where the directive starts (the index of 'l').
 */
 void Reader::parse_listen(size_t needle)
@@ -194,7 +194,7 @@ void Reader::parse_listen(size_t needle)
 }
 
 /*
-** Parse a single line in the server context, filling the configPrototype
+** Parse a single line in the server context, filling the virtualHostPrototype
 ** member.
 */
 void Reader::parse_server_line()
@@ -224,9 +224,9 @@ void Reader::parse_server_line()
 }
 
 /*
-** Reset the configPrototype member into its default state.
+** Reset the virtualHostPrototype member into its default state.
 */
-void Reader::resetConfigPrototype()
+void Reader::resetVirtualHostPrototype()
 {
 	cp.listenIp = -1;
 	cp.listenHost = "";
@@ -238,12 +238,12 @@ void Reader::resetConfigPrototype()
 
 /*
 ** Parse a server context, passing lines to parse_server_line until
-** the context ends, then create the Config object and add it to
-** configVector member.
+** the context ends, then create the virtualHost object and add it to
+** virtualHostVector member.
 */
 void Reader::parse_server()
 {
-	resetConfigPrototype();
+	resetVirtualHostPrototype();
 
 	do
 	{
@@ -259,11 +259,11 @@ void Reader::parse_server()
 	}
 	while ((ret = get_next_line(fd, &line)));
 	// TODO: check cp
-	configVector.push_back(Config(cp));
+	virtualHostVector.push_back(VirtualHost(cp));
 }
 
 /*
-** Parse the file, reading server blocks into Config objects in configVector
+** Parse the file, reading server blocks into virtualHost objects in virtualHostVector
 ** member.
 */
 void Reader::parse()
@@ -293,10 +293,10 @@ Reader::Reader(std::string filename)
 
 
 /*
-** Getter for the configVector attribute.
-** @ret std::vector<Config> The vector of parsed Configs
+** Getter for the virtualHostVector attribute.
+** @ret std::vector<virtualHost> The vector of parsed virtualHosts
 */
-std::vector<Config> Reader::getConfigVector(void) const
+std::vector<VirtualHost> Reader::getVirtualHostVector(void) const
 {
-	return configVector;
+	return virtualHostVector;
 }
