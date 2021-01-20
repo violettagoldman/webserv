@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 18:02:29 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:28:31 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ std::string parse_pattern(std::string line)
 
 bool parseBoolDirective(std::string directive)
 {
-	std::cout << "directive: |" << directive << "|" << std::endl;
 	if (directive == "on")
 		return true;
 	else
@@ -144,8 +143,8 @@ void Reader::resetLocationPrototype()
 {
 	lp.pattern = "";
 	lp.root = "";
-	lp.clientMaxBodySize = cp.clientMaxBodySize;
-	lp.autoindex = cp.autoindex;
+	lp.clientMaxBodySize = vhp.clientMaxBodySize;
+	lp.autoindex = vhp.autoindex;
 }
 
 /*
@@ -166,7 +165,7 @@ void Reader::parse_location()
 		parse_location_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
-	cp.locations.push_back(Location(lp));
+	vhp.locations.push_back(Location(lp));
 }
 
 // TODO: rewrite atoi
@@ -180,16 +179,16 @@ void Reader::parse_listen(size_t needle)
 	size_t hostEnd;
 	if ((hostEnd = lineString.find(":")) != std::string::npos)
 	{
-		cp.listenHost = lineString.substr(valueStart, hostEnd - valueStart);
-		trimWhitespaceStart(cp.listenHost);
+		vhp.listenHost = lineString.substr(valueStart, hostEnd - valueStart);
+		trimWhitespaceStart(vhp.listenHost);
 		size_t valueEnd = lineString.find(";", hostEnd);
-		cp.listenIp = std::atoi(
+		vhp.listenIp = std::atoi(
 			lineString.substr(hostEnd+1, valueEnd - hostEnd).c_str());
 	}
 	else
 	{
-		cp.listenHost = "";
-		cp.listenIp = std::atoi(getDirective(valueStart, lineString).c_str());
+		vhp.listenHost = "";
+		vhp.listenIp = std::atoi(getDirective(valueStart, lineString).c_str());
 	}
 }
 
@@ -208,18 +207,18 @@ void Reader::parse_server_line()
 	}
 	else if ((needle = lineString.find("server_name")) != std::string::npos)
 	{
-		cp.serverName = split(getDirective(
+		vhp.serverName = split(getDirective(
 			needle+12, lineString), ' ');
 	}
 	else if ((needle = lineString.find(
 				"client_max_body_size")) != std::string::npos)
 	{
-		cp.clientMaxBodySize = std::atoi(
+		vhp.clientMaxBodySize = std::atoi(
 			getDirective(needle+20, lineString).c_str());
 	}
 	else if ((needle = lineString.find("autoindex")) != std::string::npos)
 	{
-		cp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
+		vhp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
 	}
 }
 
@@ -228,12 +227,12 @@ void Reader::parse_server_line()
 */
 void Reader::resetVirtualHostPrototype()
 {
-	cp.listenIp = -1;
-	cp.listenHost = "";
-	cp.locations.clear();
-	cp.serverName.clear();
-	cp.clientMaxBodySize = 0;
-	cp.autoindex = false;
+	vhp.listenIp = -1;
+	vhp.listenHost = "";
+	vhp.locations.clear();
+	vhp.serverName.clear();
+	vhp.clientMaxBodySize = 0;
+	vhp.autoindex = false;
 }
 
 /*
@@ -258,8 +257,8 @@ void Reader::parse_server()
 			parse_server_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
-	// TODO: check cp
-	virtualHostVector.push_back(VirtualHost(cp));
+	// TODO: check vhp
+	cp.virtualHostVector.push_back(VirtualHost(vhp));
 }
 
 /*
@@ -268,9 +267,20 @@ void Reader::parse_server()
 */
 void Reader::parse()
 {
+	size_t needle;
 	if (lineString.find("server") != std::string::npos)
 	{
 		this->parse_server();
+	}
+	else if ((needle = lineString.find(
+				"client_max_body_size")) != std::string::npos)
+	{
+		cp.clientMaxBodySize = std::atoi(
+			getDirective(needle+20, lineString).c_str());
+	}
+	else if ((needle = lineString.find("autoindex")) != std::string::npos)
+	{
+		vhp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
 	}
 }
 
@@ -291,12 +301,7 @@ Reader::Reader(std::string filename)
 	}
 }
 
-
-/*
-** Getter for the virtualHostVector attribute.
-** @ret std::vector<virtualHost> The vector of parsed virtualHosts
-*/
-std::vector<VirtualHost> Reader::getVirtualHostVector(void) const
+Config *Reader::createConfig()
 {
-	return virtualHostVector;
+	return new Config(cp);
 }

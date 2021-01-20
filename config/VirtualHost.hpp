@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 18:01:51 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 18:49:18 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 // TODO: http methods for route
 // TODO: default file (index)
 // TODO: cgi
+// TODO: client body size units
 
 typedef struct sVirtualHostPrototype
 {

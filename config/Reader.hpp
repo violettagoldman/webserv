@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 18:02:04 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:25:30 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # include "get_next_line/get_next_line.hpp"
 # include "VirtualHost.hpp"
 # include "Location.hpp"
+# include "Config.hpp"
 
 
 std::vector<std::string> split(std::string s, char c);
@@ -44,7 +45,7 @@ public:
 	//~Reader();
 	//Reader(const Reader &copy);
 	//Reader &operator= (const Reader &operand);
-	std::vector<VirtualHost> getVirtualHostVector(void) const;
+	Config *createConfig();
 
 private:
 	int fd;
@@ -53,10 +54,9 @@ private:
 
 	std::string lineString;
 
-	std::vector<VirtualHost> virtualHostVector;
-
-	virtualHostPrototype cp;
+	virtualHostPrototype vhp;
 	locationPrototype lp;
+	configPrototype cp;
 	
 	void parse();
 	void parse_server();
@@ -67,6 +67,7 @@ private:
 	void resetVirtualHostPrototype();
 	void resetLocationPrototype();
 
+	
 };
 
 #endif

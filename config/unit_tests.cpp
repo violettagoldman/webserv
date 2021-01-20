@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:50:54 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:27:58 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,76 +61,78 @@ void check(int expression)
 	
 }
 
-#include "Config.hpp"
+#include "VirtualHost.hpp"
 #include "Reader.hpp"
 
 int main(void)
 {
-	// out("Config | Default config");
-	// Config default_config;
+	// out("virtualHost | Default virtualHost");
+	// virtualHost default_virtualHost;
 	Reader r("nginx.conf");
 
-	std::vector<Config> configVector = r.getConfigVector();
-	check(configVector.size() == 3);
+	Config *conf = r.createConfig();
 
-	check(configVector[0].getListenIp() == 80);
-	check(configVector[0].getListenHost() == "");
-	check(configVector[0].getServerName().size() == 2);
-	check(configVector[0].getServerName()[0] == "domain1.com");
-	check(configVector[0].getServerName()[1] == "www.domain1.com");
-	check(configVector[0].getAutoindex() == false);
+	std::vector<VirtualHost> virtualHostVector = conf->getVirtualHostVector();
+	check(virtualHostVector.size() == 3);
 
-	check(configVector[0].getLocations().size() == 1);
+	check(virtualHostVector[0].getListenIp() == 80);
+	check(virtualHostVector[0].getListenHost() == "");
+	check(virtualHostVector[0].getServerName().size() == 2);
+	check(virtualHostVector[0].getServerName()[0] == "domain1.com");
+	check(virtualHostVector[0].getServerName()[1] == "www.domain1.com");
+	check(virtualHostVector[0].getAutoindex() == false);
 
-	check(configVector[0].getLocations()[0].getPattern() == "/");
-	check(configVector[0].getLocations()[0].getRoot() == "/var/www/");
+	check(virtualHostVector[0].getLocations().size() == 1);
 
-	check(configVector[0].getClientMaxBodySize() == 0);
+	check(virtualHostVector[0].getLocations()[0].getPattern() == "/");
+	check(virtualHostVector[0].getLocations()[0].getRoot() == "/var/www/");
+
+	check(virtualHostVector[0].getClientMaxBodySize() == 0);
 
 
 
-	check(configVector[1].getListenHost() == "127.0.0.1");
-	check(configVector[1].getListenIp() == 443);
-	check(configVector[1].getServerName().size() == 2);
-	check(configVector[1].getServerName()[0] == "domain2.com");
-	check(configVector[1].getServerName()[1] == "www.domain2.com");
-	check(configVector[1].getClientMaxBodySize() == 1024);
-	check(configVector[1].getAutoindex() == true);
+	check(virtualHostVector[1].getListenHost() == "127.0.0.1");
+	check(virtualHostVector[1].getListenIp() == 443);
+	check(virtualHostVector[1].getServerName().size() == 2);
+	check(virtualHostVector[1].getServerName()[0] == "domain2.com");
+	check(virtualHostVector[1].getServerName()[1] == "www.domain2.com");
+	check(virtualHostVector[1].getClientMaxBodySize() == 1024);
+	check(virtualHostVector[1].getAutoindex() == true);
 
 	
-	check(configVector[1].getLocations().size() == 1);
+	check(virtualHostVector[1].getLocations().size() == 1);
 
-	check(configVector[1].getLocations()[0].getPattern() == "/app/");
-	check(configVector[1].getLocations()[0].getAutoindex() == true);
-	check(configVector[1].getLocations()[0].getClientMaxBodySize() == 1024);
+	check(virtualHostVector[1].getLocations()[0].getPattern() == "/app/");
+	check(virtualHostVector[1].getLocations()[0].getAutoindex() == true);
+	check(virtualHostVector[1].getLocations()[0].getClientMaxBodySize() == 1024);
 
-	check(configVector[1].getLocations()[0].getRoot() == "/var/www/");
+	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 
 
 
-	check(configVector[2].getClientMaxBodySize() == 1024);
-	check(configVector[2].getAutoindex() == false);
-	check(configVector[2].getLocations()[0].getAutoindex() == true);
+	check(virtualHostVector[2].getClientMaxBodySize() == 1024);
+	check(virtualHostVector[2].getAutoindex() == false);
+	check(virtualHostVector[2].getLocations()[0].getAutoindex() == true);
 
-	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), Config::DirectiveNotFound,\
+	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 
 	// TEST_EXCEPTION(Reader r2("missing_root.conf"), Location::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 	
 	// TEST_EXCEPTION(Reader r2("syntaxerror.conf"), Reader::SyntaxError,\
-	// 				"The config file contains a syntax error.");
+	// 				"The virtualHost file contains a syntax error.");
 
 					
 	
 
 
-	// check(default_config.getListenIp() == 80);
-	// check(default_config.getServerName().size() == 1);
-	// check(default_config.getServerName()[0] == "localhost");
-	// check(default_config.getLocations().size() == 1);
-	// check(default_config.getLocations()[0].getPattern() == "/");
-	// check(default_config.getLocations()[0].getRoot() == "/var/www/");
+	// check(default_virtualHost.getListenIp() == 80);
+	// check(default_virtualHost.getServerName().size() == 1);
+	// check(default_virtualHost.getServerName()[0] == "localhost");
+	// check(default_virtualHost.getLocations().size() == 1);
+	// check(default_virtualHost.getLocations()[0].getPattern() == "/");
+	// check(default_virtualHost.getLocations()[0].getRoot() == "/var/www/");
 
 	
 	
