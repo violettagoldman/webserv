@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:43 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 18:01:59 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:46:06 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ VirtualHost::VirtualHost(int _listenIp, std::string _listenHost,
 	locations = _locations;
 	clientMaxBodySize = _clientMaxBodySize;
 	autoindex = _autoindex;
+
 }
 
 VirtualHost::VirtualHost(virtualHostPrototype cp)
@@ -34,6 +35,7 @@ VirtualHost::VirtualHost(virtualHostPrototype cp)
 	locations = cp.locations;
 	clientMaxBodySize = cp.clientMaxBodySize;
 	autoindex = cp.autoindex;
+	index = cp.index;
 }
 
 VirtualHost::~VirtualHost()
@@ -68,6 +70,11 @@ int VirtualHost::getClientMaxBodySize(void) const
 bool VirtualHost::getAutoindex(void) const
 {
 	return this->autoindex;
+}
+
+std::vector<std::string> VirtualHost::getIndex(void) const
+{
+	return this->index;
 }
 
 // VirtualHost::VirtualHost(const VirtualHost &copy)

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:33:57 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:36:36 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ Location::Location(locationPrototype lp)
 	this->root = lp.root;
 	this->clientMaxBodySize = lp.clientMaxBodySize;
 	this->autoindex = lp.autoindex;
+	this->index = lp.index;
 }
 
 Location::~Location()
@@ -65,6 +66,11 @@ int Location::getClientMaxBodySize(void) const
 bool Location::getAutoindex(void) const
 {
 	return this->autoindex;
+}
+
+std::vector<std::string> Location::getIndex(void) const
+{
+	return this->index;
 }
 
 // Location::Location(const Location &copy)

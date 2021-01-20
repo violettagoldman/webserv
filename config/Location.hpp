@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 17:33:41 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:35:13 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct sLocationPrototype
 	std::string root;
 	int clientMaxBodySize;
 	bool autoindex;
+	std::vector<std::string> index;
 }	locationPrototype;
 
 class Location {
@@ -44,12 +45,14 @@ public:
 	std::string getRoot(void) const;
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
+	std::vector<std::string> getIndex(void) const;
 
 private:
 	int clientMaxBodySize;
 	bool autoindex;
 	std::string pattern;
 	std::string root;
+	std::vector<std::string> index;
 
 };
 

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:32:10 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:46:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,11 @@ void Reader::parse_location_line()
 	{
 		lp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
 	}
+	else if ((needle = lineString.find("index")) != std::string::npos)
+	{
+		lp.index = split(getDirective(
+			needle+5, lineString), ' ');
+	}
 }
 
 void Reader::resetLocationPrototype()
@@ -220,6 +225,11 @@ void Reader::parse_server_line()
 	{
 		vhp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
 	}
+	else if ((needle = lineString.find("index")) != std::string::npos)
+	{
+		vhp.index = split(getDirective(
+			needle+5, lineString), ' ');
+	}
 }
 
 /*
@@ -281,6 +291,11 @@ void Reader::parse()
 	else if ((needle = lineString.find("autoindex")) != std::string::npos)
 	{
 		cp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
+	}
+	else if ((needle = lineString.find("index")) != std::string::npos)
+	{
+		cp.index = split(getDirective(
+			needle+5, lineString), ' ');
 	}
 }
 

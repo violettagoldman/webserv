@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/20 18:04:06 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 18:42:03 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:35:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ typedef struct sConfigPrototype
 	std::vector<VirtualHost> virtualHostVector;
 	int clientMaxBodySize;
 	bool autoindex;
+	std::vector<std::string> index;
 }			configPrototype;
 
 class Config {
@@ -32,11 +33,13 @@ public:
 	std::vector<VirtualHost> getVirtualHostVector(void) const;
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
+	std::vector<std::string> getIndex(void) const;
 
 private:
 	std::vector<VirtualHost> virtualHostVector;
 	int clientMaxBodySize;
 	bool autoindex;
+	std::vector<std::string> index;
 };
 
 #endif

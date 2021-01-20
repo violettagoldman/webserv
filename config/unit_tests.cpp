@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:32:30 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:45:42 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,8 @@ int main(void)
 
 	check(conf->getAutoindex() == true);
 	check(conf->getClientMaxBodySize() == 32);
+	check(conf->getIndex().size() == 1);
+	check(conf->getIndex()[0] == "index.html");
 
 	std::vector<VirtualHost> virtualHostVector = conf->getVirtualHostVector();
 	check(virtualHostVector.size() == 3);
@@ -84,6 +86,11 @@ int main(void)
 	check(virtualHostVector[0].getServerName()[0] == "domain1.com");
 	check(virtualHostVector[0].getServerName()[1] == "www.domain1.com");
 	check(virtualHostVector[0].getAutoindex() == true);
+
+	out("Host 0 | Index");
+	check(virtualHostVector[0].getIndex().size() == 2);
+	check(virtualHostVector[0].getIndex()[0] == "index.php");
+	check(virtualHostVector[0].getIndex()[1] == "index2.php");
 
 	check(virtualHostVector[0].getLocations().size() == 1);
 
@@ -102,6 +109,7 @@ int main(void)
 	check(virtualHostVector[1].getClientMaxBodySize() == 1024);
 	check(virtualHostVector[1].getAutoindex() == true);
 
+
 	
 	check(virtualHostVector[1].getLocations().size() == 1);
 
@@ -111,7 +119,9 @@ int main(void)
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 
-
+	out("Host 1 | Location 0 | Index");
+	check(virtualHostVector[1].getLocations()[0].getIndex().size() == 1);
+	check(virtualHostVector[1].getLocations()[0].getIndex()[0] == "index3.html");
 
 	check(virtualHostVector[2].getClientMaxBodySize() == 1024);
 	check(virtualHostVector[2].getAutoindex() == true);
