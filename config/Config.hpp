@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:49:17 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 17:53:02 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,25 @@
 
 
 // TODO: http methods for route
-// TODO: directory listing on/off (autoindex)
 // TODO: default file (index)
 // TODO: cgi
+
+typedef struct sConfigPrototype
+{
+	int listenIp;
+	std::string listenHost;
+	std::vector<std::string> serverName;
+	std::vector<Location> locations;
+	int clientMaxBodySize;
+	bool autoindex;
+}	configPrototype;
 
 class Config {
 
 public:
 	Config(int listenIp, std::string listenHost, std::vector<std::string> serverName,
-		std::vector<Location> locations, int clientMaxBodySize);
+		std::vector<Location> locations, int clientMaxBodySize, bool autoindex);
+	Config(configPrototype cp);
 	// Config(std::vector<std::string> configBlock);
 	// Config();
 	~Config();
@@ -48,6 +58,7 @@ public:
 	std::vector<std::string> getServerName(void) const;
 	std::vector<Location> getLocations(void) const;
 	int getClientMaxBodySize(void) const;
+	bool getAutoindex(void) const;
 
 
 	
@@ -55,6 +66,7 @@ public:
 private:
 	int listenIp;
 	int clientMaxBodySize;
+	bool autoindex;
 	std::string listenHost;
 	std::vector<std::string> serverName;
 	std::vector<Location> locations;

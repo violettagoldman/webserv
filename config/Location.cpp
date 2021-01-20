@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 11:32:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 17:33:57 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,26 @@
 // **		("root" for example). Has to be supported.
 // ** @param value The value for the action ("/var/www" for example)
 // */
-Location::Location(std::string _pattern, std::string action_type, std::string value)
+Location::Location(std::string _pattern, std::string action_type,
+	std::string value, int _clientMaxBodySize, bool _autoindex)
 {
 	if (action_type == "root")
 	{
 		this->pattern = _pattern;
 		this->root = value;
+		this->clientMaxBodySize = _clientMaxBodySize;
+		this->autoindex = _autoindex;
 	}
 	else
 		throw 42;
+}
+
+Location::Location(locationPrototype lp)
+{
+	this->pattern = lp.pattern;
+	this->root = lp.root;
+	this->clientMaxBodySize = lp.clientMaxBodySize;
+	this->autoindex = lp.autoindex;
 }
 
 Location::~Location()
@@ -46,6 +57,15 @@ std::string Location::getRoot(void) const
 	return this->root;
 }
 
+int Location::getClientMaxBodySize(void) const 
+{
+	return this->clientMaxBodySize;
+}
+
+bool Location::getAutoindex(void) const
+{
+	return this->autoindex;
+}
 
 // Location::Location(const Location &copy)
 // {

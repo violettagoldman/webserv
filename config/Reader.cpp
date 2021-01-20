@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:50:45 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 17:52:50 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,17 @@ std::string parse_pattern(std::string line)
 	return pattern;
 }
 
+bool parseBoolDirective(std::string directive)
+{
+	std::cout << "directive: |" << directive << "|" << std::endl;
+	if (directive == "on")
+		return true;
+	else
+		return false;
+	// TODO exception
+
+}
+
 /*
 ** Parse a single location line, filling the locationPrototype member.
 */
@@ -113,16 +124,28 @@ void Reader::parse_location_line()
 	{
 		lp.root = getDirective(needle+4, lineString);
 	}
-	else if ((needle = lineString.find("location")) != std::string::npos)
+	if ((needle = lineString.find("location")) != std::string::npos)
 	{
 		lp.pattern = parse_pattern(lineString);
 	}
-	else if ((needle = lineString.find(
+	if ((needle = lineString.find(
 				"client_max_body_size")) != std::string::npos)
 	{
-		cp.clientMaxBodySize = std::atoi(
+		lp.clientMaxBodySize = std::atoi(
 			getDirective(needle+20, lineString).c_str());
 	}
+	if ((needle = lineString.find("autoindex")) != std::string::npos)
+	{
+		lp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
+	}
+}
+
+void Reader::resetLocationPrototype()
+{
+	lp.pattern = "";
+	lp.root = "";
+	lp.clientMaxBodySize = cp.clientMaxBodySize;
+	lp.autoindex = cp.autoindex;
 }
 
 /*
@@ -132,6 +155,7 @@ void Reader::parse_location_line()
 */
 void Reader::parse_location()
 {
+	resetLocationPrototype();
 	do
 	{
 		lineString.assign(line);
@@ -142,7 +166,7 @@ void Reader::parse_location()
 		parse_location_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
-	cp.locations.push_back(Location(lp.pattern, "root", lp.root));
+	cp.locations.push_back(Location(lp));
 }
 
 // TODO: rewrite atoi
@@ -193,6 +217,10 @@ void Reader::parse_server_line()
 		cp.clientMaxBodySize = std::atoi(
 			getDirective(needle+20, lineString).c_str());
 	}
+	else if ((needle = lineString.find("autoindex")) != std::string::npos)
+	{
+		cp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
+	}
 }
 
 /*
@@ -205,6 +233,7 @@ void Reader::resetConfigPrototype()
 	cp.locations.clear();
 	cp.serverName.clear();
 	cp.clientMaxBodySize = 0;
+	cp.autoindex = false;
 }
 
 /*
@@ -230,9 +259,7 @@ void Reader::parse_server()
 	}
 	while ((ret = get_next_line(fd, &line)));
 	// TODO: check cp
-	configVector.push_back(Config(
-		cp.listenIp, cp.listenHost, cp.serverName, cp.locations,
-		cp.clientMaxBodySize));
+	configVector.push_back(Config(cp));
 }
 
 /*

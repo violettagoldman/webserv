@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/16 15:38:41 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 17:44:11 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,22 +34,6 @@
 
 
 std::vector<std::string> split(std::string s, char c);
-
-typedef struct sConfigPrototype
-{
-	int listenIp;
-	std::string listenHost;
-	std::vector<std::string> serverName;
-	std::vector<Location> locations;
-	int clientMaxBodySize;
-}	configPrototype;
-
-typedef struct sLocationPrototype
-{
-	std::string pattern;
-	std::string root;
-
-}	locationPrototype;
 
 void trimWhitespace(std::string &s);
 
@@ -81,6 +65,7 @@ private:
 	void parse_location_line();
 	void parse_listen(size_t needle);
 	void resetConfigPrototype();
+	void resetLocationPrototype();
 
 };
 
