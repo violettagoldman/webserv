@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:27:58 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:32:30 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,9 @@ int main(void)
 
 	Config *conf = r.createConfig();
 
+	check(conf->getAutoindex() == true);
+	check(conf->getClientMaxBodySize() == 32);
+
 	std::vector<VirtualHost> virtualHostVector = conf->getVirtualHostVector();
 	check(virtualHostVector.size() == 3);
 
@@ -80,14 +83,14 @@ int main(void)
 	check(virtualHostVector[0].getServerName().size() == 2);
 	check(virtualHostVector[0].getServerName()[0] == "domain1.com");
 	check(virtualHostVector[0].getServerName()[1] == "www.domain1.com");
-	check(virtualHostVector[0].getAutoindex() == false);
+	check(virtualHostVector[0].getAutoindex() == true);
 
 	check(virtualHostVector[0].getLocations().size() == 1);
 
 	check(virtualHostVector[0].getLocations()[0].getPattern() == "/");
 	check(virtualHostVector[0].getLocations()[0].getRoot() == "/var/www/");
 
-	check(virtualHostVector[0].getClientMaxBodySize() == 0);
+	check(virtualHostVector[0].getClientMaxBodySize() == 32);
 
 
 
@@ -111,7 +114,7 @@ int main(void)
 
 
 	check(virtualHostVector[2].getClientMaxBodySize() == 1024);
-	check(virtualHostVector[2].getAutoindex() == false);
+	check(virtualHostVector[2].getAutoindex() == true);
 	check(virtualHostVector[2].getLocations()[0].getAutoindex() == true);
 
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\

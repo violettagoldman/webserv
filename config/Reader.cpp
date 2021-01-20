@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:28:31 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/20 19:32:10 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,8 +231,8 @@ void Reader::resetVirtualHostPrototype()
 	vhp.listenHost = "";
 	vhp.locations.clear();
 	vhp.serverName.clear();
-	vhp.clientMaxBodySize = 0;
-	vhp.autoindex = false;
+	vhp.clientMaxBodySize = cp.clientMaxBodySize;
+	vhp.autoindex = cp.autoindex;
 }
 
 /*
@@ -280,7 +280,7 @@ void Reader::parse()
 	}
 	else if ((needle = lineString.find("autoindex")) != std::string::npos)
 	{
-		vhp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
+		cp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
 	}
 }
 
