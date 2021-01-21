@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <map>
+# include "Utility.hpp"
 
 class Response
 {
@@ -14,14 +15,14 @@ class Response
 
 
 		Response	&operator=(Response const &src);
-		std::string serialize() const;
+		std::string serialize();
 
 		
 	private:
-		int									_statusCode;
-		std::map<std::string, std::string>	_headers;
-		std::string							_body;
-		const std::map<int, std::string>	_statusCodeTranslation;
+		int										_statusCode;
+		std::map<std::string, std::string>		_headers;
+		std::string								_body;
+		std::map<int, std::string>		_statusCodeTranslation;
 };
 
 #endif
