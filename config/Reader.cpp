@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:46:59 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/21 22:41:48 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,17 @@ std::string parse_pattern(std::string line)
 	return pattern;
 }
 
+std::string parse_method(std::string line)
+{
+	size_t loc_position = line.find("limit_except");
+	size_t pattern_start = loc_position + 13;
+	size_t pattern_end = line.find("{", pattern_start);
+	std::string pattern = line.substr(pattern_start, pattern_end-pattern_start);
+	trimWhitespace(pattern);
+	return pattern;
+}
+
+
 bool parseBoolDirective(std::string directive)
 {
 	if (directive == "on")
@@ -110,6 +121,51 @@ bool parseBoolDirective(std::string directive)
 		return false;
 	// TODO exception
 
+}
+
+void Reader::resetLimitExceptPrototype()
+{
+	lep.allow.clear();
+	lep.deny.clear();
+	lep.method = "";
+}
+
+void Reader::parse_limit_except_line()
+{
+	size_t needle;
+	std::vector<std::string> appendix;
+
+	if ((needle = lineString.find("limit_except")) != std::string::npos)
+	{
+		lep.method = parse_method(lineString);
+	}
+	if ((needle = lineString.find("allow")) != std::string::npos)
+	{
+		appendix = split(getDirective(needle+5, lineString), ' ');
+		lep.allow.insert(lep.allow.end(), appendix.begin(), appendix.end());
+	}
+	if ((needle = lineString.find("deny")) != std::string::npos)
+	{
+		appendix = split(getDirective(needle+4, lineString), ' ');
+		lep.deny.insert(lep.deny.end(), appendix.begin(), appendix.end());
+	}
+}
+
+
+void Reader::parse_limit_except()
+{
+	resetLimitExceptPrototype();
+	do
+	{
+		lineString.assign(line);
+		if (lineString.find("}") != std::string::npos)
+		{
+			break;
+		}
+		parse_limit_except_line();
+	}
+	while ((ret = get_next_line(fd, &line)));
+	lp.limitExcept = LimitExcept(lep);
 }
 
 /*
@@ -150,6 +206,7 @@ void Reader::resetLocationPrototype()
 	lp.root = "";
 	lp.clientMaxBodySize = vhp.clientMaxBodySize;
 	lp.autoindex = vhp.autoindex;
+	lp.limitExcept = LimitExcept();
 }
 
 /*
@@ -163,11 +220,15 @@ void Reader::parse_location()
 	do
 	{
 		lineString.assign(line);
+		
 		if (lineString.find("}") != std::string::npos)
 		{
 			break;
 		}
-		parse_location_line();
+		if (lineString.find("limit_except") != std::string::npos)
+			parse_limit_except();
+		else
+			parse_location_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
 	vhp.locations.push_back(Location(lp));

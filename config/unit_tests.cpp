@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:45:42 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/21 22:40:51 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,13 @@ int main(void)
 	check(virtualHostVector[1].getLocations()[0].getClientMaxBodySize() == 1024);
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
+	out("Host 1 | Location 0 | limit_except ");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethod() == "GET");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow().size() == 2);
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[0] == "127.0.0.1");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[1] == "127.0.0.2");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny().size() == 1);
+	// check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny()[0] == "all");
 
 	out("Host 1 | Location 0 | Index");
 	check(virtualHostVector[1].getLocations()[0].getIndex().size() == 1);

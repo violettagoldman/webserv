@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:25:30 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/21 18:14:11 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # include "VirtualHost.hpp"
 # include "Location.hpp"
 # include "Config.hpp"
+# include "LimitExcept.hpp"
 
 
 std::vector<std::string> split(std::string s, char c);
@@ -57,6 +58,7 @@ private:
 	virtualHostPrototype vhp;
 	locationPrototype lp;
 	configPrototype cp;
+	limitExceptPrototype lep;
 	
 	void parse();
 	void parse_server();
@@ -66,6 +68,9 @@ private:
 	void parse_listen(size_t needle);
 	void resetVirtualHostPrototype();
 	void resetLocationPrototype();
+	void parse_limit_except();
+	void resetLimitExceptPrototype();
+	void parse_limit_except_line();
 
 	
 };

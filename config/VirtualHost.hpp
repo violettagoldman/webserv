@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:35:31 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/21 22:42:00 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@
 
 // Global VirtualHost object
 
-// TODO: http methods for route
-// TODO: default file (index)
 // TODO: cgi
 // TODO: client body size units
 

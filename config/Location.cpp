@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:36:36 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/21 18:19:57 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,27 +21,28 @@
 // **		("root" for example). Has to be supported.
 // ** @param value The value for the action ("/var/www" for example)
 // */
-Location::Location(std::string _pattern, std::string action_type,
-	std::string value, int _clientMaxBodySize, bool _autoindex)
-{
-	if (action_type == "root")
-	{
-		this->pattern = _pattern;
-		this->root = value;
-		this->clientMaxBodySize = _clientMaxBodySize;
-		this->autoindex = _autoindex;
-	}
-	else
-		throw 42;
-}
+// Location::Location(std::string _pattern, std::string action_type,
+// 	std::string value, int _clientMaxBodySize, bool _autoindex)
+// {
+// 	if (action_type == "root")
+// 	{
+// 		this->pattern = _pattern;
+// 		this->root = value;
+// 		this->clientMaxBodySize = _clientMaxBodySize;
+// 		this->autoindex = _autoindex;
+// 	}
+// 	else
+// 		throw 42;
+// }
 
-Location::Location(locationPrototype lp)
+Location::Location(locationPrototype lp) :
+	pattern(lp.pattern),
+	root(lp.root),
+	clientMaxBodySize(lp.clientMaxBodySize),
+	autoindex(lp.autoindex),
+	index(lp.index),
+	limitExcept(lp.limitExcept)
 {
-	this->pattern = lp.pattern;
-	this->root = lp.root;
-	this->clientMaxBodySize = lp.clientMaxBodySize;
-	this->autoindex = lp.autoindex;
-	this->index = lp.index;
 }
 
 Location::~Location()
@@ -71,6 +72,11 @@ bool Location::getAutoindex(void) const
 std::vector<std::string> Location::getIndex(void) const
 {
 	return this->index;
+}
+
+LimitExcept Location::getLimitExcept(void) const
+{
+	return this->limitExcept;
 }
 
 // Location::Location(const Location &copy)
