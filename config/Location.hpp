@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/21 18:17:23 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:08:53 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <string>
 # include <vector>
+# include <map>
 # include <exception>
 # include "LimitExcept.hpp"
 
@@ -28,6 +29,8 @@ typedef struct sLocationPrototype
 	bool autoindex;
 	std::vector<std::string> index;
 	LimitExcept limitExcept;
+	std::string fcgiPass;
+	std::map<std::string, std::string> fcgiParams;
 }	locationPrototype;
 
 class Location {
@@ -49,6 +52,8 @@ public:
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
 	LimitExcept getLimitExcept(void) const;
+	std::string getFcgiPass(void) const;
+	std::map<std::string, std::string> getFcgiParams(void) const;
 
 private:
 	int clientMaxBodySize;
@@ -57,6 +62,8 @@ private:
 	std::string root;
 	std::vector<std::string> index;
 	LimitExcept limitExcept;
+	std::string fcgiPass;
+	std::map<std::string, std::string> fcgiParams;
 
 
 };

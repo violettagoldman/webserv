@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/21 22:40:51 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:23:40 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,9 @@ int main(void)
 	check(virtualHostVector[2].getAutoindex() == true);
 	check(virtualHostVector[2].getLocations()[0].getAutoindex() == true);
 
+	out("Host 2 | Location 1 | fastcgi_pass");
+	check(virtualHostVector[2].getLocations()[1].getFcgiPass() == "127.0.0.1:9000");
+	check(virtualHostVector[2].getLocations()[1].getFcgiParams()["TEST_PARAM"] == "test_val");
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 

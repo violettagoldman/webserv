@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/21 18:19:57 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:19:16 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,9 @@ Location::Location(locationPrototype lp) :
 	clientMaxBodySize(lp.clientMaxBodySize),
 	autoindex(lp.autoindex),
 	index(lp.index),
-	limitExcept(lp.limitExcept)
+	limitExcept(lp.limitExcept),
+	fcgiPass(lp.fcgiPass),
+	fcgiParams(lp.fcgiParams)
 {
 }
 
@@ -79,6 +81,15 @@ LimitExcept Location::getLimitExcept(void) const
 	return this->limitExcept;
 }
 
+std::string Location::getFcgiPass(void) const
+{
+	return this->fcgiPass;
+}
+
+std::map<std::string, std::string> Location::getFcgiParams(void) const
+{
+	return this->fcgiParams;
+}
 // Location::Location(const Location &copy)
 // {
 	

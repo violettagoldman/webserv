@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/21 22:41:48 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:23:48 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,32 @@ void Reader::parse_limit_except()
 	lp.limitExcept = LimitExcept(lep);
 }
 
+
+// TODO: https://github.com/nginx/nginx/blob/master/conf/fastcgi_params
+void Reader::parseFcgiParam(size_t needle)
+{
+	while(isspace(lineString[needle]))
+	{
+		needle++;
+	}
+	size_t keyStart = needle;
+	while(!isspace(lineString[needle]))
+	{
+		needle++;
+	}
+	size_t keyEnd = needle;
+	while(isspace(lineString[needle]))
+	{
+		needle++;
+	}
+	size_t valueStart = needle;
+	size_t valueEnd = lineString.find(";", valueStart);
+	// TODO: exception
+	std::string key = lineString.substr(keyStart, keyEnd-keyStart);
+	std::string value = lineString.substr(valueStart, valueEnd-valueStart);
+	lp.fcgiParams[key] = value;
+}
+
 /*
 ** Parse a single location line, filling the locationPrototype member.
 */
@@ -193,6 +219,14 @@ void Reader::parse_location_line()
 	{
 		lp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
 	}
+	if ((needle = lineString.find("fastcgi_pass")) != std::string::npos)
+	{
+		lp.fcgiPass = getDirective(needle+12, lineString);
+	}
+	if ((needle = lineString.find("fastcgi_param")) != std::string::npos)
+	{
+		parseFcgiParam(needle+13);
+	}
 	else if ((needle = lineString.find("index")) != std::string::npos)
 	{
 		lp.index = split(getDirective(
@@ -207,6 +241,8 @@ void Reader::resetLocationPrototype()
 	lp.clientMaxBodySize = vhp.clientMaxBodySize;
 	lp.autoindex = vhp.autoindex;
 	lp.limitExcept = LimitExcept();
+	lp.fcgiPass = "";
+	lp.fcgiParams.clear();
 }
 
 /*

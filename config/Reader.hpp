@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/21 18:14:11 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:11:25 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ private:
 	void parse_limit_except();
 	void resetLimitExceptPrototype();
 	void parse_limit_except_line();
+	void parseFcgiParam(size_t needle);
 
 	
 };
