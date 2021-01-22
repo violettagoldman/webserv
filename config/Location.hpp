@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 11:08:53 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 12:35:23 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 # include <string>
 # include <vector>
 # include <map>
-# include <exception>
 # include "LimitExcept.hpp"
 
 std::string read_directive(std::string block, std::string key);

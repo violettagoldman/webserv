@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:20:29 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 12:35:15 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,14 @@
 
 # include <vector>
 # include <string>
-# include <iostream>
-# include <exception>
-# include <ctype.h>
 
 # include "Location.hpp"
 
 // Global VirtualHost object
 
-// TODO: client body size units
 // TODO: atoi
+
+// TODO: exceptions
 
 typedef struct sVirtualHostPrototype
 {

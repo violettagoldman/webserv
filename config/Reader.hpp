@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 11:11:25 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 12:34:28 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,15 @@
 # define READER_HPP
 
 # include <string>
-# include <iostream>
-# include <fstream>
-# include <string>
 # include <vector>
 # include <map>
 
-# include <string>
 # include <fcntl.h>
 # include <sys/types.h>
 # include <sys/uio.h>
 # include <unistd.h>
 # include <iostream>
-# include <cstdlib>
+
 
 # include "get_next_line/get_next_line.hpp"
 # include "VirtualHost.hpp"

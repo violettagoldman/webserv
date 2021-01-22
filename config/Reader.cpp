@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:29:17 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 12:33:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,30 @@ std::vector<std::string> split(std::string s, char c)
 	return ret;
 }
 
+int	ft_atoi(const char *str)
+{
+	int		nbr;
+	int		sign;
+
+	nbr = 0;
+	sign = 1;
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+			|| (*str) == '\r' || (*str) == ' ')
+		str++;
+	if ((*str) == '-' || (*str) == '+')
+	{
+		sign *= ((*str) == '-' ? -1 : 1);
+		str++;
+	}
+	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
+	{
+		nbr *= 10;
+		nbr += (*str) - '0';
+		str++;
+	}
+	return (nbr * sign);
+}
+
 /*
 ** Get the value of a directive from the line.
 ** From this string:
@@ -86,7 +110,7 @@ std::string getDirective(size_t needle, std::string line)
 int parse_size(size_t needle, std::string lineString)
 {
 	std::string value = getDirective(needle, lineString);
-	int raw_value = std::atoi(value.c_str());
+	int raw_value = ft_atoi(value.c_str());
 	size_t semicolon = lineString.find(";", needle);
 	if (lineString[semicolon-1] == 'm' || lineString[semicolon-1] == 'M')
 	{
@@ -98,7 +122,6 @@ int parse_size(size_t needle, std::string lineString)
 	}
 	return raw_value;
 }
-
 
 /*
 ** Parse a pattern from the first line of a location block.
@@ -301,13 +324,13 @@ void Reader::parse_listen(size_t needle)
 		vhp.listenHost = lineString.substr(valueStart, hostEnd - valueStart);
 		trimWhitespaceStart(vhp.listenHost);
 		size_t valueEnd = lineString.find(";", hostEnd);
-		vhp.listenIp = std::atoi(
+		vhp.listenIp = ft_atoi(
 			lineString.substr(hostEnd+1, valueEnd - hostEnd).c_str());
 	}
 	else
 	{
 		vhp.listenHost = "";
-		vhp.listenIp = std::atoi(getDirective(valueStart, lineString).c_str());
+		vhp.listenIp = ft_atoi(getDirective(valueStart, lineString).c_str());
 	}
 }
 
