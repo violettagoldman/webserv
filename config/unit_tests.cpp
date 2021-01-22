@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 11:23:40 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 12:28:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int main(void)
 	check(virtualHostVector[1].getServerName().size() == 2);
 	check(virtualHostVector[1].getServerName()[0] == "domain2.com");
 	check(virtualHostVector[1].getServerName()[1] == "www.domain2.com");
-	check(virtualHostVector[1].getClientMaxBodySize() == 1024);
+	check(virtualHostVector[1].getClientMaxBodySize() == 1000);
 	check(virtualHostVector[1].getAutoindex() == true);
 
 
@@ -115,7 +115,7 @@ int main(void)
 
 	check(virtualHostVector[1].getLocations()[0].getPattern() == "/app/");
 	check(virtualHostVector[1].getLocations()[0].getAutoindex() == true);
-	check(virtualHostVector[1].getLocations()[0].getClientMaxBodySize() == 1024);
+	check(virtualHostVector[1].getLocations()[0].getClientMaxBodySize() == 1000);
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 	out("Host 1 | Location 0 | limit_except ");

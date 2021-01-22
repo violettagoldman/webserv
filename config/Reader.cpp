@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 11:23:48 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 12:29:17 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,24 @@ std::string getDirective(size_t needle, std::string line)
 	// TODO: exception if no ;
 	return line.substr(needle, line.find(";", needle)-needle);
 }
+
+// TODO: check overflow
+int parse_size(size_t needle, std::string lineString)
+{
+	std::string value = getDirective(needle, lineString);
+	int raw_value = std::atoi(value.c_str());
+	size_t semicolon = lineString.find(";", needle);
+	if (lineString[semicolon-1] == 'm' || lineString[semicolon-1] == 'M')
+	{
+		raw_value *= 1000000;
+	}
+	else if (lineString[semicolon-1] == 'k' || lineString[semicolon-1] == 'k')
+	{
+		raw_value *= 1000;
+	}
+	return raw_value;
+}
+
 
 /*
 ** Parse a pattern from the first line of a location block.
@@ -212,8 +230,7 @@ void Reader::parse_location_line()
 	if ((needle = lineString.find(
 				"client_max_body_size")) != std::string::npos)
 	{
-		lp.clientMaxBodySize = std::atoi(
-			getDirective(needle+20, lineString).c_str());
+		lp.clientMaxBodySize = parse_size(needle+20, lineString);
 	}
 	if ((needle = lineString.find("autoindex")) != std::string::npos)
 	{
@@ -315,8 +332,7 @@ void Reader::parse_server_line()
 	else if ((needle = lineString.find(
 				"client_max_body_size")) != std::string::npos)
 	{
-		vhp.clientMaxBodySize = std::atoi(
-			getDirective(needle+20, lineString).c_str());
+		vhp.clientMaxBodySize = parse_size(needle+20, lineString);
 	}
 	else if ((needle = lineString.find("autoindex")) != std::string::npos)
 	{
@@ -369,8 +385,8 @@ void Reader::parse_server()
 }
 
 /*
-** Parse the file, reading server blocks into virtualHost objects in virtualHostVector
-** member.
+** Parse the file, reading server blocks into virtualHost objects in
+** virtualHostVector member.
 */
 void Reader::parse()
 {
@@ -382,8 +398,7 @@ void Reader::parse()
 	else if ((needle = lineString.find(
 				"client_max_body_size")) != std::string::npos)
 	{
-		cp.clientMaxBodySize = std::atoi(
-			getDirective(needle+20, lineString).c_str());
+		cp.clientMaxBodySize = parse_size(needle+20, lineString);
 	}
 	else if ((needle = lineString.find("autoindex")) != std::string::npos)
 	{
