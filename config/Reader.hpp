@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:34:28 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/23 20:57:54 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <sys/uio.h>
 # include <unistd.h>
 # include <iostream>
+# include <algorithm>
 
 
 # include "get_next_line/get_next_line.hpp"
@@ -29,6 +30,7 @@
 # include "Location.hpp"
 # include "Config.hpp"
 # include "LimitExcept.hpp"
+# include "Exception.hpp"
 
 
 std::vector<std::string> split(std::string s, char c);
@@ -55,6 +57,7 @@ private:
 	locationPrototype lp;
 	configPrototype cp;
 	limitExceptPrototype lep;
+	std::string lastLineParsed;
 	
 	void parse();
 	void parse_server();
@@ -68,6 +71,7 @@ private:
 	void resetLimitExceptPrototype();
 	void parse_limit_except_line();
 	void parseFcgiParam(size_t needle);
+	void assignLineString();
 
 	
 };

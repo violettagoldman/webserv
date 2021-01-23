@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:28:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/23 21:39:02 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void check(int expression);
 	{ \
 		exception_thrown = true; \
 		check((!strcmp(e.what(), exceptionString))); \
+		std::cout << e.what() << std::endl;\
 	} \
 	check(exception_thrown == true); \
 }
@@ -68,7 +69,7 @@ int main(void)
 {
 	// out("virtualHost | Default virtualHost");
 	// virtualHost default_virtualHost;
-	Reader r("nginx.conf");
+	Reader r("test_configs/nginx.conf");
 
 	Config *conf = r.createConfig();
 
@@ -80,6 +81,7 @@ int main(void)
 	std::vector<VirtualHost> virtualHostVector = conf->getVirtualHostVector();
 	check(virtualHostVector.size() == 3);
 
+	out("Host 0 | Listen");
 	check(virtualHostVector[0].getListenIp() == 80);
 	check(virtualHostVector[0].getListenHost() == "");
 	check(virtualHostVector[0].getServerName().size() == 2);
@@ -134,9 +136,36 @@ int main(void)
 	check(virtualHostVector[2].getAutoindex() == true);
 	check(virtualHostVector[2].getLocations()[0].getAutoindex() == true);
 
+	out("Host 2 | Location 0 | getClientMaxBodySize in megabytes");
+	check(virtualHostVector[2].getLocations()[0].getClientMaxBodySize() == 42000000);
+	
 	out("Host 2 | Location 1 | fastcgi_pass");
 	check(virtualHostVector[2].getLocations()[1].getFcgiPass() == "127.0.0.1:9000");
 	check(virtualHostVector[2].getLocations()[1].getFcgiParams()["TEST_PARAM"] == "test_val");
+
+	out("Host 2 | Location 1 | autoindex off");
+	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
+
+	out("Exception | Missing semicolon");
+	TEST_EXCEPTION(Reader r2("test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
+
+	out("Exception | Block not closed");
+	TEST_EXCEPTION(Reader r2("test_configs/block_not_closed.conf"), Exception, "A block wasn't closed");
+
+	out("Exception | Two braces on one line");
+	TEST_EXCEPTION(Reader r2("test_configs/two_braces_on_line.conf"), Exception, "Please close each block on a new line.");
+
+	out("Exception | Two directives");
+	TEST_EXCEPTION(Reader r2("test_configs/two_directives_on_one_line.conf"), Exception, "Please only put one directive per line.");
+
+	out("Exception | Two directives (text after semicolon)");
+	TEST_EXCEPTION(Reader r2("test_configs/text_after_semicolon.conf"), Exception, "Please only put one directive per line.");
+
+	out("Exception | limit_except not closed");
+	TEST_EXCEPTION(Reader r2("test_configs/limit_except_not_closed.conf"), Exception, "A block wasn't closed");
+
+	out("Exception | location not closed");
+	TEST_EXCEPTION(Reader r2("test_configs/location_not_closed.conf"), Exception, "A block wasn't closed");
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 

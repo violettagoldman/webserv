@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:33:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/23 21:37:53 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,26 @@ std::string getDirective(size_t needle, std::string line)
 	{
 		needle++;
 	}
-	// TODO: exception if no ;
-	return line.substr(needle, line.find(";", needle)-needle);
+	size_t semicolon = line.find(";", needle);
+	if (semicolon == std::string::npos)
+		throw Exception("A semicolon is missing");
+	return line.substr(needle, semicolon-needle);
+}
+
+int count_occurence(std::string s, char c)
+{
+	return std::count(s.begin(), s.end(), c);
+}
+
+void Reader::assignLineString()
+{
+	lineString.assign(line);
+	if (count_occurence(lineString, '}') > 1)
+		throw Exception("Please close each block on a new line.");
+	if ((lineString.find(';', 0) != std::string::npos && \
+		lineString.find(';', 0) != (lineString.size() - 1)) ||
+			count_occurence(lineString, ';') > 1)
+		throw Exception("Please only put one directive per line.");
 }
 
 // TODO: check overflow
@@ -196,16 +214,20 @@ void Reader::parse_limit_except_line()
 void Reader::parse_limit_except()
 {
 	resetLimitExceptPrototype();
+	bool blockEndFound = false;
 	do
 	{
-		lineString.assign(line);
+		assignLineString();
 		if (lineString.find("}") != std::string::npos)
 		{
+			blockEndFound = true;
 			break;
 		}
 		parse_limit_except_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
+	if (!blockEndFound)
+		throw Exception("A block wasn't closed");
 	lp.limitExcept = LimitExcept(lep);
 }
 
@@ -213,25 +235,24 @@ void Reader::parse_limit_except()
 // TODO: https://github.com/nginx/nginx/blob/master/conf/fastcgi_params
 void Reader::parseFcgiParam(size_t needle)
 {
-	while(isspace(lineString[needle]))
+	std::string directive = getDirective(needle, lineString);
+	std::cout << "directive: " << directive << std::endl;
+	size_t cursor = 0;
+	size_t keyStart = 0;
+	while(!isspace(directive[cursor]))
 	{
-		needle++;
+		cursor++;
 	}
-	size_t keyStart = needle;
-	while(!isspace(lineString[needle]))
+	size_t keyEnd = cursor;
+	while(isspace(directive[cursor]))
 	{
-		needle++;
+		cursor++;
 	}
-	size_t keyEnd = needle;
-	while(isspace(lineString[needle]))
-	{
-		needle++;
-	}
-	size_t valueStart = needle;
-	size_t valueEnd = lineString.find(";", valueStart);
-	// TODO: exception
-	std::string key = lineString.substr(keyStart, keyEnd-keyStart);
-	std::string value = lineString.substr(valueStart, valueEnd-valueStart);
+	size_t valueStart = cursor;
+	size_t valueEnd = directive.find(";", valueStart);
+	std::string key = directive.substr(keyStart, keyEnd-keyStart);
+	std::string value = directive.substr(valueStart, valueEnd-valueStart);
+	std::cout << "Value: |" << value << "|" << std::endl;
 	lp.fcgiParams[key] = value;
 }
 
@@ -293,12 +314,14 @@ void Reader::resetLocationPrototype()
 void Reader::parse_location()
 {
 	resetLocationPrototype();
+	bool blockEndFound = false;
 	do
 	{
-		lineString.assign(line);
+		assignLineString();
 		
 		if (lineString.find("}") != std::string::npos)
 		{
+			blockEndFound = true;
 			break;
 		}
 		if (lineString.find("limit_except") != std::string::npos)
@@ -307,6 +330,8 @@ void Reader::parse_location()
 			parse_location_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
+	if (!blockEndFound)
+		throw Exception("A block wasn't closed");
 	vhp.locations.push_back(Location(lp));
 }
 
@@ -317,20 +342,21 @@ void Reader::parse_location()
 */
 void Reader::parse_listen(size_t needle)
 {
-	size_t valueStart = needle + 7;
+	std::string directive = getDirective(needle+6, lineString);
+	size_t valueStart = 0;
 	size_t hostEnd;
-	if ((hostEnd = lineString.find(":")) != std::string::npos)
+	if ((hostEnd = directive.find(":")) != std::string::npos)
 	{
-		vhp.listenHost = lineString.substr(valueStart, hostEnd - valueStart);
+		vhp.listenHost = directive.substr(valueStart, hostEnd - valueStart);
 		trimWhitespaceStart(vhp.listenHost);
-		size_t valueEnd = lineString.find(";", hostEnd);
+		size_t valueEnd = directive.find(";", hostEnd);
 		vhp.listenIp = ft_atoi(
-			lineString.substr(hostEnd+1, valueEnd - hostEnd).c_str());
+			directive.substr(hostEnd+1, valueEnd - hostEnd).c_str());
 	}
 	else
 	{
 		vhp.listenHost = "";
-		vhp.listenIp = ft_atoi(getDirective(valueStart, lineString).c_str());
+		vhp.listenIp = ft_atoi(directive.c_str());
 	}
 }
 
@@ -389,12 +415,13 @@ void Reader::resetVirtualHostPrototype()
 void Reader::parse_server()
 {
 	resetVirtualHostPrototype();
-
+	bool blockEndFound = false;
 	do
 	{
-		lineString.assign(line);
+		assignLineString();
 		if (lineString.find("}") != std::string::npos)
 		{
+			blockEndFound = true;
 			break;
 		}
 		if (lineString.find("location") != std::string::npos)
@@ -403,6 +430,11 @@ void Reader::parse_server()
 			parse_server_line();
 	}
 	while ((ret = get_next_line(fd, &line)));
+	if (ret == 0)
+		assignLineString();
+	if (!blockEndFound && 
+			lineString.find("}") == std::string::npos)
+		throw Exception("A block wasn't closed");
 	// TODO: check vhp
 	cp.virtualHostVector.push_back(VirtualHost(vhp));
 }
@@ -441,12 +473,13 @@ void Reader::parse()
 */
 Reader::Reader(std::string filename)
 {
+	lastLineParsed = "";
 	fd = open(filename.c_str(), O_RDONLY);
 	//TODO: check file errors
 
 	while ((ret = get_next_line(fd, &line)))
 	{
-		lineString.assign(line);
+		assignLineString();
 		parse();
 	}
 }
