@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:47 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/23 21:37:53 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/23 21:52:51 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,6 @@ void Reader::assignLineString()
 		throw Exception("Please only put one directive per line.");
 }
 
-// TODO: check overflow
 int parse_size(size_t needle, std::string lineString)
 {
 	std::string value = getDirective(needle, lineString);
@@ -132,10 +131,14 @@ int parse_size(size_t needle, std::string lineString)
 	size_t semicolon = lineString.find(";", needle);
 	if (lineString[semicolon-1] == 'm' || lineString[semicolon-1] == 'M')
 	{
+		if (raw_value > 2147)
+			throw Exception("clientMaxBodySize too large");
 		raw_value *= 1000000;
 	}
 	else if (lineString[semicolon-1] == 'k' || lineString[semicolon-1] == 'k')
 	{
+		if (raw_value > 2147483)
+			throw Exception("clientMaxBodySize too large");
 		raw_value *= 1000;
 	}
 	return raw_value;
@@ -335,7 +338,6 @@ void Reader::parse_location()
 	vhp.locations.push_back(Location(lp));
 }
 
-// TODO: rewrite atoi
 /*
 ** Parse the listen directive into the virtualHostPrototype member.
 ** @param needle The position where the directive starts (the index of 'l').
@@ -475,7 +477,8 @@ Reader::Reader(std::string filename)
 {
 	lastLineParsed = "";
 	fd = open(filename.c_str(), O_RDONLY);
-	//TODO: check file errors
+	if (fd < 0)
+		throw Exception("Couldn't open file");
 
 	while ((ret = get_next_line(fd, &line)))
 	{

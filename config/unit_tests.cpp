@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/23 21:39:02 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/23 21:49:20 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,17 @@ int main(void)
 
 	out("Exception | location not closed");
 	TEST_EXCEPTION(Reader r2("test_configs/location_not_closed.conf"), Exception, "A block wasn't closed");
+
+	out("Exception | file errors");
+	TEST_EXCEPTION(Reader r2("test_configs/nonexistent_config"), Exception, "Couldn't open file");
+
+	out("Exception | overflow");
+	TEST_EXCEPTION(Reader r2("test_configs/overflow1.conf"), Exception, "clientMaxBodySize too large");
+
+	out("Exception | overflow");
+	TEST_EXCEPTION(Reader r2("test_configs/overflow2.conf"), Exception, "clientMaxBodySize too large");
+
+
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 
