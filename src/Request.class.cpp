@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/18 12:46:24 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/24 18:28:17 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,15 @@ std::vector<std::string> split(std::string input, std::string word = "")
 	return names;
 }
 
-Request::Request(void)
+Request::Request(void) :
+	_read_bytes(0)
 {
 	std::cout << "Defualt constructor for Request called\n";
 }
 
 Request::Request(Request const &src) :
-	_headers(src._headers), _status_line(src._status_line), _method(_method)
+	_headers(src._headers), _status_line(src._status_line), _method(_method),
+	_content_length(src._content_length)
 {
 	std::cout << "Copy constructor for Request called\n";
 }
@@ -66,6 +68,7 @@ Request		&Request::operator=(Request const &src)
 	_headers = src._headers;
 	_status_line = src._status_line;
 	_method = src._method;
+	_content_length = src._content_length;
 	return *this;
 }
 
@@ -124,35 +127,60 @@ int Request::startLineReader(std::string line)
 	return 0;
 }
 
+void Request::addHeader(Header *header)
+{
+	_headers.push_back(header);
+}
+
 std::string Request::getMethod(void)
 {
 	return _method;
 }
-#include <sys/socket.h>
-int Request::read_request(int sd)
+
+int Request::getBytes(void)
 {
-	char *line;
-	char headers[1000001];
-	int ret = 0;
-	int bytes;
-	if ((ret = get_next_line(sd, &line)) == 0)
-		return 0;
-	// std::string toRead(line);
-
-	// _error = startLineReader(line);
-	bytes = recv(sd, headers, 100000000, 0);
-	std::cout << bytes << "bytes\n";
-	if (bytes == 0)
-		return 0;
-
-	std::cout << headers << "headers\n";
-	// std::string buf_ = std::string(headers, bytes);
-	// std::cout << buf_ << std::endl;
-	// while ((ret = get_next_line(sd, &line)))
-	// {
-	// 	std::cout << line;
-	// }
-	// std::cout << "From gnl" << toRead;
-
-	return bytes;
+	return _read_bytes;
 }
+
+void Request::setBytes(int bytes)
+{
+	_read_bytes = bytes;
+}
+
+std::string Request::getState(void)
+{
+	return _state;
+}
+
+void Request::setState(std::string state)
+{
+	_state = state;
+}
+#include <sys/socket.h>
+// int Request::read_request(int sd)
+// {
+// 	char *line;
+// 	char headers[1000000];
+// 	int ret = 0;
+// 	int bytes;
+// 	if ((ret = get_next_line(sd, &line)) == 0)
+// 		return 0;
+// 	// std::string toRead(line);
+//
+// 	// _error = startLineReader(line);
+// 	bytes = recv(sd, headers, 100000000, 0);
+// 	std::cout << bytes << "bytes\n";
+// 	if (bytes == 0)
+// 		return 0;
+//
+// 	std::cout << headers << "headers\n";
+// 	// std::string buf_ = std::string(headers, bytes);
+// 	// std::cout << buf_ << std::endl;
+// 	// while ((ret = get_next_line(sd, &line)))
+// 	// {
+// 	// 	std::cout << line;
+// 	// }
+// 	// std::cout << "From gnl" << toRead;
+//
+// 	return bytes;
+// }

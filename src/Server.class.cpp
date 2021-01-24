@@ -44,7 +44,7 @@ int			Server::setup(void)
 	}
 	_address.sin_family = AF_INET;
 	_address.sin_addr.s_addr = INADDR_ANY; //change by ft custom function
-	_address.sin_port = htons(8888); //same
+	_address.sin_port = htons(8880); //same
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
 		std::cerr << "Couldn't bind the port" << std::endl;

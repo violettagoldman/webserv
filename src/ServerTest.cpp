@@ -3,6 +3,10 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "../inc/Request.class.hpp"
+// #include "../inc/Header.class.hpp"
+// #include "./read_request.cpp"
+
+Request *read_request(int sd, Request *req);
 int main(void)
 {
     int     i;
@@ -11,7 +15,7 @@ int main(void)
     fd_set  fds;
     char    buffer[1024];
     int     new_socket;
-	Request request;
+	Request *request = new Request;
 	int valread;
 	int sd;
 	int max_sd;
@@ -70,7 +74,8 @@ int main(void)
 
 			if (FD_ISSET( sd , &fds))
 			{
-				if (request.read_request(sd) == 0)
+				request = read_request(sd, request);
+				if (request->getState() == "end")
 				// if ((valread = read( sd , buffer, 1024)) == 0)
 				{
                     s.close();
@@ -78,8 +83,9 @@ int main(void)
 					close(sd);
 					clients[i] = 0;
 				}
-				else
+				else if (request->getState() == "read")
 				{
+					std::cout << "Success\n";
 					// std::cout << "Request method is " << request.getMethod() << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;

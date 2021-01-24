@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 13:14:04 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/13 16:56:31 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/24 17:42:28 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ int header_split(std::string str, std::map<std::string, std::vector<std::string>
 	headers.insert(std::pair<std::string, std::vector<std::string> >(header_name, values));
 	return 1;
 }
+
 void print_map(std::map<std::string, std::vector<std::string> > & m)
 {
     for (std::map<std::string, std::vector<std::string> >::iterator it = m.begin(); it != m.end(); ++it) {
