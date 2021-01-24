@@ -1,7 +1,6 @@
-#include <algorithm>
-#include <string>
+#include "Utility.hpp"
 
-std::string ft_itoa(int n)
+std::string 	ft_itoa(int n)
 {
 	std::string	res;
 	int			nb;
@@ -28,4 +27,35 @@ std::string ft_itoa(int n)
 	if (minus)
 		res = "-" + res;
 	return (res);
+}
+
+std::string		readFile(std::string file)
+{
+	std::string	html;
+	char		buffer[257] = {0};
+	int			fd;
+
+	html = "";
+	if (!(fd = open(file.c_str(), O_CREAT)))
+		return ""; // throw exception
+	while (read(fd, buffer, 256) > 0)
+	{
+		html += std::string(buffer);
+		for (size_t i = 0; i < 257; i++)
+			buffer[i] = 0;
+	}
+	return (html);
+}
+
+std::string		replacehtml(std::string src, std::string var, std::string value)
+{
+	size_t	n;
+
+	n = src.find(var);
+	while (n != std::string::npos)
+	{
+		src.replace(n, var.size(), value);
+		n = src.find(var, n + value.size());
+	}
+	return (src);
 }

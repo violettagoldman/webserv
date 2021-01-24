@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index of $1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;700&display=swap');
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            font-family: 'Quicksand';
+            font-weight: 300;
+        }
+
+        h1 {
+            font-weight: 700;
+        }
+
+        #image-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #text-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: RGB(189, 156, 122);
+            width: 100%;
+            height: 100%;
+            transform: scale(1.5) translateX(15%) rotate(10deg);
+            z-index: -1;
+        }
+
+        #content {
+            z-index: 3;
+            color: white;
+            overflow-y: auto;
+            max-height: 100vh;
+            width: 100%;
+            padding: 60px;
+        }
+
+        #image {
+            position: absolute;
+            width: 120%;
+            transform: scaleX(-1);
+            bottom: -80px;
+            left: -80px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="image-container">
+        <img id="image" src="./assets/index.png">
+    </div>
+    <div id="text-container">
+        <div id="background">
+        </div>
+        <div id="content">
+            <h1>Index of $1</h1>
+            <ul>
+                $2
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
