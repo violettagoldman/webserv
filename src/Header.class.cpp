@@ -6,16 +6,17 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:04:49 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/22 01:07:50 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/27 17:38:05 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Header.class.hpp"
 
-std::string accepted_headers[18] = {
+std::string accepted_headers[19] = {
 	"Accept-Charsets",
 	"Accept-Language",
 	"Allow",
+	"Postman-Token", //special for postman
 	"Authorization",
 	"Content-Language",
 	"Content-Length",
@@ -49,7 +50,7 @@ Header::Header(Header const &src):
 
 int isValidHeader(std::string name)
 {
-	for (int i = 0; i < 18; ++i)
+	for (int i = 0; i < 19; ++i)
 	{
 		if (name == accepted_headers[i])
 			return 1;

@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/24 18:45:28 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/27 17:50:39 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "../inc/Request.class.hpp"
 #include "../inc/Header.class.hpp"
 #include <sys/socket.h>
+const std::string CRLF = "\r\n";
 
 
 Header *header_split(std::string str)
@@ -31,6 +32,10 @@ Header *header_split(std::string str)
 	Header *new_header = new Header(header_name, values);
 	if (!isValidHeader(header_name))
 	{
+		int kek = (int)str[0];
+		int kek2 = (int)str[1];
+		int kek3 = (int)str[2];
+		std::cout << kek << kek2 << kek3<< "kek '" << str << "'HERE\n\n\n";
 		new_header->setError(-1);
 		return new_header;
 	}
@@ -58,7 +63,7 @@ Request *read_request(int sd, Request *req)
 	std::string buf(input);
 	std::string to_interpret(buf);
 	std::string headers;
-	std::cout << "In reader: " << bytes << to_interpret << "\n";
+	std::cout << "In reader: " << bytes << to_interpret << "\r\n";
 	// probably need to do while for chunk
 	if (bytes > 0)
 	{
@@ -71,7 +76,7 @@ Request *read_request(int sd, Request *req)
 		req->startLineReader(start_line);
 		last = to_interpret.find('\n', pos + 1);
 		std::string one_header;
-		while (pos + 1 != last)
+		while (pos + 1 != last && to_interpret.substr(pos + 1, last - pos) != CRLF)
 		{
 			one_header = to_interpret.substr(pos + 1, last - pos);
 			pos = last;
