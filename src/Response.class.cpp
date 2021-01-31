@@ -3,8 +3,9 @@
 Response::Response(void)
 {
 	//test values
+	_method = "DELETE";
 	_statusCode = 200;
-	_statusCodeTranslation[200] = "OK";
+	statusCodeTranslation();
 	_headers["Date"] = getDate(getTime());
 	_headers["Server"] = "Webserv/1.0 (Unix)";
 	std::cout << "Default constructor called\n";
@@ -38,7 +39,8 @@ void			Response::handleMethod()
 	std::string option;
 
 	// check for method from the request
-	option = "GET";
+	// and check if they are in my config -> otherwise 405
+	option = _method;
 	if (option == "GET")
 		get();
 	else if (option == "POST")
@@ -56,7 +58,7 @@ void			Response::handleMethod()
 	else if (option == "PATCH")
 		patch();
 	else
-		return ;
+		error(405);
 		// return error 405 if not exist or not allowed
 }
 
@@ -204,7 +206,7 @@ void		Response::setErrorPage()
 
 	html = readFile("./pages/error.html");
 	html = replacehtml(html, "$1", ft_itoa(_statusCode));
-	// html = replacehtml(html, "$2", ft_itoa(_statusCode));
+	html = replacehtml(html, "$2", _statusCodeTranslation[_statusCode]);
 	_body = html;
 }
 
@@ -240,7 +242,21 @@ void		Response::put()
 
 void		Response::deleteMethod()
 {
+	std::string path = "/tmp/a"; // get path from request
+	int	fd;
 
+	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
+	{
+		error(404);
+		return ;
+	}
+	// not alowed -> 405
+	if (unlink(path.c_str()) == 0)
+		_statusCode = 204; // 200 but without body
+	else
+		error(403);
+	close(fd);
+	
 }
 
 void		Response::options()
@@ -250,7 +266,7 @@ void		Response::options()
 
 void		Response::connect()
 {
-
+	_statusCode = 200;
 }
 
 void		Response::trace()
@@ -290,7 +306,8 @@ std::string 	Response::serialize()
 {
 	std::string res;
 
-	_headers["Content-Length"] = ft_itoa(_body.size());
+	if (_method != "CONNECT")
+		_headers["Content-Length"] = ft_itoa(_body.size());
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
@@ -299,4 +316,49 @@ std::string 	Response::serialize()
 	res += "\r\n";
 	res += _body;
 	return (res);
+}
+
+void		Response::statusCodeTranslation()
+{
+	_statusCodeTranslation[100] = "Continue";
+	_statusCodeTranslation[101] = "Switching Protocols";
+	_statusCodeTranslation[200] = "OK";
+	_statusCodeTranslation[201] = "Created";
+	_statusCodeTranslation[202] = "Accepted";
+	_statusCodeTranslation[203] = "Non-Authoritative Information";
+	_statusCodeTranslation[204] = "No Content";
+	_statusCodeTranslation[205] = "Reset Content";
+	_statusCodeTranslation[206] = "Partial Content";
+	_statusCodeTranslation[300] = "Multiple Choices";
+	_statusCodeTranslation[301] = "Moved Permanently";
+	_statusCodeTranslation[302] = "Found";
+	_statusCodeTranslation[303] = "See Other";
+	_statusCodeTranslation[304] = "Not Modified";
+	_statusCodeTranslation[305] = "Use Proxy";
+	_statusCodeTranslation[307] = "Temporary Redirect";
+	_statusCodeTranslation[400] = "Bad Request";
+	_statusCodeTranslation[401] = "Unauthorized";
+	_statusCodeTranslation[402] = "Payment Required";
+	_statusCodeTranslation[403] = "Forbidden";
+	_statusCodeTranslation[404] = "Not Found";
+	_statusCodeTranslation[405] = "Method Not Allowed";
+	_statusCodeTranslation[406] = "Not Acceptable";
+	_statusCodeTranslation[407] = "Proxy Authentication Required";
+	_statusCodeTranslation[408] = "Request Timeout";
+	_statusCodeTranslation[409] = "Conflict";
+	_statusCodeTranslation[410] = "Gone";
+	_statusCodeTranslation[411] = "Length Required";
+	_statusCodeTranslation[412] = "Precondition Failed";
+	_statusCodeTranslation[413] = "Payload Too Large";
+	_statusCodeTranslation[414] = "URI Too Long";
+	_statusCodeTranslation[415] = "Unsupported Media Type";
+	_statusCodeTranslation[416] = "Range Not Satisfiable";
+	_statusCodeTranslation[417] = "Expectation Failed";
+	_statusCodeTranslation[426] = "Upgrade Required";
+	_statusCodeTranslation[500] = "Internal Server Error";
+	_statusCodeTranslation[501] = "Not Implemented";
+	_statusCodeTranslation[502] = "Bad Gateway";
+	_statusCodeTranslation[503] = "Service Unavailable";
+	_statusCodeTranslation[504] = "Gateway Timeout";
+	_statusCodeTranslation[505] = "HTTP Version Not Supported";
 }

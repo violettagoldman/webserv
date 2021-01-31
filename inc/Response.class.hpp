@@ -34,11 +34,13 @@ class Response
 		void		patch();
 		void		error(int status);
 		void		setContentType(std::string path);
+		void		statusCodeTranslation();
 		
 
 		
 	private:
 		int										_statusCode;
+		std::string								_method;
 		std::map<std::string, std::string>		_headers;
 		std::string								_body;
 		std::map<int, std::string>				_statusCodeTranslation;
