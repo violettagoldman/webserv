@@ -35,6 +35,8 @@ class Response
 		void		error(int status);
 		void		setContentType(std::string path);
 		void		statusCodeTranslation();
+		int			checkPathExistance(std::string path);
+		void		setLastModified(int fd);
 		
 
 		

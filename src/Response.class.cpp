@@ -3,7 +3,7 @@
 Response::Response(void)
 {
 	//test values
-	_method = "DELETE";
+	_method = "PUT";
 	_statusCode = 200;
 	statusCodeTranslation();
 	_headers["Date"] = getDate(getTime());
@@ -98,7 +98,8 @@ void		Response::get()
 	else
 	{
 		_body = readFile(path);
-		_headers["Last-Modified"] = getDate(fileStat.st_mtime);
+		// _headers["Last-Modified"] = getDate(fileStat.st_mtime);
+		setLastModified(fd);
 		setContentType(path);
 	}
 	close(fd);
@@ -237,7 +238,40 @@ void		Response::post()
 
 void		Response::put()
 {
+	int fd;
+	int exist;
 
+	fd = -1;
+	std::string path = "/tmp/test_put1";
+	exist = checkPathExistance(path);
+	if (exist == 1)
+	{
+		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) > 0)
+		{
+			if (write(fd, "replace", std::string("replace").length()) == -1)
+				error(500);
+			else
+				_statusCode = 204;
+		}
+		else
+			error(500);
+	}
+	else if (exist == 0)
+	{
+		if ((fd = open(path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644)) > 0)
+		{
+			if (write(fd, "replace by the request body", std::string("replace by the request body").length()) == -1)
+				error(500);
+			else
+			{
+				_statusCode = 201;
+				_headers["Location"] = "get url from request";
+			}
+		}
+		else
+			error(500);
+	}
+	close (fd);
 }
 
 void		Response::deleteMethod()
@@ -281,7 +315,7 @@ void		Response::patch()
 
 
 // move to utility
-time_t		Response::getTime()
+time_t			Response::getTime()
 {
 	struct timeval	tv;
 	struct timezone	tz;
@@ -290,7 +324,7 @@ time_t		Response::getTime()
 	return (tv.tv_sec + tz.tz_minuteswest * 60);
 }
 
-std::string	Response::getDate(time_t time)
+std::string		Response::getDate(time_t time)
 {
 	char 		buffer[33];
 	size_t		last;
@@ -300,13 +334,36 @@ std::string	Response::getDate(time_t time)
 	return (std::string(buffer));
 }
 
+int			Response::checkPathExistance(std::string path)
+{
+	struct stat fileStat;
+	int exist;
+	
+	exist = stat(path.c_str(), &fileStat);
+	if (exist == 0)
+	{
+		if (S_ISREG(fileStat.st_mode))
+			return (1);
+		else
+			return (2);
+	}
+	else
+		return (0);
+}
 
+void		Response::setLastModified(int fd)
+{
+	struct stat fileStat;
+
+	fstat(fd, &fileStat);
+	_headers["Last-Modified"] = getDate(fileStat.st_mtime);
+}
 
 std::string 	Response::serialize()
 {
 	std::string res;
 
-	if (_method != "CONNECT")
+	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
 		_headers["Content-Length"] = ft_itoa(_body.size());
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
