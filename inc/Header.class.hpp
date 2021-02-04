@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:05:05 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/22 01:08:51 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/30 13:58:47 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define HEADER_CLASS_HPP
 #include <vector>
 #include <string>
+#include <iostream>
 class Header
 {
 	public:
@@ -23,6 +24,9 @@ class Header
 		Header &operator=(Header const &src);
 		void setError(int i);
 		int isError(void);
+		std::string getName(void);
+		void print_out(void);
+		int checkValue(std::string value);
 	private:
 		Header(void);
 		std::string _name;

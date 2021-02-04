@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/24 21:28:44 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/04 17:11:15 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,15 @@ class Request
 		void setBytes(int bytes);
 		std::string getState(void);
 		void setState(std::string state);
+		void print_headers(void);
+		std::vector<Header *> getHeaders(void);
+		int isHeaderPresent(std::string name, std::string value = "");
 	private:
 		int _read_bytes;
 		std::vector<Header *> _headers;
 		std::string _status_line;
 		std::string _method;
+		std::string _body;
 		int _error;
 		int _content_length;
 		std::string _state;
