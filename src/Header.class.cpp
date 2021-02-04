@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:04:49 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/27 17:38:05 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/30 13:56:32 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ int isValidHeader(std::string name)
 	return 0;
 }
 
+
 Header &Header::operator=(Header const &src)
 {
 	_values = src._values;
@@ -75,4 +76,25 @@ int Header::isError(void)
 void Header::setError(int i)
 {
 	_error = i;
+}
+
+std::string Header::getName(void)
+{
+	return _name;
+}
+
+int Header::checkValue(std::string value)
+{
+	for (std::vector<std::string>::iterator it = _values.begin(); it < _values.end(); ++it)
+		if (value == (*it))
+			return 1;
+	return 0;
+}
+
+void Header::print_out(void)
+{
+	std::cout << _name << " : ";
+	for (std::vector<std::string>::iterator it = _values.begin(); it < _values.end(); ++it)
+		std::cout << *it << ", ";
+	// std::cout << "\n";
 }

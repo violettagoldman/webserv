@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/27 17:50:39 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/01/30 17:12:51 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,21 +27,15 @@ Header *header_split(std::string str)
 	std::string header_name;
 	size_t index = str.find_first_of(":");
 	header_name = str.substr(0, index);
-	std::string value = str.substr(index + 1, str.length());
+	std::string value = str.substr(index + 1, str.length() - 1);
+	value.erase('\n');
 	std::vector<std::string> values = split(value, ", ");
 	Header *new_header = new Header(header_name, values);
 	if (!isValidHeader(header_name))
 	{
-		int kek = (int)str[0];
-		int kek2 = (int)str[1];
-		int kek3 = (int)str[2];
-		std::cout << kek << kek2 << kek3<< "kek '" << str << "'HERE\n\n\n";
 		new_header->setError(-1);
 		return new_header;
 	}
-	// for (std::vector<std::string>::iterator it = values.begin(); it < values.end(); ++it)
-	// 	std::cout << "value: " << *it << '\n';
-	// headers.insert(std::pair<std::string, std::vector<std::string> >(header_name, values));
 	return new_header;
 }
 
@@ -51,25 +45,17 @@ Request *read_request(int sd, Request *req)
 	int bytes;
 	int pos;
 	int last;
-	// Request *req;
 	std::string start_line;
-	int fd = open("./test.txt", O_RDONLY);
 	bytes = recv(sd, input, BUFFER_SIZE, 0);
 	if (bytes == 0)
 	{
 		req->setState("chill");
 		return req;
 	}
-	std::string buf(input);
-	std::string to_interpret(buf);
-	std::string headers;
-	std::cout << "In reader: " << bytes << to_interpret << "\r\n";
-	// probably need to do while for chunk
+	std::string to_interpret(input);
 	if (bytes > 0)
 	{
 		req->setState("read");
-		// req->setBytes(bytes);
-		// req = new Request();
 		Header *hed;
 		pos = to_interpret.find("\n");
 		start_line = to_interpret.substr(0, pos);
@@ -87,6 +73,8 @@ Request *read_request(int sd, Request *req)
 				return NULL;
 			req->addHeader(hed);
 		}
+		if (req->isHeaderPresent("Content-Length"))
+			std::cout << "TJOWRJTW" << std::endl;
 	}
 	else if (bytes == -1)
 	{
@@ -96,10 +84,5 @@ Request *read_request(int sd, Request *req)
 	}
 	else
 		return req;
-	// 4 step reader
-	// start_line
-	// headers
-	// if content length - body
-	//chunk read
 	return req;
 }

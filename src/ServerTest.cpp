@@ -7,6 +7,7 @@
 // #include "./read_request.cpp"
 
 Request *read_request(int sd, Request *req);
+
 int main(void)
 {
     int     i;
@@ -85,6 +86,7 @@ int main(void)
 				}
 				else if (request->getState() == "read")
 				{
+					request->print_headers();
 					std::cout << "Success\n";
 					// std::cout << "Request method is " << request.getMethod() << std::endl;
 				// 	buffer[valread] = '\0';

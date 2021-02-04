@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/24 18:28:17 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/04 17:10:46 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ Request::Request(void) :
 
 Request::Request(Request const &src) :
 	_headers(src._headers), _status_line(src._status_line), _method(_method),
-	_content_length(src._content_length)
+	_content_length(src._content_length), _body(src._body)
 {
 	std::cout << "Copy constructor for Request called\n";
 }
@@ -69,6 +69,7 @@ Request		&Request::operator=(Request const &src)
 	_status_line = src._status_line;
 	_method = src._method;
 	_content_length = src._content_length;
+	_body = src._body;
 	return *this;
 }
 
@@ -119,7 +120,6 @@ int Request::startLineReader(std::string line)
 	elements = split(line);
 	if (elements.size() != 3 || elements[2] != "HTTP/1.1")
 		return 404;
-
 	if (isMethod(elements[0]) == -1)
 		return 501;
 	_method = elements[0];
@@ -156,6 +156,31 @@ void Request::setState(std::string state)
 {
 	_state = state;
 }
+
+void Request::print_headers(void)
+{
+	for (std::vector<Header *>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+		(*it)->print_out();
+
+}
+
+int Request::isHeaderPresent(std::string name, std::string value)
+{
+	for (std::vector<Header *>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+		if (name == (*it)->getName())
+		{
+			if (value != "")
+				return ((*it)->checkValue(value));
+			return 1;
+		}
+	return 0;
+}
+
+std::vector<Header *> Request::getHeaders(void)
+{
+	return _headers;
+}
+
 #include <sys/socket.h>
 // int Request::read_request(int sd)
 // {
