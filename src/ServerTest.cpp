@@ -86,7 +86,7 @@ int main(void)
 				}
 				else if (request->getState() == "read")
 				{
-					request->print_headers();
+					// request->print_headers();
 					std::cout << "Success\n";
 					// std::cout << "Request method is " << request.getMethod() << std::endl;
 				// 	buffer[valread] = '\0';

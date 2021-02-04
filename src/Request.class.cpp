@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/04 17:10:46 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/04 18:40:25 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,13 @@ std::string methods[8] = {
 *	@return vector<string> This returns vector of strings that are in input
 *	and separated by word.
 */
-std::vector<std::string> split(std::string input, std::string word = "")
+std::vector<std::string> split(std::string input, std::string key = "")
 {
 	std::vector<std::string> names;
+	std::string word;
 	while (input.compare(word) != 0)
 	{
-		size_t index = input.find_first_of(" ");
+		size_t index = input.find_first_of(key);
 		word = input.substr(0,index);
 		input = input.substr(index+1, input.length());
 		if (word.length() == 0)
@@ -180,32 +181,3 @@ std::vector<Header *> Request::getHeaders(void)
 {
 	return _headers;
 }
-
-#include <sys/socket.h>
-// int Request::read_request(int sd)
-// {
-// 	char *line;
-// 	char headers[1000000];
-// 	int ret = 0;
-// 	int bytes;
-// 	if ((ret = get_next_line(sd, &line)) == 0)
-// 		return 0;
-// 	// std::string toRead(line);
-//
-// 	// _error = startLineReader(line);
-// 	bytes = recv(sd, headers, 100000000, 0);
-// 	std::cout << bytes << "bytes\n";
-// 	if (bytes == 0)
-// 		return 0;
-//
-// 	std::cout << headers << "headers\n";
-// 	// std::string buf_ = std::string(headers, bytes);
-// 	// std::cout << buf_ << std::endl;
-// 	// while ((ret = get_next_line(sd, &line)))
-// 	// {
-// 	// 	std::cout << line;
-// 	// }
-// 	// std::cout << "From gnl" << toRead;
-//
-// 	return bytes;
-// }

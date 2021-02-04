@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/30 17:12:51 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/04 19:08:32 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ Header *header_split(std::string str)
 	std::string header_name;
 	size_t index = str.find_first_of(":");
 	header_name = str.substr(0, index);
-	std::string value = str.substr(index + 1, str.length() - 1);
-	value.erase('\n');
+	std::string value = str.substr(index + 1);
+	value.erase(value.find('\n'));
 	std::vector<std::string> values = split(value, ", ");
 	Header *new_header = new Header(header_name, values);
 	if (!isValidHeader(header_name))
@@ -53,6 +53,7 @@ Request *read_request(int sd, Request *req)
 		return req;
 	}
 	std::string to_interpret(input);
+	std::cout << "In reader " << to_interpret << "end\n";
 	if (bytes > 0)
 	{
 		req->setState("read");
@@ -61,13 +62,13 @@ Request *read_request(int sd, Request *req)
 		start_line = to_interpret.substr(0, pos);
 		req->startLineReader(start_line);
 		last = to_interpret.find('\n', pos + 1);
+		std::cout << to_interpret.length();
 		std::string one_header;
 		while (pos + 1 != last && to_interpret.substr(pos + 1, last - pos) != CRLF)
 		{
 			one_header = to_interpret.substr(pos + 1, last - pos);
 			pos = last;
 			last = to_interpret.find("\n", last + 1);
-			std::cout << "Header " << one_header;
 			hed = header_split(one_header);
 			if (hed->isError())
 				return NULL;
