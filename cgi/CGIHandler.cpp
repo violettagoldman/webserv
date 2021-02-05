@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/04 18:21:09 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/05 16:27:40 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,24 +124,24 @@ char **create_envp(std::vector<std::string> mvars)
 	return ret;
 }
 
-void execute_cgi(const char *cgi_path, const char *requested_file, char **envp)
+void execute_cgi(const char *cgi_path, char **envp)
 {
-	//"/Users/ae/spacial-steel/cdng/webserv/cgi/tiny.php"
-	// const char *path_to_cgi = "/usr/local/bin/php-cgi";
-		// const char *path_to_cgi = "/Users/ae/spacial-steel/cdng/webserv/cgi/reader";
 	char * const argv[] = {const_cast<char *>(cgi_path), NULL};
 
 	execve(cgi_path, argv, envp);
+
+
+
+	
 }
 
-void launch_cgi(int *pipe_in, int *pipe_out, const char *cgi_path,
-				const char *requested_file, char **envp)
+void launch_cgi(int *pipe_in, int *pipe_out, const char *cgi_path, char **envp)
 {
 	close(STDIN_FILENO);
 	dup(pipe_in[0]);
 	close(STDOUT_FILENO);
 	dup(pipe_out[1]);
-	execute_cgi(cgi_path, requested_file, envp);
+	execute_cgi(cgi_path, envp);
 }
 
 void CGIHandler::openPipes(void)
@@ -178,6 +178,7 @@ void CGIHandler::prepareEnvp(void)
 
 
 	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
+	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
 
 
 	v.push_back("SERVER_PROTOCOL=HTTP/1.1");
@@ -189,6 +190,14 @@ void CGIHandler::prepareEnvp(void)
 
 
 	this->envp = create_envp(v);
+
+
+	// char **envp2 = envp;
+	// while (*envp2)
+	// {
+	// 	std::cout << *envp2 << std::endl;
+	// 	envp2++;
+	// }
 
 	// while (*envp)
 	// {
@@ -208,39 +217,27 @@ void CGIHandler::handleCgi(void)
 	{
 		// child
 		// execute_to_pipe(pipe_res);
-		const char *path_to_cgi = "/usr/local/bin/php-cgi";
+		const char *path_to_cgi = "/Users/ashishae/.brew/bin/php-cgi";
 		// const char *path_to_cgi = "/Users/ae/spacial-steel/cdng/webserv/cgi/print_env";
-		const char *requested_file = "/Users/ae/spacial-steel/cdng/webserv/cgi/tiny.php";
+		// const char *requested_file = "/Users/ae/spacial-steel/cdng/webserv/cgi/tiny.php";
 		// int s = dup(STDIN_FILENO);
 		
 		// close(pipe_res[0]);
 		// close(pipe_res[1]);c
-		launch_cgi(pipe_in, pipe_out, path_to_cgi, requested_file, envp);
+		launch_cgi(pipe_in, pipe_out, path_to_cgi, envp);
 
 		
 	}
 	waitpid(pid, NULL, 0);
 }
 
-CGIHandler::CGIHandler(std::string _requestedFile, std::string body, CGIRequest cr) :
-	requestedFile(_requestedFile), _cgiRequest(cr)
+CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
+	requestedFile(cr.scriptFilename), _cgiRequest(cr)
 {
 	countBodySize(body);
 	openPipes();
 	prepareEnvp();
-	// writeBodyString(pipe_in[1], body);
-	handleCgi();
-	close(pipe_out[1]);
-	readCgiResponse(pipe_out[0]);
-}
-
-CGIHandler::CGIHandler(std::string _requestedFile, std::vector<std::string> body, CGIRequest cr) :
-	requestedFile(_requestedFile), _cgiRequest(cr)
-{
-	countBodySize(body);
-	openPipes();
-	prepareEnvp();
-	// writeBodyStringVector(pipe_in[1], body);
+	writeBodyString(pipe_in[1], body);
 	handleCgi();
 	close(pipe_out[1]);
 	readCgiResponse(pipe_out[0]);
@@ -260,7 +257,7 @@ void CGIHandler::countBodySize(std::vector<std::string> vs)
 	}
 }
 
-std::vector<std::string> CGIHandler::getCgiResponse(void) const
+std::string CGIHandler::getCgiResponse(void) const
 {
 	return cgiResponse;
 }
@@ -278,12 +275,14 @@ void CGIHandler::writeBodyStringVector(int fd, std::vector<std::string> body)
 
 void CGIHandler::readCgiResponse(int fd)
 {
-	char *line;
+	char *respline;
+	std::string resplineString;
 	int ret;
 
-	while ((ret = get_next_line(fd, &line)))
+	while ((ret = get_next_line(fd, &respline)))
 	{
-		this->cgiResponse.push_back(line);
+		resplineString.assign(respline);
+		this->cgiResponse += resplineString + "\n";
 	}
-	this->cgiResponse.push_back(line);
+	this->cgiResponse += resplineString + "\n";
 }

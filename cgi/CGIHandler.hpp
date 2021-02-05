@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/04 18:14:35 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/05 16:09:44 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,18 +42,17 @@ typedef struct s_CGIRequest {
 class CGIHandler {
 
 public:
-	CGIHandler(std::string requestedFile, std::string body, CGIRequest cr);
-	CGIHandler(std::string requestedFile, std::vector<std::string> body, CGIRequest cr);
+	CGIHandler(std::string body, CGIRequest cr);
 
 	// ~CGIHandler();
 	// CGIHandler(const CGIHandler &copy);
 	// CGIHandler &operator= (const CGIHandler &operand);
 
-	std::vector<std::string> getCgiResponse(void) const;
+	std::string getCgiResponse(void) const;
 
 private:
 	std::string requestedFile;
-	std::vector<std::string> cgiResponse;
+	std::string cgiResponse;
 
 	CGIRequest _cgiRequest;
 
