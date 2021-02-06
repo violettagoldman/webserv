@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/04 19:08:32 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/05 00:43:00 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ Request *read_request(int sd, Request *req)
 	int bytes;
 	int pos;
 	int last;
+	std::string body;
 	std::string start_line;
 	bytes = recv(sd, input, BUFFER_SIZE, 0);
 	if (bytes == 0)
@@ -53,7 +54,6 @@ Request *read_request(int sd, Request *req)
 		return req;
 	}
 	std::string to_interpret(input);
-	std::cout << "In reader " << to_interpret << "end\n";
 	if (bytes > 0)
 	{
 		req->setState("read");
@@ -75,7 +75,10 @@ Request *read_request(int sd, Request *req)
 			req->addHeader(hed);
 		}
 		if (req->isHeaderPresent("Content-Length"))
-			std::cout << "TJOWRJTW" << std::endl;
+		{
+			body = to_interpret.substr(last + 1);
+			req->setBody(body);
+		}
 	}
 	else if (bytes == -1)
 	{
