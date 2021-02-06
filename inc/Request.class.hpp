@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/04 17:11:15 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/05 00:41:07 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ class Request
 		std::string getMethod(void);
 		void addHeader(Header *header);
 		int getBytes(void);
+		void setBody(std::string body);
+		std::string getBody(void);
 		void setBytes(int bytes);
 		std::string getState(void);
 		void setState(std::string state);
