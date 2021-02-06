@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:05:05 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/30 13:58:47 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/06 15:34:25 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class Header
 		std::string getName(void);
 		void print_out(void);
 		int checkValue(std::string value);
+		std::vector<std::string> getValue();
 	private:
 		Header(void);
 		std::string _name;
