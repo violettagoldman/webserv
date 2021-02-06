@@ -29,16 +29,17 @@ class Request
 		// int read_request(int sd);
 		int isMethod(std::string line);
 		int startLineReader(std::string line);
-		std::string getMethod(void);
+		std::string getMethod(void); //
 		void addHeader(Header *header);
 		int getBytes(void);
 		void setBody(std::string body);
-		std::string getBody(void);
+		std::string getBody(void); //
 		void setBytes(int bytes);
 		std::string getState(void);
 		void setState(std::string state);
 		void print_headers(void);
-		std::vector<Header *> getHeaders(void);
+		std::vector<Header *> getHeaders(void); //
+		void uri_handler(std::string str);
 		int isHeaderPresent(std::string name, std::string value = "");
 	private:
 		int _read_bytes;
@@ -46,6 +47,9 @@ class Request
 		std::string _status_line;
 		std::string _method;
 		std::string _body;
+		std::string _query;
+		std::string _path;
+		std::string _fragment;
 		int _error;
 		int _content_length;
 		std::string _state;

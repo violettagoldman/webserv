@@ -88,28 +88,29 @@ int Request::isMethod(std::string check)
 	return -1;
 }
 
-void uri_handler(std::string str)
+void Request::uri_handler(std::string str)
 {
 	std::string scheme;
 	std::string authority;
 	std::string path;
-	std::string query;
-	std::string fragment;
+	// std::string query;
+	// std::string fragment;
 	std::size_t fragment_pos;
 	std::size_t query_pos;
 
 	if ((fragment_pos = str.find("#")) != std::string::npos)
 	{
-		fragment = str.substr(fragment_pos + 1);
+		_fragment = str.substr(fragment_pos + 1);
 		str.erase(fragment_pos);
 	}
 	if ((query_pos = str.find("?")) != std::string::npos)
 	{
-		query = str.substr(query_pos + 1);
+		_query = str.substr(query_pos + 1);
 		str.erase(query_pos);
 	}
-	std::cout << fragment << std::endl;
-	std::cout << query;
+	_path = str;
+	// std::cout << fragment << std::endl;
+	// std::cout << query;
 }
 
 int Request::startLineReader(std::string line)

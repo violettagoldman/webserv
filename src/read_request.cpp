@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   read_request.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/05 00:43:00 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/06 14:40:47 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ Header *header_split(std::string str)
 	return new_header;
 }
 
-Request *read_request(int sd, Request *req)
+Request *read_request(int fd, Request *req)
 {
 	char input[BUFFER_SIZE];
 	int bytes;
@@ -47,13 +47,15 @@ Request *read_request(int sd, Request *req)
 	int last;
 	std::string body;
 	std::string start_line;
-	bytes = recv(sd, input, BUFFER_SIZE, 0);
+	// bytes = recv(sd, input, BUFFER_SIZE, 0);
+	bytes = read(fd, input, BUFFER_SIZE);
 	if (bytes == 0)
 	{
 		req->setState("chill");
 		return req;
 	}
 	std::string to_interpret(input);
+	std::cout << to_interpret;
 	if (bytes > 0)
 	{
 		req->setState("read");

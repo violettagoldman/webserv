@@ -12,7 +12,7 @@
 
 #include "../inc/Header.class.hpp"
 
-std::string accepted_headers[19] = {
+std::string accepted_headers[23] = {
 	"Accept-Charsets",
 	"Accept-Language",
 	"Allow",
@@ -31,7 +31,11 @@ std::string accepted_headers[19] = {
 	"Server",
 	"Transfer-Encoding",
 	"User-Agent",
-	"WWW-Authenticate"
+	"WWW-Authenticate",
+	"Accept",
+	"Cache-Control",
+	"Connection",
+	"Accept-Encoding"
 };
 
 Header::Header(void)
@@ -50,7 +54,7 @@ Header::Header(Header const &src):
 
 int isValidHeader(std::string name)
 {
-	for (int i = 0; i < 19; ++i)
+	for (int i = 0; i < 23; ++i)
 	{
 		if (name == accepted_headers[i])
 			return 1;

@@ -87,7 +87,8 @@ int main(void)
 				else if (request->getState() == "read")
 				{
 					// request->print_headers();
-					std::cout << "Success\n";
+					// cgi_dostuff(request);
+					std::cout << "Success";
 					// std::cout << "Request method is " << request.getMethod() << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;
