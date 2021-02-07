@@ -3,7 +3,7 @@
 Response::Response(void)
 {
 	//test values
-	_method = "PUT";
+	_method = "POST";
 	_statusCode = 200;
 	statusCodeTranslation();
 	_headers["Date"] = getDate(getTime());
@@ -55,8 +55,6 @@ void			Response::handleMethod()
 		connect();
 	else if (option == "TRACE")
 		trace();
-	else if (option == "PATCH")
-		patch();
 	else
 		error(405);
 		// return error 405 if not exist or not allowed
@@ -233,7 +231,33 @@ void		Response::setIndexPage()
 
 void		Response::post()
 {
+	int fd;
+	int exist;
 
+	fd = -1;
+	std::string path = "/tmp/privet";
+	exist = checkPathExistance(path);
+	if (exist == 1)
+	{
+		if ((fd = open(path.c_str(), O_WRONLY | O_APPEND, 0644)) > 0)
+		{
+			if (write(fd, "replace", std::string("replace").length()) == -1)
+				error(500);
+			else
+			{
+				_headers["Content-Location"] = "get url from request";
+				_statusCode = 200;
+				_body = "request body";
+			}
+		}
+		else
+			error(500);
+	}
+	else if (exist == 0)
+	{
+		error(404);
+	}
+	close (fd);
 }
 
 void		Response::put()
@@ -295,7 +319,11 @@ void		Response::deleteMethod()
 
 void		Response::options()
 {
+	// connect to config
+	std::string		methods;
 
+	_headers["Allow"] = "GET, PUT, CONNECT";
+	_statusCode = 200;
 }
 
 void		Response::connect()
@@ -305,14 +333,7 @@ void		Response::connect()
 
 void		Response::trace()
 {
-
 }
-
-void		Response::patch()
-{
-
-}
-
 
 // move to utility
 time_t			Response::getTime()

@@ -13,6 +13,7 @@ class Response
 	public:
 		Response(void);
 		// Response(Request req);
+		// Response(CGI cgi);
 		Response(Response const &src);
 		~Response(void);
 
@@ -31,7 +32,6 @@ class Response
 		void		options();
 		void		connect();
 		void		trace();
-		void		patch();
 		void		error(int status);
 		void		setContentType(std::string path);
 		void		statusCodeTranslation();
