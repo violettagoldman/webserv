@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/05 00:41:57 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/07 14:43:30 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,7 @@ std::string Request::getBody(void)
 {
 	return _body;
 }
+
 int Request::isHeaderPresent(std::string name, std::string value)
 {
 	for (std::vector<Header *>::iterator it = _headers.begin(); it < _headers.end(); ++it)
