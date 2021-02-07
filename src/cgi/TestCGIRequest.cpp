@@ -6,13 +6,13 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 17:29:08 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/04 17:55:12 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 19:20:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TestCGIRequest.hpp"
 
-TestCGIRequest::TestCGIRequest() : 
-	_remoteAddr("127.0.0.1")
-{
-}
+// TestCGIRequest::TestCGIRequest() : 
+// 	_remoteAddr("127.0.0.1")
+// {
+// }

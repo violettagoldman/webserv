@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 17:28:31 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/05 13:20:40 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 19:20:33 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ class TestCGIRequest : public ICGIRequest {
 
 public:
 
-	TestCGIRequest();
-	~TestCGIRequest();
+	// TestCGIRequest();
+	// ~TestCGIRequest();
 	// TestCGIRequest(const TestCGIRequest &copy);
 	// TestCGIRequest &operator= (const TestCGIRequest &operand);
 

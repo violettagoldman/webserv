@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 11:19:16 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 19:20:12 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,10 @@
 // }
 
 Location::Location(locationPrototype lp) :
-	pattern(lp.pattern),
-	root(lp.root),
 	clientMaxBodySize(lp.clientMaxBodySize),
 	autoindex(lp.autoindex),
+	pattern(lp.pattern),
+	root(lp.root),
 	index(lp.index),
 	limitExcept(lp.limitExcept),
 	fcgiPass(lp.fcgiPass),
