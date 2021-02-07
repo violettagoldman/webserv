@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "LimitExcept.hpp"
+#include "LimitExcept.class.hpp"
 
 LimitExcept::LimitExcept()
 {

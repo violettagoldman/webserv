@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Exception.hpp"
+#include "Exception.class.hpp"
 
 Exception::Exception(std::string _message) :
 	message(_message)

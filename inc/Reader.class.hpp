@@ -6,12 +6,12 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 13:32:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/23 20:57:54 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 15:54:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef READER_HPP
-# define READER_HPP
+#ifndef READER_CLASS_HPP
+# define READER_CLASS_HPP
 
 # include <string>
 # include <vector>
@@ -25,12 +25,12 @@
 # include <algorithm>
 
 
-# include "get_next_line/get_next_line.hpp"
-# include "VirtualHost.hpp"
-# include "Location.hpp"
-# include "Config.hpp"
-# include "LimitExcept.hpp"
-# include "Exception.hpp"
+# include "get_next_line.h"
+# include "VirtualHost.class.hpp"
+# include "Location.class.hpp"
+# include "Config.class.hpp"
+# include "LimitExcept.class.hpp"
+# include "Exception.class.hpp"
 
 
 std::vector<std::string> split(std::string s, char c);

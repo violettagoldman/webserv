@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIMITEXCEPT_HPP
-# define LIMITEXCEPT_HPP
+#ifndef LIMITEXCEPT_CLASS_HPP
+# define LIMITEXCEPT_CLASS_HPP
 
 # include <string>
 # include <vector>

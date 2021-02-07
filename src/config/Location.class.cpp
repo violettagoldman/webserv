@@ -6,11 +6,11 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:47:52 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 19:20:12 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:19:16 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Location.hpp"
+#include "Location.class.hpp"
 
 // /*
 // ** Construct a Location with action passed as action_type (must be supported).

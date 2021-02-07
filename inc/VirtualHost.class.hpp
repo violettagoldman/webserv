@@ -6,17 +6,17 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:35:15 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 15:52:53 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef VIRTUALHOST_HPP
-# define VIRTUALHOST_HPP
+#ifndef VIRTUALHOST_CLASS_HPP
+# define VIRTUALHOST_CLASS_HPP
 
 # include <vector>
 # include <string>
 
-# include "Location.hpp"
+# include "Location.class.hpp"
 
 // Global VirtualHost object
 

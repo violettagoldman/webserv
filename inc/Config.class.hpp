@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_HPP
-# define CONFIG_HPP
+#ifndef CONFIG_CLASS_HPP
+# define CONFIG_CLASS_HPP
 
-# include "VirtualHost.hpp"
-# include "Location.hpp"
+# include "VirtualHost.class.hpp"
+# include "Location.class.hpp"
 
 typedef struct sConfigPrototype
 {

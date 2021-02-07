@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Reader.hpp"
+#include "Reader.class.hpp"
 
 /*
 ** Erases all the whitespace characters in the end of a string

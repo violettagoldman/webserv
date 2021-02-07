@@ -6,17 +6,17 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 12:35:23 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 15:51:47 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LOCATION_HPP
-# define LOCATION_HPP
+#ifndef LOCATION_CLASS_HPP
+# define LOCATION_CLASS_HPP
 
 # include <string>
 # include <vector>
 # include <map>
-# include "LimitExcept.hpp"
+# include "LimitExcept.class.hpp"
 
 std::string read_directive(std::string block, std::string key);
 

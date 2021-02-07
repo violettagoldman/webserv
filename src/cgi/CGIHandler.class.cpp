@@ -6,11 +6,11 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 19:21:52 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 15:44:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CGIHandler.hpp"
+#include "CGIHandler.class.hpp"
 
 size_t	ft_strlen(const char *str)
 {
@@ -124,24 +124,34 @@ char **create_envp(std::vector<std::string> mvars)
 	return ret;
 }
 
-void execute_cgi(const char *cgi_path, char **envp)
+bool isCgiPhpCgi(std::string pathToCGI)
 {
-	char * const argv[] = {const_cast<char *>(cgi_path), NULL};
-
-	execve(cgi_path, argv, envp);
-
-
-
-	
+	if (pathToCGI == "/usr/local/bin/php-cgi" || pathToCGI.find("php-cgi") != std::string::npos)
+		return true;
+	return false;
 }
 
-void launch_cgi(int *pipe_in, int *pipe_out, const char *cgi_path, char **envp)
+void CGIHandler::execute_cgi()
+{
+	char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
+	char *cgiPath = const_cast<char *>(_cgiRequest.pathToCGI.c_str());
+
+	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
+		reqfile = NULL;
+
+	std::cout << "Launching: " << cgiPath << " with " << reqfile << std::endl;
+	char *const argv[] = {cgiPath, reqfile};
+
+	execve(cgiPath, argv, envp);
+}
+
+void CGIHandler::launch_cgi()
 {
 	close(STDIN_FILENO);
 	dup(pipe_in[0]);
 	close(STDOUT_FILENO);
 	dup(pipe_out[1]);
-	execute_cgi(cgi_path, envp);
+	execute_cgi();
 }
 
 void CGIHandler::openPipes(void)
@@ -173,8 +183,8 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
 	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
 	
-	v.push_back("SERVER_PORT=80");
-	v.push_back("SERVER_NAME=example.com");
+	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
+	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
 
 
 	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
@@ -215,33 +225,86 @@ void CGIHandler::handleCgi(void)
 	
 	if (pid == 0)
 	{
-		// child
-		// execute_to_pipe(pipe_res);
-		const char *path_to_cgi = "/Users/ashishae/.brew/bin/php-cgi";
-		// const char *path_to_cgi = "/Users/ae/spacial-steel/cdng/webserv/cgi/print_env";
-		// const char *requested_file = "/Users/ae/spacial-steel/cdng/webserv/cgi/tiny.php";
-		// int s = dup(STDIN_FILENO);
-		
-		// close(pipe_res[0]);
-		// close(pipe_res[1]);c
-		launch_cgi(pipe_in, pipe_out, path_to_cgi, envp);
-
-		
+		launch_cgi();
 	}
 	waitpid(pid, NULL, 0);
 }
 
+std::vector<std::string> getHeaderByKey(std::vector<Header *> hds, std::string key)
+{
+	for (size_t i = 0; i < hds.size(); ++i)
+	{
+		if (hds[i]->getName() == key)
+		{
+			return hds[i]->getValue();
+		}
+	}
+	return std::vector<std::string>();
+}
+
+std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
+{
+	std::vector<std::string> result = getHeaderByKey(hds, key);
+
+	if (result.size() == 0)
+		return "";
+	if (result.size() == 1)
+		return result[0];
+	else
+	{
+		std::cout << "[CGI] Warning: header by key " << key << " contains too many variables" << std::endl;
+		return "";
+	}
+}
+
+// std::string parseAuth(std::string authValue)
+// {
+// 	std::vector<std::string> words = split(authValue, ' ');
+// }
+
+// CGIHandler::CGIHandler(ICGIRequest icr, std::string _requestedFile)
+// {
+// 	requestedFile = _requestedFile;
+// 	_cgiRequest.scriptFilename = requestedFile;
+
+// 	std::vector<Header *> hds = icr.getHeaders();
+
+// 	// _cgiRequest.remoteAddr = ;
+// // 	_cgiRequest.remoteHost = ;
+// 	_cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
+// // 	_cgiRequest.remoteIdent = ;
+// // 	_cgiRequest.remoteUser = ;
+// // 	_cgiRequest.contentType = ;
+
+// // 	_cgiRequest.requestMethod = ;
+// // 	_cgiRequest.requestURI = ;
+// // 	_cgiRequest.serverPort = ;
+// // 	_cgiRequest.serverName = ;
+// // 	_cgiRequest.scriptFilename = ;
+// // 	_cgiRequest.pathToCGI = ;
+
+
+
+// // }
+
 CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
 	requestedFile(cr.scriptFilename), _cgiRequest(cr)
 {
+
 	countBodySize(body);
 	openPipes();
+	
 	prepareEnvp();
+	
 	writeBodyString(pipe_in[1], body);
+
 	handleCgi();
+
 	close(pipe_out[1]);
 	readCgiResponse(pipe_out[0]);
 }
+
+
 
 void CGIHandler::countBodySize(std::string s)
 {

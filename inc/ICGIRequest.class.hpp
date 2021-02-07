@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 16:52:48 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 19:20:41 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/06 15:32:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,19 @@
 # define ICGIREQUEST_HPP
 
 # include <string>
+# include "Header.class.hpp"
 
 class ICGIRequest {
 
 public:
 
 	// ~ICGIRequest();
-	// ICGIRequest();
-	// ICGIRequest(const ICGIRequest &copy);
-	// ICGIRequest &operator= (const ICGIRequest &operand);
-
-	std::string getRemoteAddr() const;
-	std::string getRemoteHost() const;
-	std::string getAuthType() const;
-	std::string getRemoteIdent() const;
-	std::string getRemoteUser() const;
-	std::string getContentType() const;
-	std::string getRequestMethod() const;
-	std::string getRequestURI() const;
-	std::string getServerPort() const;
-	std::string getServerName() const;
-	std::string getScriptFilename() const;
+	virtual std::string getMethod(void) = 0; //
+	virtual std::string getBody(void) = 0; //
+	virtual std::vector<Header *> getHeaders(void) = 0; //
+	virtual std::string getQuery(void) = 0;
+	virtual std::string getPath(void) = 0;
+	virtual std::string getFragment(void) = 0;
 
 	// virtual ~ICGIRequest() = 0;
 

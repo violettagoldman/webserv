@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "VirtualHost.hpp"
+#include "VirtualHost.class.hpp"
 
 
 VirtualHost::VirtualHost(int _listenIp, std::string _listenHost,

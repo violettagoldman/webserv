@@ -6,36 +6,47 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 17:28:31 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 19:20:33 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/07 15:46:06 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TESTCGIREQUEST_HPP
 # define TESTCGIREQUEST_HPP
 
-# include "ICGIRequest.hpp"
+# include "ICGIRequest.class.hpp"
 
 class TestCGIRequest : public ICGIRequest {
 
 public:
 
-	// TestCGIRequest();
+	TestCGIRequest(std::string method,
+	std::string body,
+	std::vector<Header *> headers,
+	std::string query,
+	std::string path,
+	std::string fragment);
 	// ~TestCGIRequest();
+
+	std::string getMethod(void);
+	std::string getBody(void);
+	std::vector<Header *> getHeaders(void);
+	std::string getQuery(void);
+	std::string getPath(void);
+	std::string getFragment(void);
 	// TestCGIRequest(const TestCGIRequest &copy);
 	// TestCGIRequest &operator= (const TestCGIRequest &operand);
 
 private:
-	std::string _remoteAddr;
-	std::string _remoteHost;
-	std::string _authType;
-	std::string _remoteIdent;
-	std::string _remoteUser;
-	std::string _contentType;
-	std::string _requestMethod;
-	std::string _requestURI;
-	std::string _serverPort;
-	std::string _serverName;
-	std::string _scriptFilename;
+
+	std::string _method;
+	std::string _body;
+	std::vector<Header *> _headers;
+	std::string _query;
+	std::string _path;
+	std::string _fragment;
+
+
+
 };
 
 #endif

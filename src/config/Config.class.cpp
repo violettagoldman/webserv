@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#include "Config.class.hpp"
 
 Config::Config(configPrototype cop)
 {
