@@ -1,9 +1,9 @@
-#include "Response.class.hpp"
+// #include "Response.class.hpp"
 
-int		main(void)
-{
-	Response r;
+// int		main(void)
+// {
+// 	Response r;
 
-	std::cout << r.serialize();
-	return (0);
-} 
+// 	std::cout << r.serialize();
+// 	return (0);
+// }

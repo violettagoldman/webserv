@@ -1,0 +1,43 @@
+@startuml
+class Server {
+}
+
+HttpBody <|-- Request
+HttpBody <|-- Response
+class HttpBody {
+}
+
+class Request {
+}
+
+class Response {
+}
+
+class CGI {
+}
+
+class Client {
+}
+
+
+Server *-- "1" Config
+Config *-- "0..*" VirtualHost
+VirtualHost *-- "0..*" Location
+Server *-- "0..*" Client
+
+Reader *-- Config
+class Reader {
+filename
+}
+
+class Config {
+}
+
+class VirtualHost 
+{
+}
+
+class Location
+{
+}
+@enduml
