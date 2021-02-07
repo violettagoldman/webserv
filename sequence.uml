@@ -1,0 +1,20 @@
+@startuml
+actor user
+
+'user -> "Server" : [connection]
+'"Server" -> "Client" : Client(user)
+
+'"Client" -> "Server" : Request
+
+user -> "Server" : connection
+user -> "Server" : "HTTP 1.1 GET /static/common.css... "
+"Server" -> "Request" : create Request object
+"Request" -> "Server" : return request object
+alt CGI needed
+"Server" -> "CGI" : handle cgi
+"CGI" -> Server : cgi response
+end
+"Server" -> "Response" : create response object
+"Response" -> "Server" : return serilization of the response objectf
+"Server" -> user : "HTTP 1.1 200 OK ... "
+@enduml

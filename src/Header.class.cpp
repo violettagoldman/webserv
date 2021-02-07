@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:04:49 by ablanar           #+#    #+#             */
-/*   Updated: 2021/01/30 13:56:32 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/06 15:37:32 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,11 @@ int Header::checkValue(std::string value)
 		if (value == (*it))
 			return 1;
 	return 0;
+}
+
+std::vector<std::string> Header::getValue()
+{
+	return _values;
 }
 
 void Header::print_out(void)
