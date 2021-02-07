@@ -14,10 +14,10 @@ int main(void)
     Server  s;
     int	    clients[30]; //change to vector later
     fd_set  fds;
-    char    buffer[1024];
+    // char    buffer[1024];
     int     new_socket;
 	Request *request = new Request;
-	int valread;
+	// int valread;
 	int sd;
 	int max_sd;
 

@@ -39,9 +39,9 @@ SRC_CONFIG = ${wildcard src/config/*.cpp}
 SRC_GNL = ${wildcard src/get_next_line/*.cpp}
 
 OBJ = ${patsubst src/%.cpp, obj/%.o, ${SRC}}
-OBJ_CGI = ${patsubst src/cgi/%.cpp, obj/%.o, ${SRC_}}
-OBJ_CONFIG = ${patsubst src/config/%.cpp, obj/%.o, ${SRC}}
-OBJ_GNL = ${patsubst src/get_next_line/%.cpp, obj/%.o, ${SRC}}
+OBJ_CGI = ${patsubst src/cgi/%.cpp, obj/cgi/%.o, ${SRC_CGI}}
+OBJ_CONFIG = ${patsubst src/config/%.cpp, obj/config/%.o, ${SRC_CONFIG}}
+OBJ_GNL = ${patsubst src/get_next_line/%.cpp, obj/get_next_line/%.o, ${SRC_GNL}}
 
 all: $(NAME)
 
@@ -51,6 +51,21 @@ $(NAME): ${OBJ} ${OBJ_CGI} ${OBJ_CONFIG} ${OBJ_GNL}
 
 ./obj/%.o: ./src/%.cpp
 	@mkdir -p ./obj
+	@${CC} ${CFLAGS} -c $< -o $@
+	@$(call update)
+
+./obj/cgi/%.o: ./src/cgi/%.cpp
+	@mkdir -p ./obj/cgi
+	@${CC} ${CFLAGS} -c $< -o $@
+	@$(call update)
+
+./obj/config/%.o: ./src/config/%.cpp
+	@mkdir -p ./obj/config
+	@${CC} ${CFLAGS} -c $< -o $@
+	@$(call update)
+
+./obj/get_next_line/%.o: ./src/get_next_line/%.cpp
+	@mkdir -p ./obj/get_next_line
 	@${CC} ${CFLAGS} -c $< -o $@
 	@$(call update)
 
