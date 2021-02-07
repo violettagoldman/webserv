@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/06 15:45:07 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/07 16:36:57 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,15 @@ class Request
 		std::string getState(void);
 		void setState(std::string state);
 		void print_headers(void);
+		void setError(int error);
+		int getError(void);
 		std::vector<Header *> getHeaders(void); //
 		void uri_handler(std::string str);
 		int isHeaderPresent(std::string name, std::string value = "");
 	private:
 		int _read_bytes;
 		std::vector<Header *> _headers;
+		int _content_length;
 		std::string _status_line;
 		std::string _method;
 		std::string _body;
@@ -51,8 +54,9 @@ class Request
 		std::string _path;
 		std::string _fragment;
 		int _error;
-		int _content_length;
+
 		std::string _state;
+		std::string methods[8];
 };
 std::vector<std::string> split(std::string input, std::string word);
 #endif

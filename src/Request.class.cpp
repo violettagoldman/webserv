@@ -6,22 +6,13 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/06 15:46:36 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/07 16:36:50 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Request.class.hpp"
 #include "../inc/get_next_line.h"
-std::string methods[8] = {
-	"GET",
-	"HEAD",
-	"POST",
-	"PUT",
-	"DELETE",
-	"CONNECT",
-	"OPTIONS",
-	"TRACE"
-};
+
 /*
 *	This is the function to split string.
 *	@param input String to be splited.
@@ -48,12 +39,22 @@ std::vector<std::string> split(std::string input, std::string key = "")
 Request::Request(void) :
 	_read_bytes(0)
 {
+
+   	methods[0] = "GET";
+   	methods[1] = "HEAD";
+   	methods[2] = "POST";
+   	methods[3] = "PUT";
+   	methods[4] = "DELETE";
+   	methods[5] = "CONNECT";
+   	methods[6] = "OPTIONS";
+   	methods[7] = "TRACE";
 	std::cout << "Defualt constructor for Request called\n";
 }
 
 Request::Request(Request const &src) :
-	_headers(src._headers), _status_line(src._status_line), _method(_method),
-	_content_length(src._content_length), _body(src._body)
+	_read_bytes(src._read_bytes), _headers(src._headers),
+	_content_length(src._content_length), _status_line(src._status_line), _method(src._method),
+ _body(src._body)
 {
 	std::cout << "Copy constructor for Request called\n";
 }
@@ -121,7 +122,7 @@ int Request::startLineReader(std::string line)
 		return 400;
 	elements = split(line);
 	if (elements.size() != 3 || elements[2] != "HTTP/1.1")
-		return 404;
+		return 400;
 	if (isMethod(elements[0]) == -1)
 		return 501;
 	_method = elements[0];
@@ -176,6 +177,15 @@ std::string Request::getBody(void)
 	return _body;
 }
 
+void Request::setError(int error)
+{
+	_error = error;
+}
+
+int Request::getError(void)
+{
+	return _error;
+}
 int Request::isHeaderPresent(std::string name, std::string value)
 {
 	for (std::vector<Header *>::iterator it = _headers.begin(); it < _headers.end(); ++it)
