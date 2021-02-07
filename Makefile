@@ -2,7 +2,7 @@ NAME = webserv
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -Iinc/
 CC = clang++
 
-TOTAL = $(shell find src -iname  "*.c" | wc -l | bc)
+TOTAL = $(shell find src -iname  "*.cpp" | wc -l | bc)
 O_COUNT = 0
 COUNT = 0
 
@@ -31,8 +31,6 @@ else
 	TICK = \xE2\x9C\x94
 endif
 
-SRC_DIR = ./src/
-
 SRC = ${wildcard src/*.cpp}
 SRC_CGI = ${wildcard src/cgi/*.cpp}
 SRC_CONFIG = ${wildcard src/config/*.cpp}
@@ -49,11 +47,6 @@ $(NAME): ${OBJ} ${OBJ_CGI} ${OBJ_CONFIG} ${OBJ_GNL}
 	@${CC} ${OBJ} ${OBJ_CGI} ${OBJ_CONFIG} ${OBJ_GNL} ${CFLAGS} -o ${NAME}
 	@echo "${GREEN_BOLD}\r${NAME} by vgoldman, ablanar, ashishae ${TICK}${RESET}"
 
-./obj/%.o: ./src/%.cpp
-	@mkdir -p ./obj
-	@${CC} ${CFLAGS} -c $< -o $@
-	@$(call update)
-
 ./obj/cgi/%.o: ./src/cgi/%.cpp
 	@mkdir -p ./obj/cgi
 	@${CC} ${CFLAGS} -c $< -o $@
@@ -66,6 +59,11 @@ $(NAME): ${OBJ} ${OBJ_CGI} ${OBJ_CONFIG} ${OBJ_GNL}
 
 ./obj/get_next_line/%.o: ./src/get_next_line/%.cpp
 	@mkdir -p ./obj/get_next_line
+	@${CC} ${CFLAGS} -c $< -o $@
+	@$(call update)
+
+./obj/%.o: ./src/%.cpp
+	@mkdir -p ./obj
 	@${CC} ${CFLAGS} -c $< -o $@
 	@$(call update)
 
