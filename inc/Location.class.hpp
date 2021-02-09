@@ -30,6 +30,7 @@ typedef struct sLocationPrototype
 	LimitExcept limitExcept;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
+	std::string uploadStore;
 }	locationPrototype;
 
 class Location {
@@ -53,6 +54,7 @@ public:
 	LimitExcept getLimitExcept(void) const;
 	std::string getFcgiPass(void) const;
 	std::map<std::string, std::string> getFcgiParams(void) const;
+	std::string getUploadStore(void) const;
 
 private:
 	int clientMaxBodySize;
@@ -63,6 +65,7 @@ private:
 	LimitExcept limitExcept;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
+	std::string uploadStore;
 
 
 };

@@ -36,6 +36,7 @@ VirtualHost::VirtualHost(virtualHostPrototype cp)
 	clientMaxBodySize = cp.clientMaxBodySize;
 	autoindex = cp.autoindex;
 	index = cp.index;
+	uploadStore = cp.uploadStore;
 }
 
 VirtualHost::~VirtualHost()
@@ -75,6 +76,11 @@ bool VirtualHost::getAutoindex(void) const
 std::vector<std::string> VirtualHost::getIndex(void) const
 {
 	return this->index;
+}
+
+std::string VirtualHost::getUploadStore(void) const
+{
+	return this->uploadStore;
 }
 
 // VirtualHost::VirtualHost(const VirtualHost &copy)

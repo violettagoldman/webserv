@@ -296,6 +296,10 @@ void Reader::parse_location_line()
 		lp.index = split(getDirective(
 			needle+5, lineString), ' ');
 	}
+	else if ((needle = lineString.find("upload_store")) != std::string::npos)
+	{
+		lp.uploadStore = getDirective(needle+12, lineString);
+	}
 }
 
 void Reader::resetLocationPrototype()
@@ -307,6 +311,7 @@ void Reader::resetLocationPrototype()
 	lp.limitExcept = LimitExcept();
 	lp.fcgiPass = "";
 	lp.fcgiParams.clear();
+	lp.uploadStore = vhp.uploadStore;
 }
 
 /*
@@ -394,6 +399,10 @@ void Reader::parse_server_line()
 		vhp.index = split(getDirective(
 			needle+5, lineString), ' ');
 	}
+	else if ((needle = lineString.find("upload_store")) != std::string::npos)
+	{
+		vhp.uploadStore = getDirective(needle+12, lineString);
+	}
 }
 
 /*
@@ -407,6 +416,7 @@ void Reader::resetVirtualHostPrototype()
 	vhp.serverName.clear();
 	vhp.clientMaxBodySize = cp.clientMaxBodySize;
 	vhp.autoindex = cp.autoindex;
+	vhp.uploadStore = "";
 }
 
 /*

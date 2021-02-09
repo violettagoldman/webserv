@@ -33,6 +33,7 @@ typedef struct sVirtualHostPrototype
 	int clientMaxBodySize;
 	bool autoindex;
 	std::vector<std::string> index;
+	std::string uploadStore;
 }	virtualHostPrototype;
 
 class VirtualHost {
@@ -54,9 +55,7 @@ public:
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
-
-
-	
+	std::string getUploadStore(void) const;
 
 private:
 	int listenIp;
@@ -66,6 +65,7 @@ private:
 	std::vector<std::string> serverName;
 	std::vector<Location> locations;
 	std::vector<std::string> index;
+	std::string uploadStore;
 };
 
 #endif

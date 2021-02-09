@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 20:15:47 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/09 18:08:56 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,10 @@ int main(void)
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny().size() == 1);
 	// check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny()[0] == "all");
 
+	out("Host 1 | Location 0 | upload_store on Server, inherited to Location");
+	check(virtualHostVector[1].getUploadStore() == "/toto/lol/");
+	check(virtualHostVector[1].getLocations()[0].getUploadStore() == "/toto/lol/");
+
 	out("Host 1 | Location 0 | Index");
 	check(virtualHostVector[1].getLocations()[0].getIndex().size() == 1);
 	check(virtualHostVector[1].getLocations()[0].getIndex()[0] == "index3.html");
@@ -140,6 +144,9 @@ int main(void)
 	out("Host 2 | Location 0 | getClientMaxBodySize in megabytes");
 	check(virtualHostVector[2].getLocations()[0].getClientMaxBodySize() == 42000000);
 	
+	out("Host 2 | Location 0 | upload_store on Location");
+	check(virtualHostVector[2].getLocations()[0].getUploadStore() == "/toto/lol2/");
+
 	out("Host 2 | Location 1 | fastcgi_pass");
 	check(virtualHostVector[2].getLocations()[1].getFcgiPass() == "127.0.0.1:9000");
 	check(virtualHostVector[2].getLocations()[1].getFcgiParams()["TEST_PARAM"] == "test_val");

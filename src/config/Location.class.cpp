@@ -43,7 +43,8 @@ Location::Location(locationPrototype lp) :
 	index(lp.index),
 	limitExcept(lp.limitExcept),
 	fcgiPass(lp.fcgiPass),
-	fcgiParams(lp.fcgiParams)
+	fcgiParams(lp.fcgiParams),
+	uploadStore(lp.uploadStore)
 {
 }
 
@@ -90,14 +91,8 @@ std::map<std::string, std::string> Location::getFcgiParams(void) const
 {
 	return this->fcgiParams;
 }
-// Location::Location(const Location &copy)
-// {
-	
-// }
 
-// Location::Location &operator= (const Location &operand)
-// {
-	
-
-// }
-
+std::string Location::getUploadStore(void) const
+{
+	return this->uploadStore;
+}
