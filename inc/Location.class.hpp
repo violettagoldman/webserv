@@ -17,6 +17,7 @@
 # include <vector>
 # include <map>
 # include "LimitExcept.class.hpp"
+# include "Exception.class.hpp"
 
 std::string read_directive(std::string block, std::string key);
 

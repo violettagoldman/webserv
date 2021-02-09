@@ -17,8 +17,6 @@
 # include "Location.class.hpp"
 # include "Exception.class.hpp"
 
-#include <iostream>
-
 typedef struct sConfigPrototype
 {
 	std::vector<VirtualHost> virtualHostVector;

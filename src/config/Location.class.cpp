@@ -46,6 +46,8 @@ Location::Location(locationPrototype lp) :
 	fcgiParams(lp.fcgiParams),
 	uploadStore(lp.uploadStore)
 {
+	if (root != "" && fcgiPass != "")
+		throw Exception("Root and fcgi_pass on the same location.");
 }
 
 Location::~Location()
