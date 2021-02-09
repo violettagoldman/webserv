@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   read_request.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/06 14:40:47 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/10 00:14:29 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,26 @@
 #include <sys/socket.h>
 const std::string CRLF = "\r\n";
 
+unsigned long contentLengthChecker(std::vector<Header *> headers, Request *req)
+{
+	std::vector<std::string> values;
+	for (std::vector<Header *>::iterator it = headers.begin(); it < headers.end(); ++it)
+		if ((*it)->getName() == "Content-Length")
+			values = (*it)->getValue();
+	if (values.size() > 1)
+	{
+		req->setError(400);
+		return -1;
+	}
+	unsigned long size =  std::strtol(values[0].c_str(), NULL, 10);
+	if (errno)
+	{
+		req->setError(400);
+		return -1;
+	}
+	return size;
+
+}
 
 Header *header_split(std::string str)
 {
@@ -39,7 +59,7 @@ Header *header_split(std::string str)
 	return new_header;
 }
 
-Request *read_request(int fd, Request *req)
+Request *read_request(int sd, Request *req)
 {
 	char input[BUFFER_SIZE];
 	int bytes;
@@ -47,13 +67,10 @@ Request *read_request(int fd, Request *req)
 	int last;
 	std::string body;
 	std::string start_line;
-	// bytes = recv(sd, input, BUFFER_SIZE, 0);
-	bytes = read(fd, input, BUFFER_SIZE);
+	bytes = recv(sd, input, BUFFER_SIZE, 0);
+	// bytes = read(fd, input, BUFFER_SIZE);
 	if (bytes == 0)
-	{
 		req->setState("chill");
-		return req;
-	}
 	std::string to_interpret(input);
 	std::cout << to_interpret;
 	if (bytes > 0)
@@ -73,22 +90,22 @@ Request *read_request(int fd, Request *req)
 			last = to_interpret.find("\n", last + 1);
 			hed = header_split(one_header);
 			if (hed->isError())
-				return NULL;
+				return req;
 			req->addHeader(hed);
 		}
 		if (req->isHeaderPresent("Content-Length"))
 		{
+			unsigned long content_size = contentLengthChecker(req->getHeaders(), req);
 			body = to_interpret.substr(last + 1);
+			if (content_size != body.length())
+			{
+				req->setError(400);
+				return req;
+			}
 			req->setBody(body);
 		}
 	}
 	else if (bytes == -1)
-	{
-		// delete req;
 		req->setState("end");
-		return NULL;
-	}
-	else
-		return req;
 	return req;
 }

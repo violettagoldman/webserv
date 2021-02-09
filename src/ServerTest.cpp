@@ -75,25 +75,26 @@ int main(void)
 
 			if (FD_ISSET( sd , &fds))
 			{
-				request = read_request(sd, request);
-				if (request->getState() == "end")
-				// if ((valread = read( sd , buffer, 1024)) == 0)
-				{
-                    s.close();
-					printf("Host disconnected\n");
-					close(sd);
-					clients[i] = 0;
-				}
-				else if (request->getState() == "read")
-				{
-					// request->print_headers();
-					// cgi_dostuff(request);
-					std::cout << "Success";
-					// std::cout << "Request method is " << request.getMethod() << std::endl;
-				// 	buffer[valread] = '\0';
-					// std::cout << "I just got your message: " << buffer << std::endl;
-				//
-				}
+				(void)request;
+				// request = read_request(sd, request);
+				// if (request->getState() == "end")
+				// // if ((valread = read( sd , buffer, 1024)) == 0)
+				// {
+                //     s.close();
+				// 	printf("Host disconnected\n");
+				// 	close(sd);
+				// 	clients[i] = 0;
+				// }
+				// else if (request->getState() == "read")
+				// {
+				// 	// request->print_headers();
+				// 	// cgi_dostuff(request);
+				// 	std::cout << "Success";
+				// 	// std::cout << "Request method is " << request.getMethod() << std::endl;
+				// // 	buffer[valread] = '\0';
+				// 	// std::cout << "I just got your message: " << buffer << std::endl;
+				// //
+				// }
 			}
 		}
 	}
