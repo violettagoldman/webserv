@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/09 18:08:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/09 18:56:41 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void check(int expression);
 		check((!strcmp(e.what(), exceptionString))); \
 		std::cout << e.what() << std::endl;\
 	} \
+	if (!exception_thrown)\
+		std::cout << "Exception NOT thrown" << std::endl; \
 	check(exception_thrown == true); \
 }
 
@@ -184,6 +186,9 @@ int main(void)
 	out("Exception | overflow");
 	TEST_EXCEPTION(Reader r2("./config/test_configs/overflow2.conf"), Exception, "clientMaxBodySize too large");
 
+	Reader r2("./config/test_configs/two_servers_with_one_name.conf");
+	out("Exception | two servers with one name");
+	TEST_EXCEPTION(r2.createConfig(), Exception, "Two servers with one server_name and listen");
 
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
