@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vgoldman <vgoldman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 19:20:00 by vgoldman          #+#    #+#             */
-/*   Updated: 2021/01/17 17:55:18 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/07 20:19:21 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,33 @@ int     get_next_line(int fd, char **line)
     if (!res && !(res = (char * )ft_calloc(1, sizeof(char))))
         return (-1);
     while (!breaks_checker(res) && (status = recv(fd, buffer, BUFFER_SIZE, 0)) > 0)
+        res = ft_strappend(res, buffer, status);
+    if (status < 0)
+        error_gnl("Error\nEmpty file");
+    else if (status == 0)
+    {
+        *line = get_first_line(res);
+        res = get_rest_buffer(res);
+        free(res);
+        res = NULL;
+        return (0);
+    }
+    *line = get_first_line(res);
+    res = get_rest_buffer(res);
+    return (1);
+}
+
+int     fd_get_next_line(int fd, char **line)
+{
+    static char     *res;
+    char            buffer[BUFFER_SIZE];
+    int             status;
+
+    *line = NULL;
+    status = 2;
+    if (!res && !(res = (char * )ft_calloc(1, sizeof(char))))
+        return (-1);
+    while (!breaks_checker(res) && (status = read(fd, buffer, BUFFER_SIZE)) > 0)
         res = ft_strappend(res, buffer, status);
     if (status < 0)
         error_gnl("Error\nEmpty file");

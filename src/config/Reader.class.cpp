@@ -228,7 +228,7 @@ void Reader::parse_limit_except()
 		}
 		parse_limit_except_line();
 	}
-	while ((ret = get_next_line(fd, &line)));
+	while ((ret = fd_get_next_line(fd, &line)));
 	if (!blockEndFound)
 		throw Exception("A block wasn't closed");
 	lp.limitExcept = LimitExcept(lep);
@@ -332,7 +332,7 @@ void Reader::parse_location()
 		else
 			parse_location_line();
 	}
-	while ((ret = get_next_line(fd, &line)));
+	while ((ret = fd_get_next_line(fd, &line)));
 	if (!blockEndFound)
 		throw Exception("A block wasn't closed");
 	vhp.locations.push_back(Location(lp));
@@ -431,7 +431,7 @@ void Reader::parse_server()
 		else
 			parse_server_line();
 	}
-	while ((ret = get_next_line(fd, &line)));
+	while ((ret = fd_get_next_line(fd, &line)));
 	if (ret == 0)
 		assignLineString();
 	if (!blockEndFound && 
@@ -480,7 +480,7 @@ Reader::Reader(std::string filename)
 	if (fd < 0)
 		throw Exception("Couldn't open file");
 
-	while ((ret = get_next_line(fd, &line)))
+	while ((ret = fd_get_next_line(fd, &line)))
 	{
 		assignLineString();
 		parse();

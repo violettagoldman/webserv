@@ -139,7 +139,6 @@ void CGIHandler::execute_cgi()
 	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
 		reqfile = NULL;
 
-	std::cout << "Launching: " << cgiPath << " with " << reqfile << std::endl;
 	char *const argv[] = {cgiPath, reqfile};
 
 	execve(cgiPath, argv, envp);
@@ -290,16 +289,11 @@ std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
 CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
 	requestedFile(cr.scriptFilename), _cgiRequest(cr)
 {
-
 	countBodySize(body);
 	openPipes();
-	
 	prepareEnvp();
-	
 	writeBodyString(pipe_in[1], body);
-
 	handleCgi();
-
 	close(pipe_out[1]);
 	readCgiResponse(pipe_out[0]);
 }
@@ -342,7 +336,7 @@ void CGIHandler::readCgiResponse(int fd)
 	std::string resplineString;
 	int ret;
 
-	while ((ret = get_next_line(fd, &respline)))
+	while ((ret = fd_get_next_line(fd, &respline)))
 	{
 		resplineString.assign(respline);
 		this->cgiResponse += resplineString + "\n";
