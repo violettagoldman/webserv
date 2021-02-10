@@ -25,8 +25,8 @@ int main(void)
     for (i = 0; i < 30; i++)
 		clients[i] = 0;
 
-//     s.setup();
-//     s.listen();
+    s.setup();
+    s.listen();
 
 	std::cout << "Waiting for connections ...\n";
 
@@ -75,26 +75,28 @@ int main(void)
 
 			if (FD_ISSET( sd , &fds))
 			{
-				(void)request;
-				// request = read_request(sd, request);
-				// if (request->getState() == "end")
-				// // if ((valread = read( sd , buffer, 1024)) == 0)
-				// {
-                //     s.close();
-				// 	printf("Host disconnected\n");
-				// 	close(sd);
-				// 	clients[i] = 0;
-				// }
-				// else if (request->getState() == "read")
-				// {
-				// 	// request->print_headers();
-				// 	// cgi_dostuff(request);
-				// 	std::cout << "Success";
-				// 	// std::cout << "Request method is " << request.getMethod() << std::endl;
-				// // 	buffer[valread] = '\0';
-				// 	// std::cout << "I just got your message: " << buffer << std::endl;
-				// //
-				// }
+				request = read_request(sd, request);
+				if (request->getState() == "end")
+				{
+                    s.close();
+					printf("Host disconnected\n");
+					close(sd);
+					clients[i] = 0;
+				}
+				else if (request->getState() == "read")
+				{
+					request->print_headers();
+					// cgi_dostuff(request);
+					std::cout << "Success" << std::endl;
+				// 	buffer[valread] = '\0';
+					// std::cout << "I just got your message: " << buffer << std::endl;
+				//
+				}
+				else if (request->getState() == "error")
+				{
+					std::cout << "Error";
+				}
+
 			}
 		}
 	}
