@@ -37,6 +37,7 @@ VirtualHost::VirtualHost(virtualHostPrototype cp)
 	autoindex = cp.autoindex;
 	index = cp.index;
 	uploadStore = cp.uploadStore;
+	root = cp.root;
 }
 
 VirtualHost::~VirtualHost()
@@ -81,6 +82,11 @@ std::vector<std::string> VirtualHost::getIndex(void) const
 std::string VirtualHost::getUploadStore(void) const
 {
 	return this->uploadStore;
+}
+
+std::string VirtualHost::getRoot(void) const
+{
+	return this->root;
 }
 
 // VirtualHost::VirtualHost(const VirtualHost &copy)

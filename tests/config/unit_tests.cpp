@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/09 19:05:36 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/10 15:36:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,15 @@ int main(void)
 	std::vector<VirtualHost> virtualHostVector = conf->getVirtualHostVector();
 	check(virtualHostVector.size() == 3);
 
+	out("Config | Root");
+	check(conf->getRoot() == "/var/www/");
+
 	out("Host 0 | Listen");
 	check(virtualHostVector[0].getListenIp() == 80);
 	check(virtualHostVector[0].getListenHost() == "");
+
+
+
 	check(virtualHostVector[0].getServerName().size() == 2);
 	check(virtualHostVector[0].getServerName()[0] == "domain1.com");
 	check(virtualHostVector[0].getServerName()[1] == "www.domain1.com");
@@ -104,6 +110,8 @@ int main(void)
 
 	check(virtualHostVector[0].getClientMaxBodySize() == 32);
 
+	out("Host 0 | Root inherited from config");
+	check(virtualHostVector[0].getRoot() == "/var/www/");
 
 
 	check(virtualHostVector[1].getListenHost() == "127.0.0.1");
@@ -116,7 +124,7 @@ int main(void)
 
 
 	
-	check(virtualHostVector[1].getLocations().size() == 1);
+	check(virtualHostVector[1].getLocations().size() == 2);
 
 	check(virtualHostVector[1].getLocations()[0].getPattern() == "/app/");
 	check(virtualHostVector[1].getLocations()[0].getAutoindex() == true);
@@ -129,6 +137,9 @@ int main(void)
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[0] == "127.0.0.1");
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[1] == "127.0.0.2");
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny().size() == 1);
+
+	out("Host 1 | Root on server level");
+	check(virtualHostVector[1].getRoot() == "/var/www2/");
 	// check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny()[0] == "all");
 
 	out("Host 1 | Location 0 | upload_store on Server, inherited to Location");
@@ -142,6 +153,9 @@ int main(void)
 	check(virtualHostVector[2].getClientMaxBodySize() == 1024);
 	check(virtualHostVector[2].getAutoindex() == true);
 	check(virtualHostVector[2].getLocations()[0].getAutoindex() == true);
+
+	out("Host 1 | Location 1 | Root inherited from server");
+	check(virtualHostVector[1].getLocations()[1].getRoot() == "/var/www2/");
 
 	out("Host 2 | Location 0 | getClientMaxBodySize in megabytes");
 	check(virtualHostVector[2].getLocations()[0].getClientMaxBodySize() == 42000000);
@@ -193,6 +207,9 @@ int main(void)
 	
 	out("Exception | root and fcgi on same location");
 	TEST_EXCEPTION(Reader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
+
+	out("Exception | upload and fcgi on same location");
+	TEST_EXCEPTION(Reader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
 
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");

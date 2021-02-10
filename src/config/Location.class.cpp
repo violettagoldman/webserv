@@ -35,6 +35,8 @@
 // 		throw 42;
 // }
 
+#include <iostream>
+
 Location::Location(locationPrototype lp) :
 	clientMaxBodySize(lp.clientMaxBodySize),
 	autoindex(lp.autoindex),
@@ -44,10 +46,16 @@ Location::Location(locationPrototype lp) :
 	limitExcept(lp.limitExcept),
 	fcgiPass(lp.fcgiPass),
 	fcgiParams(lp.fcgiParams),
-	uploadStore(lp.uploadStore)
+	uploadStore(lp.uploadStore),
+	rootSet(lp.rootSet),
+	fcgiSet(lp.fcgiSet),
+	uploadStoreSet(lp.uploadStoreSet)
 {
-	if (root != "" && fcgiPass != "")
+	std::cout << "Location: " << lp.pattern << " US: " << lp.uploadStoreSet << " fcgiSet: " << lp.fcgiSet << std::endl;
+	if (rootSet == true && fcgiSet == true)
 		throw Exception("Root and fcgi_pass on the same location.");
+	if (fcgiSet == true && uploadStoreSet == true)
+		throw Exception("Upload_store and fcgi_pass on the same location.");
 }
 
 Location::~Location()
@@ -97,4 +105,19 @@ std::map<std::string, std::string> Location::getFcgiParams(void) const
 std::string Location::getUploadStore(void) const
 {
 	return this->uploadStore;
+}
+
+bool Location::getRootSet(void) const
+{
+	return this->rootSet;
+}
+
+bool Location::getFcgiSet(void) const
+{
+	return this->fcgiSet;
+}
+
+bool Location::getUploadStoreSet(void) const
+{
+	return this->uploadStoreSet;
 }

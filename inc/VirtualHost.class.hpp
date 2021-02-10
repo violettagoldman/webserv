@@ -34,6 +34,7 @@ typedef struct sVirtualHostPrototype
 	bool autoindex;
 	std::vector<std::string> index;
 	std::string uploadStore;
+	std::string root;
 }	virtualHostPrototype;
 
 class VirtualHost {
@@ -56,6 +57,7 @@ public:
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
 	std::string getUploadStore(void) const;
+	std::string getRoot(void) const;
 
 private:
 	int listenIp;
@@ -66,6 +68,7 @@ private:
 	std::vector<Location> locations;
 	std::vector<std::string> index;
 	std::string uploadStore;
+	std::string root;
 };
 
 #endif

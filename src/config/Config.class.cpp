@@ -44,12 +44,16 @@ Config::Config(configPrototype cop)
 		if (virtualHostsHaveSameListen(virtualHostVector[i],
 			virtualHostVector[i+1]) && duplicatesInServerName(
 			virtualHostVector[i], virtualHostVector[i+1]))
+		{
 			throw Exception("Two servers with one server_name and listen");
+		}
+			
 	}
 
 	clientMaxBodySize = cop.clientMaxBodySize;
 	autoindex = cop.autoindex;
 	index = cop.index;
+	root = cop.root;
 }
 
 std::vector<VirtualHost> Config::getVirtualHostVector(void) const
@@ -70,4 +74,9 @@ bool Config::getAutoindex(void) const
 std::vector<std::string> Config::getIndex(void) const
 {
 	return this->index;
+}
+
+std::string Config::getRoot(void) const
+{
+	return this->root;
 }

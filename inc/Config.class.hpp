@@ -17,11 +17,14 @@
 # include "Location.class.hpp"
 # include "Exception.class.hpp"
 
+# include <iostream>
+
 typedef struct sConfigPrototype
 {
 	std::vector<VirtualHost> virtualHostVector;
 	int clientMaxBodySize;
 	bool autoindex;
+	std::string root;
 	std::vector<std::string> index;
 }			configPrototype;
 
@@ -35,12 +38,14 @@ public:
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
+	std::string getRoot(void) const;
 
 private:
 	std::vector<VirtualHost> virtualHostVector;
 	int clientMaxBodySize;
 	bool autoindex;
 	std::vector<std::string> index;
+	std::string root;
 };
 
 #endif

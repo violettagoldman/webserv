@@ -84,6 +84,12 @@ int	ft_atoi(const char *str)
 	return (nbr * sign);
 }
 
+void throwexp(std::string msg)
+{
+	std::cout << "Exception: " << msg << std::endl;
+	throw Exception(msg);
+}
+
 /*
 ** Get the value of a directive from the line.
 ** From this string:
@@ -104,7 +110,7 @@ std::string getDirective(size_t needle, std::string line)
 	}
 	size_t semicolon = line.find(";", needle);
 	if (semicolon == std::string::npos)
-		throw Exception("A semicolon is missing");
+		throwexp("A semicolon is missing");
 	return line.substr(needle, semicolon-needle);
 }
 
@@ -117,11 +123,11 @@ void Reader::assignLineString()
 {
 	lineString.assign(line);
 	if (count_occurence(lineString, '}') > 1)
-		throw Exception("Please close each block on a new line.");
+		throwexp("Please close each block on a new line.");
 	if ((lineString.find(';', 0) != std::string::npos && \
 		lineString.find(';', 0) != (lineString.size() - 1)) ||
 			count_occurence(lineString, ';') > 1)
-		throw Exception("Please only put one directive per line.");
+		throwexp("Please only put one directive per line.");
 }
 
 int parse_size(size_t needle, std::string lineString)
@@ -132,13 +138,13 @@ int parse_size(size_t needle, std::string lineString)
 	if (lineString[semicolon-1] == 'm' || lineString[semicolon-1] == 'M')
 	{
 		if (raw_value > 2147)
-			throw Exception("clientMaxBodySize too large");
+			throwexp("clientMaxBodySize too large");
 		raw_value *= 1000000;
 	}
 	else if (lineString[semicolon-1] == 'k' || lineString[semicolon-1] == 'k')
 	{
 		if (raw_value > 2147483)
-			throw Exception("clientMaxBodySize too large");
+			throwexp("clientMaxBodySize too large");
 		raw_value *= 1000;
 	}
 	return raw_value;
@@ -230,7 +236,7 @@ void Reader::parse_limit_except()
 	}
 	while ((ret = fd_get_next_line(fd, &line)));
 	if (!blockEndFound)
-		throw Exception("A block wasn't closed");
+		throwexp("A block wasn't closed");
 	lp.limitExcept = LimitExcept(lep);
 }
 
@@ -269,6 +275,7 @@ void Reader::parse_location_line()
 	if ((needle = lineString.find("root")) != std::string::npos)
 	{
 		lp.root = getDirective(needle+4, lineString);
+		lp.rootSet = true;
 	}
 	if ((needle = lineString.find("location")) != std::string::npos)
 	{
@@ -286,6 +293,7 @@ void Reader::parse_location_line()
 	if ((needle = lineString.find("fastcgi_pass")) != std::string::npos)
 	{
 		lp.fcgiPass = getDirective(needle+12, lineString);
+		lp.fcgiSet = true;
 	}
 	if ((needle = lineString.find("fastcgi_param")) != std::string::npos)
 	{
@@ -299,19 +307,23 @@ void Reader::parse_location_line()
 	else if ((needle = lineString.find("upload_store")) != std::string::npos)
 	{
 		lp.uploadStore = getDirective(needle+12, lineString);
+		lp.uploadStoreSet = true;
 	}
 }
 
 void Reader::resetLocationPrototype()
 {
 	lp.pattern = "";
-	lp.root = "";
+	lp.root = vhp.root;
 	lp.clientMaxBodySize = vhp.clientMaxBodySize;
 	lp.autoindex = vhp.autoindex;
 	lp.limitExcept = LimitExcept();
 	lp.fcgiPass = "";
 	lp.fcgiParams.clear();
 	lp.uploadStore = vhp.uploadStore;
+	lp.fcgiSet = false;
+	lp.rootSet = false;
+	lp.uploadStoreSet = false;
 }
 
 /*
@@ -339,7 +351,7 @@ void Reader::parse_location()
 	}
 	while ((ret = fd_get_next_line(fd, &line)));
 	if (!blockEndFound)
-		throw Exception("A block wasn't closed");
+		throwexp("A block wasn't closed");
 	vhp.locations.push_back(Location(lp));
 }
 
@@ -403,6 +415,10 @@ void Reader::parse_server_line()
 	{
 		vhp.uploadStore = getDirective(needle+12, lineString);
 	}
+	else if ((needle = lineString.find("root")) != std::string::npos)
+	{
+		vhp.root = getDirective(needle+4, lineString);
+	}
 }
 
 /*
@@ -417,6 +433,7 @@ void Reader::resetVirtualHostPrototype()
 	vhp.clientMaxBodySize = cp.clientMaxBodySize;
 	vhp.autoindex = cp.autoindex;
 	vhp.uploadStore = "";
+	vhp.root = cp.root;
 }
 
 /*
@@ -446,7 +463,7 @@ void Reader::parse_server()
 		assignLineString();
 	if (!blockEndFound && 
 			lineString.find("}") == std::string::npos)
-		throw Exception("A block wasn't closed");
+		throwexp("A block wasn't closed");
 	// TODO: check vhp
 	cp.virtualHostVector.push_back(VirtualHost(vhp));
 }
@@ -476,6 +493,10 @@ void Reader::parse()
 		cp.index = split(getDirective(
 			needle+5, lineString), ' ');
 	}
+	else if ((needle = lineString.find("root")) != std::string::npos)
+	{
+		cp.root = getDirective(needle+4, lineString);
+	}
 }
 
 
@@ -488,7 +509,7 @@ Reader::Reader(std::string filename)
 	lastLineParsed = "";
 	fd = open(filename.c_str(), O_RDONLY);
 	if (fd < 0)
-		throw Exception("Couldn't open file");
+		throwexp("Couldn't open file");
 
 	while ((ret = fd_get_next_line(fd, &line)))
 	{

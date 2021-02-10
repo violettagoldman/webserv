@@ -32,6 +32,9 @@ typedef struct sLocationPrototype
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
 	std::string uploadStore;
+	bool rootSet;
+	bool fcgiSet;
+	bool uploadStoreSet;
 }	locationPrototype;
 
 class Location {
@@ -57,6 +60,10 @@ public:
 	std::map<std::string, std::string> getFcgiParams(void) const;
 	std::string getUploadStore(void) const;
 
+	bool getFcgiSet(void) const;
+	bool getRootSet(void) const;
+	bool getUploadStoreSet(void) const;
+
 private:
 	int clientMaxBodySize;
 	bool autoindex;
@@ -67,6 +74,9 @@ private:
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
 	std::string uploadStore;
+	bool rootSet;
+	bool fcgiSet;
+	bool uploadStoreSet;
 
 
 };
