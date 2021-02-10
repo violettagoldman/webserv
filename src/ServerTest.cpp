@@ -87,6 +87,8 @@ int main(void)
 				{
 					request->print_headers();
 					// cgi_dostuff(request);
+					std::cout << request->getPath() << std::endl;
+					
 					std::cout << "Success" << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;

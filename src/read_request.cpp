@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/10 15:08:02 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/10 15:48:54 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,20 @@
 #include <sys/socket.h>
 const std::string CRLF = "\r\n";
 const std::string WSP = "\r ";
-std::vector<std::string> ft_split(std::string input, char key);
-
+// std::vector<std::string> ft_split(std::string input, char key);
+std::vector<std::string> ft_split(std::string s, char c)
+{
+	std::vector<std::string> ret;
+	int i = 0;
+	size_t pos;
+	while ((pos = s.find(c, i)) != std::string::npos)
+	{
+		ret.push_back(s.substr(i, pos-i));
+		i = pos+1;
+	}
+	ret.push_back(s.substr(i));
+	return ret;
+}
 unsigned long contentLengthChecker(std::vector<Header *> headers, Request *req)
 {
 	std::vector<std::string> values;
@@ -104,7 +116,8 @@ Request *read_request(int sd, Request *req)
 		Header *hed;
 		pos = to_interpret.find("\n");
 		start_line = to_interpret.substr(0, pos);
-		req->startLineReader(start_line);
+		int kek = req->startLineReader(start_line);
+		std::cout << kek << std::endl; 
 		last = to_interpret.find('\n', pos + 1);
 		std::string one_header;
 		while (pos + 1 != last && to_interpret.substr(pos + 1, last - pos) != CRLF)
