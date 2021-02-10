@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/10 14:49:09 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/10 15:08:02 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,7 @@ Request *read_request(int sd, Request *req)
 		}
 		if (req->isHeaderPresent("Transfer-Encoding", "chunked"))
 		{
+			//In chunked requests data length is in hex. transform hex to Int
 			while ((bytes = recv(sd, input, BUFFER_SIZE, 0)) > 0)
 			{
 				to_interpret.assign(input, bytes);
