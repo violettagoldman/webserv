@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vgoldman <vgoldman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 23:15:38 by vgoldman          #+#    #+#             */
-/*   Updated: 2021/01/13 21:29:09 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/07 20:18:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # define BUFFER_SIZE 1000
 
 int		get_next_line(int fd, char **line);
+int		fd_get_next_line(int fd, char **line);
 char	*get_rest_buffer(char *str);
 int		breaks_checker(char *buffer);
 char	*get_first_line(char *buffer);
