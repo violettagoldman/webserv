@@ -245,7 +245,6 @@ void Reader::parse_limit_except()
 void Reader::parseFcgiParam(size_t needle)
 {
 	std::string directive = getDirective(needle, lineString);
-	std::cout << "directive: " << directive << std::endl;
 	size_t cursor = 0;
 	size_t keyStart = 0;
 	while(!isspace(directive[cursor]))
@@ -261,7 +260,6 @@ void Reader::parseFcgiParam(size_t needle)
 	size_t valueEnd = directive.find(";", valueStart);
 	std::string key = directive.substr(keyStart, keyEnd-keyStart);
 	std::string value = directive.substr(valueStart, valueEnd-valueStart);
-	std::cout << "Value: |" << value << "|" << std::endl;
 	lp.fcgiParams[key] = value;
 }
 
