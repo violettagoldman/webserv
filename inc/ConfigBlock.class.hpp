@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ServerBlock.class.hpp                              :+:      :+:    :+:   */
+/*   ConfigBlock.class.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,44 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVERBLOCK_CLASS_HPP
-# define SERVERBLOCK_CLASS_HPP
+#ifndef CONFIGBLOCK_CLASS_HPP
+# define CONFIGBLOCK_CLASS_HPP
 
 # include "ABlock.class.hpp"
-# include "LocationBlock.class.hpp"
+# include "ServerBlock.class.hpp"
 
-class ServerBlock : public ABlock
+class ConfigBlock : public ABlock
 {
 public:
-	ServerBlock(ConfigFile &confFile);
+	ConfigBlock(ConfigFile &confFile);
 	virtual void handleLine(std::string lineString);
+	void handle();
 
-	int getListenIp(void) const;
-	std::string getListenHost(void) const;
-	std::vector<std::string> getServerName(void) const;
-	std::vector<LocationBlock> getLocations(void) const;
+	std::vector<ServerBlock> getVirtualHostVector(void) const;
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
-	std::string getUploadStore(void) const;
 	std::string getRoot(void) const;
 
-	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
-			std::vector<std::string> index);
+	void check(void);
 
 private:
-	std::vector<LocationBlock> locationBlockVector;
-
-
-
-	int listenIp;
+	std::vector<ServerBlock> virtualHostVector;
 	int clientMaxBodySize;
 	bool autoindex;
-	std::string listenHost;
-	std::vector<std::string> serverName;
-	std::vector<LocationBlock> locations;
 	std::vector<std::string> index;
-	std::string uploadStore;
 	std::string root;
 
 };

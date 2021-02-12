@@ -14,6 +14,9 @@
 
 LocationBlock::LocationBlock(ConfigFile &confFile) : ABlock(confFile)
 {
+	this->rootSet = false;
+	this->fcgiSet = false;
+	this->uploadStoreSet = false;
 }
 
 /*
@@ -36,10 +39,40 @@ std::string LocationBlock::parsePattern(std::string line)
 	return pattern;
 }
 
+void LocationBlock::inheritParams(int _clientMaxBodySize, bool _autoindex,
+		std::string _root, std::vector<std::string> _index, std::string _uploadStore)
+{
+	this->clientMaxBodySize = _clientMaxBodySize;
+	this->autoindex = _autoindex;
+	this->root = _root;
+	this->index = _index;
+	this->uploadStore = _uploadStore;
+}
+
+void LocationBlock::check()
+{
+	if (rootSet == true && fcgiSet == true)
+		throw Exception("Root and fcgi_pass on the same location.");
+	if (fcgiSet == true && uploadStoreSet == true)
+		throw Exception("Upload_store and fcgi_pass on the same location.");
+}
+
+// void LocationBlock::inheritParams(ABlock *parent)
+// {
+// 	this->clientMaxBodySize = parent->getClientMaxBodySize;
+// }
 
 void LocationBlock::handleLine(std::string lineString)
 {
-	std::cout << "LocationBlock handled: " << lineString << std::endl;
+	// std::cout << "LocationBlock handled: " << lineString << std::endl;
+
+	if (lineString.find("limit_except") != std::string::npos)
+	{
+		LimitExceptBlock lExcept(this->getConfFile());
+		lExcept.handle();
+
+		limitExceptVector.push_back(lExcept);
+	}
 
 	if (isPresent(lineString, "root"))
 	{
@@ -56,7 +89,7 @@ void LocationBlock::handleLine(std::string lineString)
 	}
 	if (isPresent(lineString, "autoindex"))
 	{
-		this->autoindex = parseBoolDirective(getDirective(needle+9, lineString));
+		this->autoindex = parseBoolDirective(lineString, "autoindex");
 	}
 	if (isPresent(lineString, "fastcgi_pass"))
 	{
@@ -69,12 +102,11 @@ void LocationBlock::handleLine(std::string lineString)
 	}
 	else if (isPresent(lineString, "index"))
 	{
-		this->index = split(getDirective(
-			needle+5, lineString), ' ');
+		this->index = ft_split(getStringDirective(lineString, "index"), ' ');
 	}
 	else if (isPresent(lineString, "upload_store"))
 	{
-		this->uploadStore = getDirective(needle+12, lineString);
+		this->uploadStore = getStringDirective(lineString, "upload_store");
 		this->uploadStoreSet = true;
 	}
 }
@@ -104,9 +136,9 @@ std::vector<std::string> LocationBlock::getIndex(void) const
 	return this->index;
 }
 
-LimitExcept LocationBlock::getLimitExcept(void) const
+std::vector<LimitExceptBlock> LocationBlock::getLimitExceptVector(void) const
 {
-	return this->limitExcept;
+	return this->limitExceptVector;
 }
 
 std::string LocationBlock::getFcgiPass(void) const

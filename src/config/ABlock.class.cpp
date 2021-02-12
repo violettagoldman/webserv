@@ -29,17 +29,45 @@ ABlock::ABlock(ConfigFile &confFile) :
 {
 }
 
+int ABlock::countOccurence(std::string s, char c)
+{
+	return std::count(s.begin(), s.end(), c);
+}
+
+void ABlock::checkLine(std::string lineString)
+{
+	if (countOccurence(lineString, '}') > 1)
+		throw Exception("Please close each block on a new line.");
+	if ((lineString.find(';', 0) != std::string::npos && \
+		lineString.find(';', 0) != (lineString.size() - 1)) ||
+			countOccurence(lineString, ';') > 1)
+		throw Exception("Please only put one directive per line.");
+}
+
+void ABlock::check(void)
+{
+}
+
 void ABlock::handle()
 {
+	bool blockClosed;
 	do
 	{
+		checkLine(_confFile.getLineString());
+
 		if (_confFile.getLineString().find("}") != std::string::npos)
+		{
+			blockClosed = true;
 			break;
+		}
 
 		handleLine(_confFile.getLineString());
 
 	}
 	while(_confFile.getNext());
+	if (!blockClosed)
+		throw Exception("A block wasn't closed");
+	check();
 }
 
 void ABlock::handleLine(std::string lineString)
@@ -66,7 +94,7 @@ bool ABlock::isPresent(std::string lineString, std::string keyword)
 std::string ABlock::getStringDirective(std::string lineString, std::string key)
 {
 	size_t keyStart = lineString.find(key);
-	size_t valueStart = keyStart;
+	size_t valueStart = keyStart + key.size();
 
 	while (isspace(lineString[valueStart]))
 		valueStart++;
@@ -74,7 +102,8 @@ std::string ABlock::getStringDirective(std::string lineString, std::string key)
 	size_t semicolon = lineString.find(";", keyStart);
 	if (semicolon == std::string::npos)
 		throw Exception("A semicolon is missing");
-	return lineString.substr(keyStart, semicolon-keyStart);
+
+	return lineString.substr(valueStart, semicolon-valueStart);
 }
 
 ConfigFile &ABlock::getConfFile(void) const
@@ -110,30 +139,30 @@ void ABlock::trimWhitespaceStart(std::string &s)
 	}
 }
 
-// TODO : test some more
-int	ft_atoi(const char *str)
-{
-	int		nbr;
-	int		sign;
+// // TODO : test some more
+int	ft_atoi(const char *str);
+// {
+// 	int		nbr;
+// 	int		sign;
 
-	nbr = 0;
-	sign = 1;
-	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
-			|| (*str) == '\r' || (*str) == ' ')
-		str++;
-	if ((*str) == '-' || (*str) == '+')
-	{
-		sign *= ((*str) == '-' ? -1 : 1);
-		str++;
-	}
-	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
-	{
-		nbr *= 10;
-		nbr += (*str) - '0';
-		str++;
-	}
-	return (nbr * sign);
-}
+// 	nbr = 0;
+// 	sign = 1;
+// 	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+// 			|| (*str) == '\r' || (*str) == ' ')
+// 		str++;
+// 	if ((*str) == '-' || (*str) == '+')
+// 	{
+// 		sign *= ((*str) == '-' ? -1 : 1);
+// 		str++;
+// 	}
+// 	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
+// 	{
+// 		nbr *= 10;
+// 		nbr += (*str) - '0';
+// 		str++;
+// 	}
+// 	return (nbr * sign);
+// }
 
 // int parse_size(size_t needle, std::string lineString)
 int ABlock::parseClientMaxBodySize(std::string lineString)
@@ -177,4 +206,36 @@ void ABlock::parseFastCGIParam(std::string lineString,
 	std::string key = directive.substr(keyStart, keyEnd-keyStart);
 	std::string value = directive.substr(valueStart, valueEnd-valueStart);
 	params[key] = value;
+}
+
+bool ABlock::parseBoolDirective(std::string lineString, std::string key)
+{
+	std::string directive = getStringDirective(lineString, key);
+
+	if (directive == "on")
+		return true;
+	else
+		return false;
+	// TODO exception
+}
+
+void ABlock::parseListen(std::string lineString, std::string &listenHost,
+							int &listenIp)
+{
+	std::string directive = getStringDirective(lineString, "listen");
+	size_t valueStart = 0;
+	size_t hostEnd;
+	if ((hostEnd = directive.find(":")) != std::string::npos)
+	{
+		listenHost = directive.substr(valueStart, hostEnd - valueStart);
+		trimWhitespaceStart(listenHost);
+		size_t valueEnd = directive.find(";", hostEnd);
+		listenIp = ft_atoi(
+			directive.substr(hostEnd+1, valueEnd - hostEnd).c_str());
+	}
+	else
+	{
+		listenHost = "";
+		listenIp = ft_atoi(directive.c_str());
+	}
 }

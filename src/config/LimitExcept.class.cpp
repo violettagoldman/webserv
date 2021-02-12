@@ -12,6 +12,20 @@
 
 #include "LimitExcept.class.hpp"
 
+std::vector<std::string> ft_split(std::string s, char c)
+{
+	std::vector<std::string> ret;
+	int i = 0;
+	size_t pos;
+	while ((pos = s.find(c, i)) != std::string::npos)
+	{
+		ret.push_back(s.substr(i, pos-i));
+		i = pos+1;
+	}
+	ret.push_back(s.substr(i));
+	return ret;
+}
+
 LimitExcept::LimitExcept()
 {
 }

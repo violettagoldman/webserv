@@ -19,6 +19,8 @@
 # include <map>
 # include "LimitExcept.class.hpp"
 # include "Exception.class.hpp"
+# include "Utility.hpp"
+# include "LimitExceptBlock.class.hpp"
 
 
 class LocationBlock : public ABlock
@@ -27,21 +29,29 @@ public:
 	LocationBlock(ConfigFile &confFile);
 	void handleLine(std::string lineString);
 
+	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
+			std::vector<std::string> index, std::string uploadStore);
 
+	void inheritParams(ABlock *parent);
 
 	std::string getPattern(void) const;
 	std::string getRoot(void) const;
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
-	LimitExcept getLimitExcept(void) const;
+	// LimitExcept getLimitExcept(void) const;
+
+
 	std::string getFcgiPass(void) const;
 	std::map<std::string, std::string> getFcgiParams(void) const;
 	std::string getUploadStore(void) const;
+	std::vector<LimitExceptBlock> getLimitExceptVector(void) const;
 
 	bool getFcgiSet(void) const;
 	bool getRootSet(void) const;
 	bool getUploadStoreSet(void) const;
+
+	void check(void);
 
 private:
 
@@ -52,7 +62,9 @@ private:
 	std::string pattern;
 	std::string root;
 	std::vector<std::string> index;
-	LimitExcept limitExcept;
+	// LimitExcept limitExcept;
+
+	std::vector<LimitExceptBlock> limitExceptVector;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
 	std::string uploadStore;

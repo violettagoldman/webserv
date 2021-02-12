@@ -24,17 +24,21 @@ void throwexp2(std::string msg)
 */
 void AConfigReader::parse(std::string lineString)
 {
-	std::cout << "Parse: " << lineString << std::endl;
+	// std::cout << "Parse: " << lineString << std::endl;
 
-	if (lineString.find("server") != std::string::npos)
-	{
-		ServerBlock sb(this->confFile);
-		sb.handle();
 
-		serverBlockVector.push_back(sb);
-		// ABlock(this->confFile);
+	configBlock = new ConfigBlock(confFile);
 
-	}
+	configBlock->handle();
+	// if (lineString.find("server") != std::string::npos)
+	// {
+	// 	ServerBlock sb(this->confFile);
+	// 	sb.handle();
+
+	// 	serverBlockVector.push_back(sb);
+	// 	// ABlock(this->confFile);
+
+	// }
 	// size_t needle;
 	// if (lineString.find("server") != std::string::npos)
 	// {
@@ -81,6 +85,9 @@ AConfigReader::AConfigReader(std::string filename) :
 		parse(confFile.getLineString());
 	}
 
-	
+}
 
+ConfigBlock *AConfigReader::createConfig()
+{
+	return configBlock;
 }

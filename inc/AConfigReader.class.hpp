@@ -33,6 +33,7 @@
 # include "Exception.class.hpp"
 
 # include "ConfigFile.class.hpp"
+# include "ConfigBlock.class.hpp"
 // # include "ABlock.class.hpp"
 # include "ServerBlock.class.hpp"
 
@@ -41,12 +42,16 @@ class AConfigReader
 public:
 	AConfigReader(std::string filename);
 
+	ConfigBlock *createConfig();
+
 private:
 	// int fd;
 	// int ret;
 	// char *line;
 
 	ConfigFile confFile;
+
+	ConfigBlock *configBlock;
 	std::string lineString;
 
 	// virtualHostPrototype vhp;
