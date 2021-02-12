@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   AConfigReader.hpp                                  :+:      :+:    :+:   */
+/*   ConfigReader.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ACONFIGREADER_HPP
-# define ACONFIGREADER_HPP
+#ifndef CONFIGREADER_HPP
+# define CONFIGREADER_HPP
 
 # include <string>
 # include <vector>
@@ -26,10 +26,6 @@
 
 
 # include "get_next_line.h"
-# include "VirtualHost.class.hpp"
-# include "Location.class.hpp"
-# include "Config.class.hpp"
-# include "LimitExcept.class.hpp"
 # include "Exception.class.hpp"
 
 # include "ConfigFile.class.hpp"
@@ -37,10 +33,10 @@
 // # include "ABlock.class.hpp"
 # include "ServerBlock.class.hpp"
 
-class AConfigReader
+class ConfigReader
 {
 public:
-	AConfigReader(std::string filename);
+	ConfigReader(std::string filename);
 
 	ConfigBlock *createConfig();
 

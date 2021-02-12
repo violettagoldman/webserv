@@ -6,11 +6,9 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:09:50 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/12 16:10:09 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/12 16:22:14 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "AConfigReader.class.hpp"
 
 // int main(void)
 // {
@@ -37,7 +35,6 @@
 
 #include <iostream>
 
-#include "AConfigReader.class.hpp"
 
 bool exception_thrown = false;
 
@@ -84,15 +81,14 @@ void check(int expression)
 	
 }
 
-#include "VirtualHost.class.hpp"
-#include "Reader.class.hpp"
+#include "ConfigReader.class.hpp"
 
 int main(void)
 {
 	// out("virtualHost | Default virtualHost");
 	// virtualHost default_virtualHost;
 	out("Simple config");
-	AConfigReader r("./config/test_configs/nginx.conf");
+	ConfigReader r("./config/test_configs/nginx.conf");
 
 	ConfigBlock *conf = r.createConfig();
 
@@ -192,45 +188,45 @@ int main(void)
 	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
 
 	out("Exception | Missing semicolon");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
 
 	out("Exception | Block not closed");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/block_not_closed.conf"), Exception, "A block wasn't closed");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/block_not_closed.conf"), Exception, "A block wasn't closed");
 
 	out("Exception | Two braces on one line");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/two_braces_on_line.conf"), Exception, "Please close each block on a new line.");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_braces_on_line.conf"), Exception, "Please close each block on a new line.");
 
 	out("Exception | Two directives");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/two_directives_on_one_line.conf"), Exception, "Please only put one directive per line.");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_directives_on_one_line.conf"), Exception, "Please only put one directive per line.");
 
 	out("Exception | Two directives (text after semicolon)");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/text_after_semicolon.conf"), Exception, "Please only put one directive per line.");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/text_after_semicolon.conf"), Exception, "Please only put one directive per line.");
 
 	out("Exception | limit_except not closed");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/limit_except_not_closed.conf"), Exception, "A block wasn't closed");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/limit_except_not_closed.conf"), Exception, "A block wasn't closed");
 
 	out("Exception | location not closed");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/location_not_closed.conf"), Exception, "A block wasn't closed");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/location_not_closed.conf"), Exception, "A block wasn't closed");
 
 	out("Exception | file errors");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/nonexistent_config"), Exception, "Couldn't open file");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/nonexistent_config"), Exception, "Couldn't open file");
 
 	out("Exception | overflow");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/overflow1.conf"), Exception, "clientMaxBodySize too large");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/overflow1.conf"), Exception, "clientMaxBodySize too large");
 
 	out("Exception | overflow");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/overflow2.conf"), Exception, "clientMaxBodySize too large");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/overflow2.conf"), Exception, "clientMaxBodySize too large");
 
 	
 	out("Exception | two servers with one name");
-	TEST_EXCEPTION(AConfigReader r2("./config/test_configs/two_servers_with_one_name.conf"), Exception, "Two servers with one server_name and listen");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_servers_with_one_name.conf"), Exception, "Two servers with one server_name and listen");
 
 	
 	out("Exception | root and fcgi on same location");
-	TEST_EXCEPTION(AConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
 
 	out("Exception | upload and fcgi on same location");
-	TEST_EXCEPTION(AConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
 
 	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");

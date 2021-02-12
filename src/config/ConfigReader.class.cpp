@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   AConfigReader.cpp                                  :+:      :+:    :+:   */
+/*   ConfigReader.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "AConfigReader.class.hpp"
+#include "ConfigReader.class.hpp"
 
 void throwexp2(std::string msg)
 {
@@ -22,7 +22,7 @@ void throwexp2(std::string msg)
 ** Parse the file, reading server blocks into virtualHost objects in
 ** virtualHostVector member.
 */
-void AConfigReader::parse(std::string lineString)
+void ConfigReader::parse(std::string lineString)
 {
 	// std::cout << "Parse: " << lineString << std::endl;
 
@@ -64,7 +64,7 @@ void AConfigReader::parse(std::string lineString)
 	// }
 }
 
-AConfigReader::AConfigReader(std::string filename) :
+ConfigReader::ConfigReader(std::string filename) :
 	confFile(filename)
 {
 	// lastLineParsed = "";
@@ -87,7 +87,7 @@ AConfigReader::AConfigReader(std::string filename) :
 
 }
 
-ConfigBlock *AConfigReader::createConfig()
+ConfigBlock *ConfigReader::createConfig()
 {
 	return configBlock;
 }

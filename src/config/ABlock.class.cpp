@@ -140,29 +140,50 @@ void ABlock::trimWhitespaceStart(std::string &s)
 }
 
 // // TODO : test some more
-int	ft_atoi(const char *str);
-// {
-// 	int		nbr;
-// 	int		sign;
+int	ft_atoi(const char *str)
+{
+	int		nbr;
+	int		sign;
 
-// 	nbr = 0;
-// 	sign = 1;
-// 	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
-// 			|| (*str) == '\r' || (*str) == ' ')
-// 		str++;
-// 	if ((*str) == '-' || (*str) == '+')
-// 	{
-// 		sign *= ((*str) == '-' ? -1 : 1);
-// 		str++;
-// 	}
-// 	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
-// 	{
-// 		nbr *= 10;
-// 		nbr += (*str) - '0';
-// 		str++;
-// 	}
-// 	return (nbr * sign);
-// }
+	nbr = 0;
+	sign = 1;
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+			|| (*str) == '\r' || (*str) == ' ')
+		str++;
+	if ((*str) == '-' || (*str) == '+')
+	{
+		sign *= ((*str) == '-' ? -1 : 1);
+		str++;
+	}
+	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
+	{
+		nbr *= 10;
+		nbr += (*str) - '0';
+		str++;
+	}
+	return (nbr * sign);
+}
+
+/*
+** Split a string s, separated by delimiter c
+** @param s String that needs to be splitted
+** @param c The delimiter
+** @ret std::vector<std::string> the vector of resulting separated strings
+*/
+std::vector<std::string> ft_split(std::string s, char c)
+{
+	std::vector<std::string> ret;
+	int i = 0;
+	size_t pos;
+	while ((pos = s.find(c, i)) != std::string::npos)
+	{
+		ret.push_back(s.substr(i, pos-i));
+		i = pos+1;
+	}
+	ret.push_back(s.substr(i));
+	return ret;
+}
+
 
 // int parse_size(size_t needle, std::string lineString)
 int ABlock::parseClientMaxBodySize(std::string lineString)
