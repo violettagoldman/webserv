@@ -3,11 +3,14 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "../inc/Request.class.hpp"
+#include "../inc/Config.class.hpp"
+#include "../inc/Reader.class.hpp"
+
 // #include "../inc/Header.class.hpp"
 // #include "./read_request.cpp"
 
 Request *read_request(int sd, Request *req);
-
+void handler(Request *req, Config *conf);
 int main(void)
 {
     int     i;
@@ -18,9 +21,10 @@ int main(void)
     int     new_socket;
 	Request *request = new Request;
 	// int valread;
+	Reader reader("./tests/config/test_configs/nginx.conf");
+	Config *conf = reader.createConfig();
 	int sd;
 	int max_sd;
-
     s = Server();
     for (i = 0; i < 30; i++)
 		clients[i] = 0;
@@ -85,10 +89,11 @@ int main(void)
 				}
 				else if (request->getState() == "read")
 				{
-					request->print_headers();
+					// request->print_headers();
+					handler(request, conf);
 					// cgi_dostuff(request);
 					std::cout << request->getPath() << std::endl;
-					
+
 					std::cout << "Success" << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;

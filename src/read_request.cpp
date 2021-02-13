@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/10 15:48:54 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/13 13:04:18 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,14 @@
 const std::string CRLF = "\r\n";
 const std::string WSP = "\r ";
 // std::vector<std::string> ft_split(std::string input, char key);
+
+
+/*
+* A Host header field must be sent in all HTTP/1.1 request messages.
+* A 400 (Bad Request) status code may be sent to any HTTP/1.1 request message
+* that lacks a Host header field or that contains more than one.
+*/
+
 std::vector<std::string> ft_split(std::string s, char c)
 {
 	std::vector<std::string> ret;
@@ -115,9 +123,9 @@ Request *read_request(int sd, Request *req)
 		req->setState("read");
 		Header *hed;
 		pos = to_interpret.find("\n");
-		start_line = to_interpret.substr(0, pos);
+		start_line = to_interpret.substr(0, pos - 1);
 		int kek = req->startLineReader(start_line);
-		std::cout << kek << std::endl; 
+		std::cout << kek << std::endl;
 		last = to_interpret.find('\n', pos + 1);
 		std::string one_header;
 		while (pos + 1 != last && to_interpret.substr(pos + 1, last - pos) != CRLF)

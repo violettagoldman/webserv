@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/10 15:54:59 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/13 13:05:07 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,17 +124,12 @@ int Request::startLineReader(std::string line)
 	if (line.find("  ") != std::string::npos)
 		return 400;
 	elements = ft_split(line, ' ');
-
-	std::cout << elements[0] <<  elements.size() << std::endl;
-	std::cout << elements[1] << std::endl;
-	std::cout << (elements[2] != "HTTP/1.1") <<  std::endl;
 	if (elements.size() != 3 || elements[2] != "HTTP/1.1")
 		return 401;
 	if (isMethod(elements[0]) == -1)
 		return 501;
 	_method = elements[0];
 	uri_handler(elements[1]);
-	std::cout << elements[1] << std::endl;
 	return 0;
 }
 
@@ -197,7 +192,6 @@ int Request::getError(void)
 
 std::string Request::getPath(void) const
 {
-	std::cout << "trsrtat"<< std::endl;
 	return _path;
 }
 int Request::isHeaderPresent(std::string name, std::string value)
