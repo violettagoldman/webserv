@@ -10,7 +10,7 @@
 // #include "./read_request.cpp"
 
 Request *read_request(int sd, Request *req);
-void handler(Request *req, Config *conf);
+std::string handler(Request *req, Config *conf);
 int main(void)
 {
     int     i;
@@ -25,6 +25,7 @@ int main(void)
 	Config *conf = reader.createConfig();
 	int sd;
 	int max_sd;
+	std::string final_path;
     s = Server();
     for (i = 0; i < 30; i++)
 		clients[i] = 0;
@@ -90,10 +91,9 @@ int main(void)
 				else if (request->getState() == "read")
 				{
 					// request->print_headers();
-					handler(request, conf);
+					final_path = handler(request, conf);
 					// cgi_dostuff(request);
-					std::cout << request->getPath() << std::endl;
-
+					std::cout << final_path << std::endl;
 					std::cout << "Success" << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;
