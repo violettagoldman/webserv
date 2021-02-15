@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:04:49 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/06 15:37:32 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/10 14:46:05 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,10 @@ Header::Header(void)
 {}
 
 Header::Header(std::string name, std::vector<std::string> value):
-	_name(name), _values(value), _error(0)
-{}
+	_name(name), _error(0)
+{
+	_values = value;
+}
 
 Header::~Header(void)
 {}
@@ -102,8 +104,9 @@ std::vector<std::string> Header::getValue()
 
 void Header::print_out(void)
 {
-	std::cout << _name << " : ";
+	std::cout << _name << " : " << std::endl;
+
 	for (std::vector<std::string>::iterator it = _values.begin(); it < _values.end(); ++it)
-		std::cout << *it << ", ";
-	// std::cout << "\n";
+		std::cout << "value:" << *it << std::endl;
+	std::cout << std::endl;
 }

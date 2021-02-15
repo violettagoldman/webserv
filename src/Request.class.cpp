@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/07 16:36:50 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/13 13:05:07 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,23 @@
 *	@return vector<string> This returns vector of strings that are in input
 *	and separated by word.
 */
-std::vector<std::string> split(std::string input, std::string key = "")
-{
-	std::vector<std::string> names;
-	std::string word;
-	while (input.compare(word) != 0)
-	{
-		size_t index = input.find_first_of(key);
-		word = input.substr(0,index);
-		input = input.substr(index+1, input.length());
-		if (word.length() == 0)
-			continue;
-		names.push_back(word);
-	}
-	return names;
-}
+// std::vector<std::string> split(std::string input, std::string key = "")
+// {
+// 	std::vector<std::string> names;
+// 	std::string word;
+// 	while (input.compare(word) != 0)
+// 	{
+// 		size_t index = input.find_first_of(key);
+// 		word = input.substr(0,index);
+// 		input = input.substr(index+1, input.length());
+// 		if (word.length() == 0)
+// 			continue;
+// 		names.push_back(word);
+// 	}
+// 	return names;
+// }
+
+std::vector<std::string> ft_split(std::string s, char c);
 
 Request::Request(void) :
 	_read_bytes(0)
@@ -99,6 +101,7 @@ void Request::uri_handler(std::string str)
 	std::size_t fragment_pos;
 	std::size_t query_pos;
 
+
 	if ((fragment_pos = str.find("#")) != std::string::npos)
 	{
 		_fragment = str.substr(fragment_pos + 1);
@@ -117,12 +120,12 @@ void Request::uri_handler(std::string str)
 int Request::startLineReader(std::string line)
 {
 	std::vector<std::string> elements;
-
+	std::cout << line << std::endl;
 	if (line.find("  ") != std::string::npos)
 		return 400;
-	elements = split(line);
+	elements = ft_split(line, ' ');
 	if (elements.size() != 3 || elements[2] != "HTTP/1.1")
-		return 400;
+		return 401;
 	if (isMethod(elements[0]) == -1)
 		return 501;
 	_method = elements[0];
@@ -185,6 +188,11 @@ void Request::setError(int error)
 int Request::getError(void)
 {
 	return _error;
+}
+
+std::string Request::getPath(void) const
+{
+	return _path;
 }
 int Request::isHeaderPresent(std::string name, std::string value)
 {

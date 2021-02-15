@@ -3,11 +3,14 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "../inc/Request.class.hpp"
+#include "../inc/Config.class.hpp"
+#include "../inc/Reader.class.hpp"
+
 // #include "../inc/Header.class.hpp"
 // #include "./read_request.cpp"
 
 Request *read_request(int sd, Request *req);
-
+void handler(Request *req, Config *conf);
 int main(void)
 {
     int     i;
@@ -18,15 +21,16 @@ int main(void)
     int     new_socket;
 	Request *request = new Request;
 	// int valread;
+	Reader reader("./tests/config/test_configs/nginx.conf");
+	Config *conf = reader.createConfig();
 	int sd;
 	int max_sd;
-
     s = Server();
     for (i = 0; i < 30; i++)
 		clients[i] = 0;
 
-//     s.setup();
-//     s.listen();
+    s.setup();
+    s.listen();
 
 	std::cout << "Waiting for connections ...\n";
 
@@ -77,7 +81,6 @@ int main(void)
 			{
 				request = read_request(sd, request);
 				if (request->getState() == "end")
-				// if ((valread = read( sd , buffer, 1024)) == 0)
 				{
                     s.close();
 					printf("Host disconnected\n");
@@ -87,13 +90,20 @@ int main(void)
 				else if (request->getState() == "read")
 				{
 					// request->print_headers();
+					handler(request, conf);
 					// cgi_dostuff(request);
-					std::cout << "Success";
-					// std::cout << "Request method is " << request.getMethod() << std::endl;
+					std::cout << request->getPath() << std::endl;
+
+					std::cout << "Success" << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;
 				//
 				}
+				else if (request->getState() == "error")
+				{
+					std::cout << "Error";
+				}
+
 			}
 		}
 	}
