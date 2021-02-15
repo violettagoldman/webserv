@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/13 15:48:04 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/15 15:14:01 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,19 +56,46 @@ std::string path_to_pattern(std::string path)
 	return path.substr(0, pos + 1);
 }
 
-int check_location(VirtualHost host, std::string request_path)
+int count_match(std::string str1, std::string str2)
 {
-	std::vector<Location> server_locations = host.getLocations();
+	int count = 0;
+
+	int i = 0;
+	while (str1[i] != '\0' && str2[i] != '\0')
+	{
+		if (str1[i] == str2[i])
+			count++;
+		i++;
+	}
+	return count;
+}
+
+std::vector<Location>::iterator check_location(VirtualHost host, std::string request_path)
+{
 	std::string request_pattern = path_to_pattern(request_path);
+	std::vector<Location> server_locations = host.getLocations();
+	int count_max = 0;
+	int count_cur;
+	std::vector<Location>::iterator it_best;
 
 	for (std::vector<Location>::iterator it = server_locations.begin(); it < server_locations.end(); ++it)
 	{
-		std::cout << "Pattern :" << (*it).getPattern() << std::endl;
-		std::cout << "Request pattern :" << request_pattern << std::endl;
-		if ((*it).getPattern() == request_pattern)
-			return 1;
+		if ((count_cur = count_match((*it).getPattern(), request_pattern)) > count_max)
+		{
+			it_best = it;
+			count_max = count_cur;
+		}
 	}
-	return 0;
+	if (count_max > 0)
+		return it_best;
+	return server_locations.end();
+}
+
+std::string *create_final_path(Location loc, std::string request_path)
+{
+	std::string root = loc.getRoot();
+	std::string *final = new std::string(root + request_path.substr(1));
+	return final;
 }
 
 void handler(Request *req, Config *conf)
@@ -85,9 +112,23 @@ void handler(Request *req, Config *conf)
 	 {
 		 if (check_listen(*it, host_header))
 		 {
-			 std::string path = req->getPath();
-			 if (check_location(*it, path))
-			 	std::cout << "Need to create path pattern+root" << std::endl;
+			std::string request_path = req->getPath();
+			std::string request_pattern = path_to_pattern(request_path);
+			std::vector<Location> server_locations = (*it).getLocations();
+			std::vector<Location>::iterator it_best = check_location(*it, request_path);
+			if (it_best != server_locations.end())
+			{
+			 	std::string *final = create_final_path(*it_best, request_path);
+				std::cout << *final << std::endl;
+			}
+			else
+				std::cout << "404" << std::endl;
+			 // for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
+			 	// if (check_location())
+				 // if ((*it_loc).getPattern() == request_pattern)
+				 // 	std::cout << "Kek" << std::endl;
+			 // if (check_location(*it, path))
+			 	// create_final_path(*it)
 		 }
 	 }
  }
