@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/24 17:34:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/13 13:04:18 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/15 20:58:31 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,12 +96,12 @@ Header *header_split(std::string str)
 	values = remove_spaces(values);
 	// std::cout << values[0] << std::endl;
 	Header *new_header = new Header(header_name, values);
-	new_header->print_out();
-	if (!isValidHeader(header_name))
-	{
-		new_header->setError(-1);
-		return new_header;
-	}
+	// new_header->print_out();
+	// if (!isValidHeader(header_name))
+	// {
+	// 	new_header->setError(-1);
+	// 	return new_header;
+	// }
 	return new_header;
 }
 
