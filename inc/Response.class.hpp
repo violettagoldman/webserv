@@ -7,12 +7,14 @@
 # include <dirent.h>
 # include <sys/stat.h>
 # include "Utility.hpp"
+# include "Config.class.hpp"
+# include "Request.class.hpp"
 
 class Response
 {
 	public:
 		Response(void);
-		// Response(Request req);
+		Response(Request req, Config conf);
 		// Response(CGI cgi);
 		Response(Response const &src);
 		~Response(void);

@@ -89,6 +89,7 @@ int main(void)
 					// request->print_headers();
 					// cgi_dostuff(request);
 					std::cout << "Success";
+					Response(request, config);
 					// std::cout << "Request method is " << request.getMethod() << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;

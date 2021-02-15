@@ -9,8 +9,18 @@ Response::Response(void)
 	_headers["Date"] = getDate(getTime());
 	_headers["Server"] = "Webserv/1.0 (Unix)";
 	std::cout << "Default constructor called\n";
-	// setIndexPage();
-	// setErrorPage();
+	handleMethod();
+}
+
+Response::Response(Request req, Config conf)
+{
+	//test values
+	_method = "POST";
+	_statusCode = 200;
+	statusCodeTranslation();
+	_headers["Date"] = getDate(getTime());
+	_headers["Server"] = "Webserv/1.0 (Unix)";
+	std::cout << "Default constructor called\n";
 	handleMethod();
 }
 
@@ -203,6 +213,7 @@ void		Response::setErrorPage()
 {
 	std::string		html;
 
+	// check for customised pages
 	html = readFile("./pages/error.html");
 	html = replacehtml(html, "$1", ft_itoa(_statusCode));
 	html = replacehtml(html, "$2", _statusCodeTranslation[_statusCode]);
