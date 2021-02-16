@@ -1,46 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LimitExcept.hpp                                    :+:      :+:    :+:   */
+/*   LimitExcept.class.hpp                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/21 22:15:18 by ashishae         ###   ########.fr       */
+/*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
+/*   Updated: 2021/02/11 12:07:39 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIMITEXCEPT_CLASS_HPP
 # define LIMITEXCEPT_CLASS_HPP
 
-# include <string>
-# include <vector>
-# include <exception>
+# include "ABlock.class.hpp"
+// # include "LocationBlock.class.hpp"
+# include "Utility.hpp"
 
-// std::string read_directive(std::string block, std::string key);
-
-typedef struct sLimitExceptPrototype
+class LimitExcept : public ABlock
 {
-	std::vector<std::string> allow;
-	std::vector<std::string> deny;
-	std::string method;
-}	limitExceptPrototype;
-
-
-
-class LimitExcept {
-
 public:
-	LimitExcept();
-	LimitExcept(std::vector<std::string> allow,
-					std::vector<std::string> deny, std::string method);
-	LimitExcept(limitExceptPrototype lep);
-	// LimitExcept(LimitExceptPrototype lp);
-	// ~LimitExcept();
+	LimitExcept(ConfigFile &confFile);
+	virtual void handleLine(std::string lineString);
 
+	static std::string parseMethod(std::string line);
+	
 	std::vector<std::string> getAllow(void) const;
 	std::vector<std::string> getDeny(void) const;
 	std::string getMethod(void) const;
+
 
 private:
 	std::vector<std::string> allow;

@@ -1,74 +1,75 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Location.hpp                                       :+:      :+:    :+:   */
+/*   Location.class.hpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/17 17:18:20 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:51:47 by ashishae         ###   ########.fr       */
+/*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
+/*   Updated: 2021/02/11 12:07:39 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LOCATION_CLASS_HPP
 # define LOCATION_CLASS_HPP
 
+# include "ABlock.class.hpp"
 # include <string>
 # include <vector>
 # include <map>
-# include "LimitExcept.class.hpp"
 # include "Exception.class.hpp"
+# include "Utility.hpp"
+# include "LimitExcept.class.hpp"
 
-std::string read_directive(std::string block, std::string key);
 
-typedef struct sLocationPrototype
+class Location : public ABlock
 {
-	std::string pattern;
-	std::string root;
-	int clientMaxBodySize;
-	bool autoindex;
-	std::vector<std::string> index;
-	LimitExcept limitExcept;
-	std::string fcgiPass;
-	std::map<std::string, std::string> fcgiParams;
-	std::string uploadStore;
-}	locationPrototype;
-
-class Location {
-
 public:
-	// Location();
-	// Location(std::string pattern, std::string block);
-	// Location(std::string pattern, std::string action_type, std::string value,
-		// int clientMaxBodySize, bool autoindex);
-	Location(locationPrototype lp);
-	~Location();
-	
-	// Location(const Location &copy);
-	// Location &operator= (const Location &operand);
+	Location(ConfigFile &confFile);
+	void handleLine(std::string lineString);
+
+	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
+			std::vector<std::string> index, std::string uploadStore);
+
+	void inheritParams(ABlock *parent);
 
 	std::string getPattern(void) const;
 	std::string getRoot(void) const;
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
-	LimitExcept getLimitExcept(void) const;
+	// LimitExcept getLimitExcept(void) const;
+
+
 	std::string getFcgiPass(void) const;
 	std::map<std::string, std::string> getFcgiParams(void) const;
 	std::string getUploadStore(void) const;
+	LimitExcept getLimitExcept(void) const;
+
+	bool getFcgiSet(void) const;
+	bool getRootSet(void) const;
+	bool getUploadStoreSet(void) const;
+
+	void check(void);
 
 private:
+
+	static std::string parsePattern(std::string line);
+
 	int clientMaxBodySize;
 	bool autoindex;
 	std::string pattern;
 	std::string root;
 	std::vector<std::string> index;
+	// LimitExcept limitExcept;
+
 	LimitExcept limitExcept;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
 	std::string uploadStore;
-
-
+	bool rootSet;
+	bool fcgiSet;
+	bool uploadStoreSet;
 };
 
 #endif
