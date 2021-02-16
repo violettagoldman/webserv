@@ -12,7 +12,7 @@
 
 #include "Location.class.hpp"
 
-Location::Location(ConfigFile &confFile) : ABlock(confFile)
+Location::Location(ConfigFile &confFile) : ABlock(confFile), limitExcept(confFile)
 {
 	this->rootSet = false;
 	this->fcgiSet = false;
@@ -68,10 +68,10 @@ void Location::handleLine(std::string lineString)
 
 	if (lineString.find("limit_except") != std::string::npos)
 	{
-		LimitExcept lExcept(this->getConfFile());
-		lExcept.handle();
+		// LimitExcept lExcept(this->getConfFile());
+		limitExcept.handle();
 
-		limitExceptVector.push_back(lExcept);
+		// limitExceptVector.push_back(lExcept);
 	}
 
 	if (isPresent(lineString, "root"))
@@ -136,9 +136,9 @@ std::vector<std::string> Location::getIndex(void) const
 	return this->index;
 }
 
-std::vector<LimitExcept> Location::getLimitExceptVector(void) const
+LimitExcept Location::getLimitExcept(void) const
 {
-	return this->limitExceptVector;
+	return this->limitExcept;
 }
 
 std::string Location::getFcgiPass(void) const

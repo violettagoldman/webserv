@@ -44,7 +44,7 @@ public:
 	std::string getFcgiPass(void) const;
 	std::map<std::string, std::string> getFcgiParams(void) const;
 	std::string getUploadStore(void) const;
-	std::vector<LimitExcept> getLimitExceptVector(void) const;
+	LimitExcept getLimitExcept(void) const;
 
 	bool getFcgiSet(void) const;
 	bool getRootSet(void) const;
@@ -63,7 +63,7 @@ private:
 	std::vector<std::string> index;
 	// LimitExcept limitExcept;
 
-	std::vector<LimitExcept> limitExceptVector;
+	LimitExcept limitExcept;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
 	std::string uploadStore;

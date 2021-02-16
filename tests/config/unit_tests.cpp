@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/16 15:14:03 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/16 16:19:49 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,15 +132,15 @@ int main(void)
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 	out("Host 1 | Location 0 | limit_except ");
-	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getMethod() == "GET");
-	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getAllow().size() == 2);
-	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getAllow()[0] == "127.0.0.1");
-	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getAllow()[1] == "127.0.0.2");
-	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getDeny().size() == 1);
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethod() == "GET");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow().size() == 2);
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[0] == "127.0.0.1");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[1] == "127.0.0.2");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny().size() == 1);
 
 	out("Host 1 | Root on server level");
 	check(virtualHostVector[1].getRoot() == "/var/www2/");
-	// check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0]().getDeny()[0] == "all");
+	// check(virtualHostVector[1].getLocations()[0].getLimitExcept()().getDeny()[0] == "all");
 
 	out("Host 1 | Location 0 | upload_store on Server, inherited to Location");
 	check(virtualHostVector[1].getUploadStore() == "/toto/lol/");
