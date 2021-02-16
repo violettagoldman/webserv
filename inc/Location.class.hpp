@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LocationBlock.class.hpp                            :+:      :+:    :+:   */
+/*   Location.class.hpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LOCATIONBLOCK_CLASS_HPP
-# define LOCATIONBLOCK_CLASS_HPP
+#ifndef LOCATION_CLASS_HPP
+# define LOCATION_CLASS_HPP
 
 # include "ABlock.class.hpp"
 # include <string>
@@ -19,13 +19,13 @@
 # include <map>
 # include "Exception.class.hpp"
 # include "Utility.hpp"
-# include "LimitExceptBlock.class.hpp"
+# include "LimitExcept.class.hpp"
 
 
-class LocationBlock : public ABlock
+class Location : public ABlock
 {
 public:
-	LocationBlock(ConfigFile &confFile);
+	Location(ConfigFile &confFile);
 	void handleLine(std::string lineString);
 
 	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
@@ -44,7 +44,7 @@ public:
 	std::string getFcgiPass(void) const;
 	std::map<std::string, std::string> getFcgiParams(void) const;
 	std::string getUploadStore(void) const;
-	std::vector<LimitExceptBlock> getLimitExceptVector(void) const;
+	std::vector<LimitExcept> getLimitExceptVector(void) const;
 
 	bool getFcgiSet(void) const;
 	bool getRootSet(void) const;
@@ -63,7 +63,7 @@ private:
 	std::vector<std::string> index;
 	// LimitExcept limitExcept;
 
-	std::vector<LimitExceptBlock> limitExceptVector;
+	std::vector<LimitExcept> limitExceptVector;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;
 	std::string uploadStore;

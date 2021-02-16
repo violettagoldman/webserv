@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LocationBlock.class.cpp                              :+:      :+:    :+:   */
+/*   Location.class.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "LocationBlock.class.hpp"
+#include "Location.class.hpp"
 
-LocationBlock::LocationBlock(ConfigFile &confFile) : ABlock(confFile)
+Location::Location(ConfigFile &confFile) : ABlock(confFile)
 {
 	this->rootSet = false;
 	this->fcgiSet = false;
@@ -29,7 +29,7 @@ LocationBlock::LocationBlock(ConfigFile &confFile) : ABlock(confFile)
 ** @param line The line containing the pattern.
 ** @ret std::string The pattern.
 */
-std::string LocationBlock::parsePattern(std::string line)
+std::string Location::parsePattern(std::string line)
 {
 	size_t loc_position = line.find("location");
 	size_t pattern_start = loc_position + 9;
@@ -39,7 +39,7 @@ std::string LocationBlock::parsePattern(std::string line)
 	return pattern;
 }
 
-void LocationBlock::inheritParams(int _clientMaxBodySize, bool _autoindex,
+void Location::inheritParams(int _clientMaxBodySize, bool _autoindex,
 		std::string _root, std::vector<std::string> _index, std::string _uploadStore)
 {
 	this->clientMaxBodySize = _clientMaxBodySize;
@@ -49,7 +49,7 @@ void LocationBlock::inheritParams(int _clientMaxBodySize, bool _autoindex,
 	this->uploadStore = _uploadStore;
 }
 
-void LocationBlock::check()
+void Location::check()
 {
 	if (rootSet == true && fcgiSet == true)
 		throw Exception("Root and fcgi_pass on the same location.");
@@ -57,18 +57,18 @@ void LocationBlock::check()
 		throw Exception("Upload_store and fcgi_pass on the same location.");
 }
 
-// void LocationBlock::inheritParams(ABlock *parent)
+// void Location::inheritParams(ABlock *parent)
 // {
 // 	this->clientMaxBodySize = parent->getClientMaxBodySize;
 // }
 
-void LocationBlock::handleLine(std::string lineString)
+void Location::handleLine(std::string lineString)
 {
-	// std::cout << "LocationBlock handled: " << lineString << std::endl;
+	// std::cout << "Location handled: " << lineString << std::endl;
 
 	if (lineString.find("limit_except") != std::string::npos)
 	{
-		LimitExceptBlock lExcept(this->getConfFile());
+		LimitExcept lExcept(this->getConfFile());
 		lExcept.handle();
 
 		limitExceptVector.push_back(lExcept);
@@ -111,62 +111,62 @@ void LocationBlock::handleLine(std::string lineString)
 	}
 }
 
-std::string LocationBlock::getPattern(void) const
+std::string Location::getPattern(void) const
 {
 	return this->pattern;
 }
 
-std::string LocationBlock::getRoot(void) const
+std::string Location::getRoot(void) const
 {
 	return this->root;
 }
 
-int LocationBlock::getClientMaxBodySize(void) const 
+int Location::getClientMaxBodySize(void) const 
 {
 	return this->clientMaxBodySize;
 }
 
-bool LocationBlock::getAutoindex(void) const
+bool Location::getAutoindex(void) const
 {
 	return this->autoindex;
 }
 
-std::vector<std::string> LocationBlock::getIndex(void) const
+std::vector<std::string> Location::getIndex(void) const
 {
 	return this->index;
 }
 
-std::vector<LimitExceptBlock> LocationBlock::getLimitExceptVector(void) const
+std::vector<LimitExcept> Location::getLimitExceptVector(void) const
 {
 	return this->limitExceptVector;
 }
 
-std::string LocationBlock::getFcgiPass(void) const
+std::string Location::getFcgiPass(void) const
 {
 	return this->fcgiPass;
 }
 
-std::map<std::string, std::string> LocationBlock::getFcgiParams(void) const
+std::map<std::string, std::string> Location::getFcgiParams(void) const
 {
 	return this->fcgiParams;
 }
 
-std::string LocationBlock::getUploadStore(void) const
+std::string Location::getUploadStore(void) const
 {
 	return this->uploadStore;
 }
 
-bool LocationBlock::getRootSet(void) const
+bool Location::getRootSet(void) const
 {
 	return this->rootSet;
 }
 
-bool LocationBlock::getFcgiSet(void) const
+bool Location::getFcgiSet(void) const
 {
 	return this->fcgiSet;
 }
 
-bool LocationBlock::getUploadStoreSet(void) const
+bool Location::getUploadStoreSet(void) const
 {
 	return this->uploadStoreSet;
 }

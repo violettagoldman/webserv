@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LimitExceptBlock.class.hpp                         :+:      :+:    :+:   */
+/*   Config.class.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,30 +10,33 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIMITEXCEPTBLOCK_CLASS_HPP
-# define LIMITEXCEPTBLOCK_CLASS_HPP
+#ifndef CONFIG_CLASS_HPP
+# define CONFIG_CLASS_HPP
 
 # include "ABlock.class.hpp"
-// # include "LocationBlock.class.hpp"
-# include "Utility.hpp"
+# include "VirtualHost.class.hpp"
 
-class LimitExceptBlock : public ABlock
+class Config : public ABlock
 {
 public:
-	LimitExceptBlock(ConfigFile &confFile);
+	Config(ConfigFile &confFile);
 	virtual void handleLine(std::string lineString);
+	void handle();
 
-	static std::string parseMethod(std::string line);
-	
-	std::vector<std::string> getAllow(void) const;
-	std::vector<std::string> getDeny(void) const;
-	std::string getMethod(void) const;
+	std::vector<VirtualHost> getVirtualHostVector(void) const;
+	int getClientMaxBodySize(void) const;
+	bool getAutoindex(void) const;
+	std::vector<std::string> getIndex(void) const;
+	std::string getRoot(void) const;
 
+	void check(void);
 
 private:
-	std::vector<std::string> allow;
-	std::vector<std::string> deny;
-	std::string method;
+	std::vector<VirtualHost> virtualHostVector;
+	int clientMaxBodySize;
+	bool autoindex;
+	std::vector<std::string> index;
+	std::string root;
 
 };
 

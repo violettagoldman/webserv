@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ServerBlock.class.hpp                              :+:      :+:    :+:   */
+/*   VirtualHost.class.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,22 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVERBLOCK_CLASS_HPP
-# define SERVERBLOCK_CLASS_HPP
+#ifndef VIRTUALHOST_CLASS_HPP
+# define VIRTUALHOST_CLASS_HPP
 
 # include "ABlock.class.hpp"
-# include "LocationBlock.class.hpp"
+# include "Location.class.hpp"
 
-class ServerBlock : public ABlock
+class VirtualHost : public ABlock
 {
 public:
-	ServerBlock(ConfigFile &confFile);
-	virtual void handleLine(std::string lineString);
+	VirtualHost(ConfigFile &confFile);
+	void handleLine(std::string lineString);
 
 	int getListenIp(void) const;
 	std::string getListenHost(void) const;
 	std::vector<std::string> getServerName(void) const;
-	std::vector<LocationBlock> getLocations(void) const;
+	std::vector<Location> getLocations(void) const;
 	int getClientMaxBodySize(void) const;
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
@@ -36,16 +36,14 @@ public:
 			std::vector<std::string> index);
 
 private:
-	std::vector<LocationBlock> locationBlockVector;
-
-
+	std::vector<Location> locationBlockVector;
 
 	int listenIp;
 	int clientMaxBodySize;
 	bool autoindex;
 	std::string listenHost;
 	std::vector<std::string> serverName;
-	std::vector<LocationBlock> locations;
+	std::vector<Location> locations;
 	std::vector<std::string> index;
 	std::string uploadStore;
 	std::string root;

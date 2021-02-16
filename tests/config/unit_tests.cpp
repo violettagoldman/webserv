@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/10 15:36:59 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/16 15:14:03 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,14 +65,14 @@ void check(int expression)
 }
 
 #include "VirtualHost.class.hpp"
-#include "Reader.class.hpp"
+#include "ConfigReader.class.hpp"
 
 int main(void)
 {
 	// out("virtualHost | Default virtualHost");
 	// virtualHost default_virtualHost;
 	out("Simple config");
-	Reader r("./config/test_configs/nginx.conf");
+	ConfigReader r("./config/test_configs/nginx.conf");
 
 	Config *conf = r.createConfig();
 
@@ -132,15 +132,15 @@ int main(void)
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 	out("Host 1 | Location 0 | limit_except ");
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethod() == "GET");
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow().size() == 2);
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[0] == "127.0.0.1");
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[1] == "127.0.0.2");
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny().size() == 1);
+	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getMethod() == "GET");
+	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getAllow().size() == 2);
+	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getAllow()[0] == "127.0.0.1");
+	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getAllow()[1] == "127.0.0.2");
+	check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0].getDeny().size() == 1);
 
 	out("Host 1 | Root on server level");
 	check(virtualHostVector[1].getRoot() == "/var/www2/");
-	// check(virtualHostVector[1].getLocations()[0].getLimitExcept().getDeny()[0] == "all");
+	// check(virtualHostVector[1].getLocations()[0].getLimitExceptVector()[0]().getDeny()[0] == "all");
 
 	out("Host 1 | Location 0 | upload_store on Server, inherited to Location");
 	check(virtualHostVector[1].getUploadStore() == "/toto/lol/");
@@ -171,53 +171,52 @@ int main(void)
 	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
 
 	out("Exception | Missing semicolon");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
 
 	out("Exception | Block not closed");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/block_not_closed.conf"), Exception, "A block wasn't closed");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/block_not_closed.conf"), Exception, "A block wasn't closed");
 
 	out("Exception | Two braces on one line");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/two_braces_on_line.conf"), Exception, "Please close each block on a new line.");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_braces_on_line.conf"), Exception, "Please close each block on a new line.");
 
 	out("Exception | Two directives");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/two_directives_on_one_line.conf"), Exception, "Please only put one directive per line.");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_directives_on_one_line.conf"), Exception, "Please only put one directive per line.");
 
 	out("Exception | Two directives (text after semicolon)");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/text_after_semicolon.conf"), Exception, "Please only put one directive per line.");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/text_after_semicolon.conf"), Exception, "Please only put one directive per line.");
 
 	out("Exception | limit_except not closed");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/limit_except_not_closed.conf"), Exception, "A block wasn't closed");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/limit_except_not_closed.conf"), Exception, "A block wasn't closed");
 
 	out("Exception | location not closed");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/location_not_closed.conf"), Exception, "A block wasn't closed");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/location_not_closed.conf"), Exception, "A block wasn't closed");
 
 	out("Exception | file errors");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/nonexistent_config"), Exception, "Couldn't open file");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/nonexistent_config"), Exception, "Couldn't open file");
 
 	out("Exception | overflow");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/overflow1.conf"), Exception, "clientMaxBodySize too large");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/overflow1.conf"), Exception, "clientMaxBodySize too large");
 
 	out("Exception | overflow");
-	TEST_EXCEPTION(Reader r2("./config/test_configs/overflow2.conf"), Exception, "clientMaxBodySize too large");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/overflow2.conf"), Exception, "clientMaxBodySize too large");
 
-	Reader r2("./config/test_configs/two_servers_with_one_name.conf");
 	out("Exception | two servers with one name");
-	TEST_EXCEPTION(r2.createConfig(), Exception, "Two servers with one server_name and listen");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_servers_with_one_name.conf"), Exception, "Two servers with one server_name and listen");
 
 	
 	out("Exception | root and fcgi on same location");
-	TEST_EXCEPTION(Reader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
 
 	out("Exception | upload and fcgi on same location");
-	TEST_EXCEPTION(Reader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
 
-	// TEST_EXCEPTION(Reader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
+	// TEST_EXCEPTION(ConfigReader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 
-	// TEST_EXCEPTION(Reader r2("missing_root.conf"), Location::DirectiveNotFound,\
+	// TEST_EXCEPTION(ConfigReader r2("missing_root.conf"), Location::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");
 	
-	// TEST_EXCEPTION(Reader r2("syntaxerror.conf"), Reader::SyntaxError,\
+	// TEST_EXCEPTION(ConfigReader r2("syntaxerror.conf"), Reader::SyntaxError,\
 	// 				"The virtualHost file contains a syntax error.");
 
 					

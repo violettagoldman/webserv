@@ -48,9 +48,13 @@ void ABlock::check(void)
 {
 }
 
+ABlock::~ABlock(void)
+{
+}
+
 void ABlock::handle()
 {
-	bool blockClosed;
+	bool blockClosed = false;
 	do
 	{
 		checkLine(_confFile.getLineString());

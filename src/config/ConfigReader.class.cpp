@@ -22,12 +22,12 @@ void throwexp2(std::string msg)
 ** Parse the file, reading server blocks into virtualHost objects in
 ** virtualHostVector member.
 */
-void ConfigReader::parse(std::string lineString)
+void ConfigReader::parse()
 {
 	// std::cout << "Parse: " << lineString << std::endl;
 
 
-	configBlock = new ConfigBlock(confFile);
+	configBlock = new Config(confFile);
 
 	configBlock->handle();
 	// if (lineString.find("server") != std::string::npos)
@@ -82,12 +82,13 @@ ConfigReader::ConfigReader(std::string filename) :
 	// this->confFile = ConfigFile(filename);
 	while (confFile.getNext())
 	{
-		parse(confFile.getLineString());
+		confFile.getLineString();
+		parse();
 	}
 
 }
 
-ConfigBlock *ConfigReader::createConfig()
+Config *ConfigReader::createConfig()
 {
 	return configBlock;
 }

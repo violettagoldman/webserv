@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ServerBlock.class.cpp                              :+:      :+:    :+:   */
+/*   VirtualHost.class.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,18 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ServerBlock.class.hpp"
+#include "VirtualHost.class.hpp"
 
-ServerBlock::ServerBlock(ConfigFile &confFile) : ABlock(confFile)
+VirtualHost::VirtualHost(ConfigFile &confFile) : ABlock(confFile)
 {
 }
 
-void ServerBlock::handleLine(std::string lineString)
+void VirtualHost::handleLine(std::string lineString)
 {
-	// std::cout << "ServerBlock handled: " << lineString << std::endl;
+	// std::cout << "VirtualHost handled: " << lineString << std::endl;
 	if (lineString.find("location") != std::string::npos)
 	{
-		LocationBlock locBlock(this->getConfFile());
+		Location locBlock(this->getConfFile());
 
 		locBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
 			this->root, this->index, this->uploadStore);
@@ -62,7 +62,7 @@ void ServerBlock::handleLine(std::string lineString)
 	}
 }
 
-void ServerBlock::inheritParams(int _clientMaxBodySize, bool _autoindex,
+void VirtualHost::inheritParams(int _clientMaxBodySize, bool _autoindex,
 		std::string _root, std::vector<std::string> _index)
 {
 	this->clientMaxBodySize = _clientMaxBodySize;
@@ -71,47 +71,47 @@ void ServerBlock::inheritParams(int _clientMaxBodySize, bool _autoindex,
 	this->index = _index;
 }
 
-int ServerBlock::getListenIp(void) const
+int VirtualHost::getListenIp(void) const
 {
 	return this->listenIp;
 }
 
-std::string ServerBlock::getListenHost(void) const
+std::string VirtualHost::getListenHost(void) const
 {
 	return this->listenHost;
 }
 
-std::vector<std::string> ServerBlock::getServerName(void) const
+std::vector<std::string> VirtualHost::getServerName(void) const
 {
 	return this->serverName;
 }
 
-std::vector<LocationBlock> ServerBlock::getLocations(void) const
+std::vector<Location> VirtualHost::getLocations(void) const
 {
 	return this->locations;
 }
 
-int ServerBlock::getClientMaxBodySize(void) const
+int VirtualHost::getClientMaxBodySize(void) const
 {
 	return this->clientMaxBodySize;
 }
 
-bool ServerBlock::getAutoindex(void) const
+bool VirtualHost::getAutoindex(void) const
 {
 	return this->autoindex;
 }
 
-std::vector<std::string> ServerBlock::getIndex(void) const
+std::vector<std::string> VirtualHost::getIndex(void) const
 {
 	return this->index;
 }
 
-std::string ServerBlock::getUploadStore(void) const
+std::string VirtualHost::getUploadStore(void) const
 {
 	return this->uploadStore;
 }
 
-std::string ServerBlock::getRoot(void) const
+std::string VirtualHost::getRoot(void) const
 {
 	return this->root;
 }

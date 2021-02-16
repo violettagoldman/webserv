@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ConfigBlock.class.cpp                              :+:      :+:    :+:   */
+/*   Config.class.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,19 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ConfigBlock.class.hpp"
+#include "Config.class.hpp"
 
-ConfigBlock::ConfigBlock(ConfigFile &confFile) : ABlock(confFile)
+Config::Config(ConfigFile &confFile) : ABlock(confFile)
 {
 }
 
 /*
-** In our implementation ConfigBlock is the whole file (it's not wrapped
+** In our implementation Config is the whole file (it's not wrapped
 ** in braces), so we don't need a break condition. We also don't need
 ** to check if the block was closed.
 */
 
-void ConfigBlock::handle()
+void Config::handle()
 {
 	do
 	{
@@ -31,10 +31,10 @@ void ConfigBlock::handle()
 
 	}
 	while(getConfFile().getNext());
-	ConfigBlock::check();
+	Config::check();
 }
 
-bool duplicatesInServerName(ServerBlock vh1, ServerBlock vh2)
+bool duplicatesInServerName(VirtualHost vh1, VirtualHost vh2)
 {
 	std::vector<std::string> v1 = vh1.getServerName();
 	std::vector<std::string> v2 = vh2.getServerName();
@@ -50,13 +50,13 @@ bool duplicatesInServerName(ServerBlock vh1, ServerBlock vh2)
 	return false;
 }
 
-bool virtualHostsHaveSameListen(ServerBlock vh1, ServerBlock vh2)
+bool virtualHostsHaveSameListen(VirtualHost vh1, VirtualHost vh2)
 {
 	return (vh1.getListenIp() == vh2.getListenIp() &&\
 			vh1.getListenHost() == vh2.getListenHost());
 }
 
-void ConfigBlock::check()
+void Config::check()
 {
 	for (size_t i = 0; i < virtualHostVector.size() - 1; i++)
 	{
@@ -71,14 +71,14 @@ void ConfigBlock::check()
 
 }
 
-void ConfigBlock::handleLine(std::string lineString)
+void Config::handleLine(std::string lineString)
 {
-	// std::cout << "ConfigBlock handled: " << lineString << std::endl;
+	// std::cout << "Config handled: " << lineString << std::endl;
 
 	if (lineString.find("server") != std::string::npos)
 	{
 		// std::cout << "Found server" << std::endl;
-		ServerBlock sBlock(this->getConfFile());
+		VirtualHost sBlock(this->getConfFile());
 
 		sBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
 			this->root, this->index);
@@ -140,27 +140,27 @@ void ConfigBlock::handleLine(std::string lineString)
 	// }
 }
 
-std::vector<ServerBlock> ConfigBlock::getVirtualHostVector(void) const
+std::vector<VirtualHost> Config::getVirtualHostVector(void) const
 {
 	return this->virtualHostVector;
 }
 
-int ConfigBlock::getClientMaxBodySize(void) const
+int Config::getClientMaxBodySize(void) const
 {
 	return this->clientMaxBodySize;
 }
 
-bool ConfigBlock::getAutoindex(void) const
+bool Config::getAutoindex(void) const
 {
 	return this->autoindex;
 }
 
-std::vector<std::string> ConfigBlock::getIndex(void) const
+std::vector<std::string> Config::getIndex(void) const
 {
 	return this->index;
 }
 
-std::string ConfigBlock::getRoot(void) const
+std::string Config::getRoot(void) const
 {
 	return this->root;
 }

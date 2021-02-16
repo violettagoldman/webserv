@@ -29,16 +29,16 @@
 # include "Exception.class.hpp"
 
 # include "ConfigFile.class.hpp"
-# include "ConfigBlock.class.hpp"
+# include "Config.class.hpp"
 // # include "ABlock.class.hpp"
-# include "ServerBlock.class.hpp"
+# include "VirtualHost.class.hpp"
 
 class ConfigReader
 {
 public:
 	ConfigReader(std::string filename);
 
-	ConfigBlock *createConfig();
+	Config *createConfig();
 
 private:
 	// int fd;
@@ -47,7 +47,7 @@ private:
 
 	ConfigFile confFile;
 
-	ConfigBlock *configBlock;
+	Config *configBlock;
 	std::string lineString;
 
 	// virtualHostPrototype vhp;
@@ -56,9 +56,9 @@ private:
 	// limitExceptPrototype lep;
 	std::string lastLineParsed;
 
-	void parse(std::string line);
+	void parse();
 
-	std::vector<ServerBlock> serverBlockVector;
+	std::vector<VirtualHost> serverBlockVector;
 };
 
 #endif 

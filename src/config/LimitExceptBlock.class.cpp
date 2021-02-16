@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LimitExceptBlock.class.cpp                         :+:      :+:    :+:   */
+/*   LimitExcept.class.cpp                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "LimitExceptBlock.class.hpp"
+#include "LimitExcept.class.hpp"
 
-LimitExceptBlock::LimitExceptBlock(ConfigFile &confFile) : ABlock(confFile)
+LimitExcept::LimitExcept(ConfigFile &confFile) : ABlock(confFile)
 {
 }
 
-std::string LimitExceptBlock::parseMethod(std::string line)
+std::string LimitExcept::parseMethod(std::string line)
 {
 	size_t loc_position = line.find("limit_except");
 	size_t pattern_start = loc_position + 13;
@@ -26,9 +26,9 @@ std::string LimitExceptBlock::parseMethod(std::string line)
 	return pattern;
 }
 
-void LimitExceptBlock::handleLine(std::string lineString)
+void LimitExcept::handleLine(std::string lineString)
 {
-	// std::cout << "LimitExceptBlock handled: " << lineString << std::endl;
+	// std::cout << "LimitExcept handled: " << lineString << std::endl;
 
 	std::vector<std::string> appendix;
 
@@ -49,17 +49,17 @@ void LimitExceptBlock::handleLine(std::string lineString)
 }
 
 
-std::vector<std::string> LimitExceptBlock::getAllow(void) const
+std::vector<std::string> LimitExcept::getAllow(void) const
 {
 	return allow;
 }
 
-std::vector<std::string> LimitExceptBlock::getDeny(void) const
+std::vector<std::string> LimitExcept::getDeny(void) const
 {
 	return deny;
 }
 
-std::string LimitExceptBlock::getMethod(void) const
+std::string LimitExcept::getMethod(void) const
 {
 	return method;
 }

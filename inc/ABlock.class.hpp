@@ -55,6 +55,7 @@ public:
 	static int countOccurence(std::string s, char c);
 
 	static void checkLine(std::string lineString);
+	virtual ~ABlock();
 
 private:
 	ConfigFile &_confFile;
