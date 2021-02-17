@@ -27,9 +27,9 @@ void ConfigReader::parse()
 	// std::cout << "Parse: " << lineString << std::endl;
 
 
-	configBlock = new Config(confFile);
-
-	configBlock->handle();
+	// configBlock = new Config(confFile);
+	// _config = Config(confFile)
+	// configBlock->handle();
 	// if (lineString.find("server") != std::string::npos)
 	// {
 	// 	ServerBlock sb(this->confFile);
@@ -38,34 +38,14 @@ void ConfigReader::parse()
 	// 	serverBlockVector.push_back(sb);
 	// 	// ABlock(this->confFile);
 
-	// }
-	// size_t needle;
-	// if (lineString.find("server") != std::string::npos)
-	// {
-	// 	this->parse_server();
-	// }
-	// else if ((needle = lineString.find(
-	// 			"client_max_body_size")) != std::string::npos)
-	// {
-	// 	cp.clientMaxBodySize = parse_size(needle+20, lineString);
-	// }
-	// else if ((needle = lineString.find("autoindex")) != std::string::npos)
-	// {
-	// 	cp.autoindex = parseBoolDirective(getDirective(needle+9, lineString));
-	// }
-	// else if ((needle = lineString.find("index")) != std::string::npos)
-	// {
-	// 	cp.index = split(getDirective(
-	// 		needle+5, lineString), ' ');
-	// }
-	// else if ((needle = lineString.find("root")) != std::string::npos)
-	// {
-	// 	cp.root = getDirective(needle+4, lineString);
-	// }
+	_config.handle();
+	configBlock = &_config;
+
+
 }
 
 ConfigReader::ConfigReader(std::string filename) :
-	confFile(filename)
+	confFile(filename), _config(confFile)
 {
 	// lastLineParsed = "";
 	// fd = open(filename.c_str(), O_RDONLY);
@@ -91,4 +71,9 @@ ConfigReader::ConfigReader(std::string filename) :
 Config *ConfigReader::createConfig()
 {
 	return configBlock;
+}
+
+Config ConfigReader::getConfig(void) const
+{
+	return this->_config;
 }

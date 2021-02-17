@@ -12,11 +12,22 @@
 
 # include "ConfigFile.class.hpp"
 
-ConfigFile::ConfigFile(std::string filename) :
-	lastLineRead(false), lastLineSent(false)
+ConfigFile::ConfigFile() : _fd(-1)
 {
-	this->fd = open(filename.c_str(), O_RDONLY);
-	if (fd < 0)
+}
+
+void ConfigFile::openFile(std::string filename)
+{
+	this->_fd = open(filename.c_str(), O_RDONLY);
+	if (_fd < 0)
+		throw Exception("Couldn't open file");
+}
+
+ConfigFile::ConfigFile(std::string filename) :
+	_lastLineRead(false), _lastLineSent(false)
+{
+	this->_fd = open(filename.c_str(), O_RDONLY);
+	if (_fd < 0)
 		throw Exception("Couldn't open file");
 
 	// while ((ret = fd_get_next_line(fd, &line)))
@@ -37,25 +48,31 @@ ConfigFile::ConfigFile(std::string filename) :
 
 int ConfigFile::getNext()
 {
-	if (lastLineSent)
+	if (this->_fd < 0)
+		throw Exception("File not open");
+
+	if (_lastLineSent)
 		return 0;
 
-	if (lastLineRead)
+	if (_lastLineRead)
 	{
-		lastLineSent = true;
+		_lastLineSent = true;
 		return 0;
 	}
-	this->ret = fd_get_next_line(this->fd, &(this->line));
-	this->lineString.assign(this->line);
-	if (ret == 0)
+	this->_ret = fd_get_next_line(this->_fd, &(this->_line));
+	this->_lineString.assign(this->_line);
+	if (_ret == 0)
 	{
-		lastLineRead = true;
+		_lastLineRead = true;
 		return 1;
 	}
-	return this->ret;
+	return this->_ret;
 }
 
 std::string ConfigFile::getLineString(void) const
 {
-	return this->lineString;
+	if (this->_fd < 0)
+		throw Exception("File not open");
+
+	return this->_lineString;
 }

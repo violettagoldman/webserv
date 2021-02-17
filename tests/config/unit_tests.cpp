@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/16 16:19:49 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/17 16:01:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,18 +74,27 @@ int main(void)
 	out("Simple config");
 	ConfigReader r("./config/test_configs/nginx.conf");
 
-	Config *conf = r.createConfig();
+	// Config *conf = r.createConfig();
+	Config conf = r.getConfig();
 
-	check(conf->getAutoindex() == true);
-	check(conf->getClientMaxBodySize() == 32);
-	check(conf->getIndex().size() == 1);
-	check(conf->getIndex()[0] == "index.html");
+	check(conf.getAutoindex() == true);
+	check(conf.getClientMaxBodySize() == 32);
+	check(conf.getIndex().size() == 1);
+	check(conf.getIndex()[0] == "index.html");
 
-	std::vector<VirtualHost> virtualHostVector = conf->getVirtualHostVector();
+	Config *_conf = r.createConfig();
+
+	check(_conf->getAutoindex() == true);
+	check(_conf->getClientMaxBodySize() == 32);
+	check(_conf->getIndex().size() == 1);
+	check(_conf->getIndex()[0] == "index.html");
+
+
+	std::vector<VirtualHost> virtualHostVector = conf.getVirtualHostVector();
 	check(virtualHostVector.size() == 3);
 
 	out("Config | Root");
-	check(conf->getRoot() == "/var/www/");
+	check(conf.getRoot() == "/var/www/");
 
 	out("Host 0 | Listen");
 	check(virtualHostVector[0].getListenIp() == 80);

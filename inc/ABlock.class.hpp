@@ -26,7 +26,6 @@ class ABlock
 
 
 public:
-	static const std::string blockStartKeyword;
 	ABlock(ConfigFile &confFile);
 
 	virtual void handle();

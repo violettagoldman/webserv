@@ -39,6 +39,7 @@ public:
 	ConfigReader(std::string filename);
 
 	Config *createConfig();
+	Config getConfig(void) const;
 
 private:
 	// int fd;
@@ -48,6 +49,7 @@ private:
 	ConfigFile confFile;
 
 	Config *configBlock;
+	Config _config;
 	std::string lineString;
 
 	// virtualHostPrototype vhp;
