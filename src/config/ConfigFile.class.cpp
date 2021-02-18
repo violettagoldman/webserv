@@ -64,6 +64,7 @@ int ConfigFile::getNext()
 	if (_ret == 0)
 	{
 		_lastLineRead = true;
+		close(_fd);
 		return 1;
 	}
 	return this->_ret;
