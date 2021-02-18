@@ -29,22 +29,7 @@ ConfigFile::ConfigFile(std::string filename) :
 	this->_fd = open(filename.c_str(), O_RDONLY);
 	if (_fd < 0)
 		throw Exception("Couldn't open file");
-
-	// while ((ret = fd_get_next_line(fd, &line)))
-	// {
-	// 	// std::cout << "Line read: " << line << std::endl;
-	// 	// assignLineString();
-	// 	this->lineString.assign(line);
-	// 	parse(this->lineString);
-	// }
-	// parse(this->lineString);
 }
-
-// void ConfigFile::next()
-// {
-// 	this->ret = fd_get_next_line(this->fd, &(this->line));
-// 	this->lineString.assign(this->line);
-// }
 
 int ConfigFile::getNext()
 {
