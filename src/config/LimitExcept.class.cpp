@@ -16,14 +16,14 @@ LimitExcept::LimitExcept(ConfigFile &confFile) : ABlock(confFile)
 {
 }
 
-std::string LimitExcept::parseMethod(std::string line)
+std::vector<std::string> LimitExcept::parseMethods(std::string line)
 {
 	size_t loc_position = line.find("limit_except");
 	size_t pattern_start = loc_position + 13;
 	size_t pattern_end = line.find("{", pattern_start);
 	std::string pattern = line.substr(pattern_start, pattern_end-pattern_start);
 	trimWhitespace(pattern);
-	return pattern;
+	return ft_split(pattern, ' ');
 }
 
 void LimitExcept::handleLine(std::string lineString)
@@ -34,32 +34,32 @@ void LimitExcept::handleLine(std::string lineString)
 
 	if (isPresent(lineString, "limit_except"))
 	{
-		this->method = parseMethod(lineString);
+		this->_methods = parseMethods(lineString);
 	}
 	if (isPresent(lineString, "allow"))
 	{
 		appendix = ft_split(getStringDirective(lineString, "allow"), ' ');
-		this->allow.insert(this->allow.end(), appendix.begin(), appendix.end());
+		this->_allow.insert(this->_allow.end(), appendix.begin(), appendix.end());
 	}
 	if (isPresent(lineString, "deny"))
 	{
 		appendix = ft_split(getStringDirective(lineString, "deny"), ' ');
-		this->deny.insert(this->deny.end(), appendix.begin(), appendix.end());
+		this->_deny.insert(this->_deny.end(), appendix.begin(), appendix.end());
 	}
 }
 
 
 std::vector<std::string> LimitExcept::getAllow(void) const
 {
-	return allow;
+	return _allow;
 }
 
 std::vector<std::string> LimitExcept::getDeny(void) const
 {
-	return deny;
+	return _deny;
 }
 
-std::string LimitExcept::getMethod(void) const
+std::vector<std::string> LimitExcept::getMethods(void) const
 {
-	return method;
+	return _methods;
 }

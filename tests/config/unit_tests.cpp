@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/17 16:01:26 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/18 12:49:56 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int main(void)
 
 
 	std::vector<VirtualHost> virtualHostVector = conf.getVirtualHostVector();
-	check(virtualHostVector.size() == 3);
+	check(virtualHostVector.size() == 4);
 
 	out("Config | Root");
 	check(conf.getRoot() == "/var/www/");
@@ -141,7 +141,8 @@ int main(void)
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 	out("Host 1 | Location 0 | limit_except ");
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethod() == "GET");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethods().size() == 1);
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethods()[0] == "GET");
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow().size() == 2);
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[0] == "127.0.0.1");
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[1] == "127.0.0.2");
@@ -178,6 +179,11 @@ int main(void)
 
 	out("Host 2 | Location 1 | autoindex off");
 	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
+
+	out("Host 3 | Location 0 | limit_except with multiple methods");
+	check(virtualHostVector[3].getLocations()[0].getLimitExcept().getMethods().size() == 2);
+	check(virtualHostVector[3].getLocations()[0].getLimitExcept().getMethods()[0] == "GET");
+	check(virtualHostVector[3].getLocations()[0].getLimitExcept().getMethods()[1] == "POST");
 
 	out("Exception | Missing semicolon");
 	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
