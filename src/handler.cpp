@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 13:20:57 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 13:33:13 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,10 +100,10 @@ std::string create_final_path(Location loc, std::string request_path)
 
 std::string handler(Request req, Config *conf)
  {
-	 std::vector<VirtualHost> hosts;
+	 std::vector<VirtualHost> hosts(conf->getVirtualHostVector());
 	 std::string final("");
 	 Header host_header = *(req.getHeaderByName("Host"));
-	 hosts = conf->getVirtualHostVector();
+	 // hosts = 
 	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	 {
 		 if (check_listen(*it, host_header))

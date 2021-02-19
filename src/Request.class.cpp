@@ -6,31 +6,16 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 13:18:07 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 13:35:51 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Request.class.hpp"
-// #include "../inc/get_next_line.h"
-
+#include "../inc/Utility.hpp"
+#include <sys/socket.h>
 const std::string CRLF = "\r\n";
 const std::string WSP = "\r ";
 #define BUFFER_SIZE 1000000
-#include <sys/socket.h>
-
-std::vector<std::string> ft_split(std::string s, char c)
-{
-	std::vector<std::string> ret;
-	int i = 0;
-	size_t pos;
-	while ((pos = s.find(c, i)) != std::string::npos)
-	{
-		ret.push_back(s.substr(i, pos-i));
-		i = pos+1;
-	}
-	ret.push_back(s.substr(i));
-	return ret;
-}
 
 
 std::vector<std::string> remove_spaces(std::vector<std::string> values)
