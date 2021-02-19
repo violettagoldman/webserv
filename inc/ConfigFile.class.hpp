@@ -21,19 +21,23 @@
 class ConfigFile
 {
 public:
+	ConfigFile();
 	ConfigFile(std::string filename);
+
+	void openFile(std::string filename);
+
 	// void next();
 	int getNext();
 	std::string getLineString(void) const;
 
 private:
-	int fd;
-	int ret;
-	char *line;
+	int _fd;
+	int _ret;
+	char *_line;
 
-	bool lastLineRead;
-	bool lastLineSent;
-	std::string lineString;
+	bool _lastLineRead;
+	bool _lastLineSent;
+	std::string _lineString;
 };
 
 # endif

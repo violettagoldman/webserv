@@ -102,42 +102,6 @@ void Config::handleLine(std::string lineString)
 	{
 		this->root = getStringDirective(lineString, "root");
 	}
-
-	// if (isPresent(lineString, "root"))
-	// {
-	// 	this->root = getStringDirective(lineString, "root");
-	// 	this->rootSet = true;
-	// }
-	// if (isPresent(lineString, "location"))
-	// {
-	// 	this->pattern = parsePattern(lineString);
-	// }
-	// if (isPresent(lineString, "client_max_body_size"))
-	// {
-	// 	this->clientMaxBodySize = parseClientMaxBodySize(lineString);
-	// }
-	// if (isPresent(lineString, "autoindex"))
-	// {
-	// 	this->autoindex = parseBoolDirective(getStringDirective(lineString, "autoindex"));
-	// }
-	// if (isPresent(lineString, "fastcgi_pass"))
-	// {
-	// 	this->fcgiPass = getStringDirective(lineString, "fastcgi_pass");
-	// 	this->fcgiSet = true;
-	// }
-	// if (isPresent(lineString, "fastcgi_param"))
-	// {
-	// 	parseFastCGIParam(lineString, this->fcgiParams);
-	// }
-	// else if (isPresent(lineString, "index"))
-	// {
-	// 	this->index = ft_split(getStringDirective(lineString, "index"), ' ');
-	// }
-	// else if (isPresent(lineString, "upload_store"))
-	// {
-	// 	this->uploadStore = getStringDirective(lineString, "upload_store");
-	// 	this->uploadStoreSet = true;
-	// }
 }
 
 std::vector<VirtualHost> Config::getVirtualHostVector(void) const
