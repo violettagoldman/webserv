@@ -20,20 +20,22 @@ class VirtualHost : public ABlock
 {
 public:
 	VirtualHost(ConfigFile &confFile);
+
+	VirtualHost(ABlock &ab);
 	void handleLine(std::string lineString);
 
 	int getListenIp(void) const;
 	std::string getListenHost(void) const;
 	std::vector<std::string> getServerName(void) const;
 	std::vector<Location> getLocations(void) const;
-	int getClientMaxBodySize(void) const;
-	bool getAutoindex(void) const;
-	std::vector<std::string> getIndex(void) const;
+	// int getClientMaxBodySize(void) const;
+	// bool getAutoindex(void) const;
+	// std::vector<std::string> getIndex(void) const;
 	std::string getUploadStore(void) const;
-	std::string getRoot(void) const;
+	// std::string getRoot(void) const;
 
-	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
-			std::vector<std::string> index);
+	// void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
+			// std::vector<std::string> index);
 
 	void check(void);
 
@@ -41,14 +43,11 @@ private:
 	std::vector<Location> locationBlockVector;
 
 	int listenIp;
-	int clientMaxBodySize;
-	bool autoindex;
 	std::string listenHost;
 	std::vector<std::string> serverName;
 	std::vector<Location> locations;
-	std::vector<std::string> index;
 	std::string uploadStore;
-	std::string root;
+	// std::string root;
 
 };
 

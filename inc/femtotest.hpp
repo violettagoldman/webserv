@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:17:05 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/31 12:19:04 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/19 11:43:49 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@
 # include <iostream>
 
 bool exception_thrown = false;
+
+int total_checks = 0;
+int tests_passed = 0;
 
 void check(int expression);
 
@@ -53,15 +56,23 @@ void check(int expression)
 {
 	// If expression doesn't evaluate to 1, the program will abort
 	// assert(expression == 1);
+	total_checks += 1;
 	if (expression == 1)
 	{
 		std::cout << "\033[92m✓ PASS\033[0m" << std::endl;
+		tests_passed += 1;
 	}
 	else 
 	{
 		std::cout << "\033[91m✓ FAIL\033[0m" << std::endl;
 	}
 	
+}
+
+void test_results()
+{
+	std::cout << "\n\n---------" << std::endl;
+	std::cout << "Total checks: " << total_checks << ", passed: " << tests_passed << ", failed: " << total_checks - tests_passed << std::endl;
 }
 
 template <typename T>

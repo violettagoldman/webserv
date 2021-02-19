@@ -24,19 +24,19 @@ public:
 	void handle();
 
 	std::vector<VirtualHost> getVirtualHostVector(void) const;
-	int getClientMaxBodySize(void) const;
-	bool getAutoindex(void) const;
-	std::vector<std::string> getIndex(void) const;
-	std::string getRoot(void) const;
+	// int getClientMaxBodySize(void) const;
+	// bool getAutoindex(void) const;
+	// std::vector<std::string> getIndex(void) const;
+	// std::string getRoot(void) const;
 
 	void check(void);
 
 private:
 	std::vector<VirtualHost> virtualHostVector;
-	int clientMaxBodySize;
-	bool autoindex;
-	std::vector<std::string> index;
-	std::string root;
+	// int clientMaxBodySize;
+	// bool autoindex;
+	// std::vector<std::string> index;
+	// std::string root;
 
 };
 

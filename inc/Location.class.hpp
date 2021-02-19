@@ -21,23 +21,24 @@
 # include "Utility.hpp"
 # include "LimitExcept.class.hpp"
 
-
 class Location : public ABlock
 {
 public:
 	Location(ConfigFile &confFile);
+
+	Location(ABlock &ab);
 	void handleLine(std::string lineString);
 
-	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
-			std::vector<std::string> index, std::string uploadStore);
+	// void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
+	// 		std::vector<std::string> index, std::string uploadStore);
 
-	void inheritParams(ABlock *parent);
+	// void inheritParams(ABlock *parent);
 
 	std::string getPattern(void) const;
-	std::string getRoot(void) const;
-	int getClientMaxBodySize(void) const;
-	bool getAutoindex(void) const;
-	std::vector<std::string> getIndex(void) const;
+	// std::string getRoot(void) const;
+	// int getClientMaxBodySize(void) const;
+	// bool getAutoindex(void) const;
+	// std::vector<std::string> getIndex(void) const;
 	// LimitExcept getLimitExcept(void) const;
 
 
@@ -50,17 +51,17 @@ public:
 	bool getRootSet(void) const;
 	bool getUploadStoreSet(void) const;
 
+	void setUploadStore(std::string uploadStore);
+
 	void check(void);
 
 private:
 
 	static std::string parsePattern(std::string line);
 
-	int clientMaxBodySize;
-	bool autoindex;
 	std::string pattern;
-	std::string root;
-	std::vector<std::string> index;
+	
+	// std::vector<std::string> index;
 	// LimitExcept limitExcept;
 
 	LimitExcept limitExcept;
