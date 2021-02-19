@@ -10,7 +10,7 @@
 // #include "./read_request.cpp"
 
 Request *read_request(int sd, Request *req);
-std::string handler(Request *req, Config *conf);
+std::string handler(Request req, Config *conf);
 int main(void)
 {
     int     i;
@@ -95,10 +95,10 @@ int main(void)
 				{
 					(void)conf;
 					request.print_headers();
-					// final_path = handler(&request, conf);
+					final_path = handler(request, conf);
 					// cgi_dostuff(request);
 					// request.print_headers();
-					// std::cout << final_path << std::endl;
+					std::cout << "hehe " << final_path << std::endl;
 					std::cout << "Success" << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;
