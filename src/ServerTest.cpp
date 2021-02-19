@@ -47,15 +47,15 @@ int		main(void)
 		if (FD_ISSET(s.getFd(), &fds))
 		{
 			new_socket = s.accept();
-			for (i = 0; i < s.getClients().size(); i++)
-			{
-				//if position is empty
-				if(s.getClients()[i] == 0)
-				{
-					s.addClient(new_socket);
-					break;
-				}
-			}
+			// for (i = 0; i < s.getClients().size(); i++)
+			// {
+			// 	if(s.getClients()[i] == 0)
+			// 	{
+			// 		s.addClient(new_socket);
+			// 		break;
+			// 	}
+			// }
+			s.addClient(new_socket);
 		}
 		//else its some IO operation on some other socket
 		for (i = 0; i < s.getClients().size(); i++)
