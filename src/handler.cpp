@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 15:45:02 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 20:48:52 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,26 +70,26 @@ int count_match(std::string str1, std::string str2)
 	return count;
 }
 
-std::vector<Location>::iterator check_location(VirtualHost host, std::string request_path)
-{
-	std::string request_pattern = path_to_pattern(request_path);
-	std::vector<Location> server_locations = host.getLocations();
-	int count_max = 0;
-	int count_cur;
-	std::vector<Location>::iterator it_best;
-
-	for (std::vector<Location>::iterator it = server_locations.begin(); it < server_locations.end(); ++it)
-	{
-		if ((count_cur = count_match((*it).getPattern(), request_pattern)) > count_max)
-		{
-			it_best = it;
-			count_max = count_cur;
-		}
-	}
-	if (count_max > 0)
-		return it_best;
-	return server_locations.end();
-}
+// std::vector<Location>::iterator check_location(VirtualHost host, std::string request_path)
+// {
+// 	std::string request_pattern = path_to_pattern(request_path);
+// 	std::vector<Location> server_locations = host.getLocations();
+// 	int count_max = 0;
+// 	int count_cur;
+// 	std::vector<Location>::iterator it_best;
+//
+// 	for (std::vector<Location>::iterator it = server_locations.begin(); it < server_locations.end(); ++it)
+// 	{
+// 		if ((count_cur = count_match((*it).getPattern(), request_pattern)) > count_max)
+// 		{
+// 			it_best = it;
+// 			count_max = count_cur;
+// 		}
+// 	}
+// 	if (count_max > 0)
+// 		return it_best;
+// 	return server_locations.end();
+// }
 
 std::string create_final_path(Location loc, std::string request_path)
 {
@@ -111,7 +111,20 @@ std::string handler(Request req, Config conf)
 			std::string request_path = req.getPath();
 			std::string request_pattern = path_to_pattern(request_path);
 			std::vector<Location> server_locations = (*it).getLocations();
-			std::vector<Location>::iterator it_best = check_location(*it, request_path);
+			// std::vector<Location>::iterator it_best = check_location(*it, request_path);
+			int count_max = 0;
+			int count_cur;
+			std::vector<Location>::iterator it_best;
+			for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
+			{
+				if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
+				{
+					it_best = it_loc;
+					count_max = count_cur;
+				}
+			}
+			if (count_max == 0)
+				it_best = server_locations.end();
 			if (it_best != server_locations.end())
 			{
 				if (((*it_best).getLimitExcept()).getMethod() != "" && ((*it_best).getLimitExcept()).getMethod() != req.getMethod())
