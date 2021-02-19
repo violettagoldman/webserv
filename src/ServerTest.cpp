@@ -19,10 +19,11 @@ int main(void)
     fd_set  fds;
     // char    buffer[1024];
     int     new_socket;
-	Request *request = new Request;
+	// Request *request = new Request;
 	// int valread;
 	Reader reader("./tests/config/test_configs/nginx.conf");
 	Config *conf = reader.createConfig();
+	Request request;
 	int sd;
 	int max_sd;
 	std::string final_path;
@@ -80,26 +81,30 @@ int main(void)
 
 			if (FD_ISSET( sd , &fds))
 			{
-				request = read_request(sd, request);
-				if (request->getState() == "end")
+				// request = read_request(sd, request);
+				request.read_request(sd);
+				// std::cout << request.getState() << std::endl;
+				if (request.getState() == "end")
 				{
                     s.close();
 					printf("Host disconnected\n");
 					close(sd);
 					clients[i] = 0;
 				}
-				else if (request->getState() == "read")
+				else if (request.getState() == "read")
 				{
-					// request->print_headers();
-					final_path = handler(request, conf);
+					(void)conf;
+					request.print_headers();
+					// final_path = handler(&request, conf);
 					// cgi_dostuff(request);
-					std::cout << final_path << std::endl;
+					// request.print_headers();
+					// std::cout << final_path << std::endl;
 					std::cout << "Success" << std::endl;
 				// 	buffer[valread] = '\0';
 					// std::cout << "I just got your message: " << buffer << std::endl;
 				//
 				}
-				else if (request->getState() == "error")
+				else if (request.getState() == "error")
 				{
 					std::cout << "Error";
 				}

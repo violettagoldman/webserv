@@ -6,12 +6,75 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/13 13:05:07 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/17 15:52:08 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Request.class.hpp"
-#include "../inc/get_next_line.h"
+// #include "../inc/get_next_line.h"
+
+const std::string CRLF = "\r\n";
+const std::string WSP = "\r ";
+#define BUFFER_SIZE 1000000
+#include <sys/socket.h>
+
+std::vector<std::string> ft_split(std::string s, char c)
+{
+	std::vector<std::string> ret;
+	int i = 0;
+	size_t pos;
+	while ((pos = s.find(c, i)) != std::string::npos)
+	{
+		ret.push_back(s.substr(i, pos-i));
+		i = pos+1;
+	}
+	ret.push_back(s.substr(i));
+	return ret;
+}
+
+
+std::vector<std::string> remove_spaces(std::vector<std::string> values)
+{
+	size_t pos;
+	for (std::vector<std::string>::iterator it = values.begin(); it < values.end(); ++it)
+	{
+		if ((pos = WSP.find((*it)[0])) != std::string::npos)
+			(*it).erase(0, 1);
+		if ((pos = WSP.find((*it)[((*it).length())])) != std::string::npos)
+			(*it).erase((*it).length() - 1, 1);
+	}
+	return values;
+}
+Header *header_split(std::string str)
+{
+	std::string header_name;
+	size_t index = str.find_first_of(":");
+	header_name = str.substr(0, index);
+	if (header_name.find(" ") != std::string::npos)
+	/*
+	* A
+	* server MUST reject any received request message that contains
+	* whitespace between a header field-name and colon with a response code
+	* of 400 (Bad Request).
+	*/
+		return NULL;
+	// std::cout << header_name << std::endl;
+	std::string value = str.substr(index + 1);
+	value.erase(value.find('\n'));
+	std::vector<std::string> values = ft_split(value, ',');
+	values = remove_spaces(values);
+	// std::cout << values[0] << std::endl;
+	Header *new_header = new Header(header_name, values);
+	// new_header->print_out();
+	// if (!isValidHeader(header_name))
+	// {
+	// 	new_header->setError(-1);
+	// 	return new_header;
+	// }
+	return new_header;
+}
+
+
 
 /*
 *	This is the function to split string.
@@ -133,8 +196,9 @@ int Request::startLineReader(std::string line)
 	return 0;
 }
 
-void Request::addHeader(Header *header)
+void Request::addHeader(std::string line)
 {
+	Header header(line);
 	_headers.push_back(header);
 }
 
@@ -165,8 +229,8 @@ void Request::setState(std::string state)
 
 void Request::print_headers(void)
 {
-	for (std::vector<Header *>::iterator it = _headers.begin(); it < _headers.end(); ++it)
-		(*it)->print_out();
+	for (std::vector<Header>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+		(*it).print_out();
 
 }
 
@@ -196,17 +260,97 @@ std::string Request::getPath(void) const
 }
 int Request::isHeaderPresent(std::string name, std::string value)
 {
-	for (std::vector<Header *>::iterator it = _headers.begin(); it < _headers.end(); ++it)
-		if (name == (*it)->getName())
+	for (std::vector<Header>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+		if (name == (*it).getName())
 		{
 			if (value != "")
-				return ((*it)->checkValue(value));
+				return ((*it).checkValue(value));
 			return 1;
 		}
 	return 0;
 }
+unsigned long Request::contentLengthChecker(std::vector<Header> headers)
+{
+	std::vector<std::string> values;
+	for (std::vector<Header>::iterator it = headers.begin(); it < headers.end(); ++it)
+		if ((*it).getName() == "Content-Length")
+			values = (*it).getValue();
+	if (values.size() > 1)
+	{
+		setError(400);
+		return 0;
+	}
+	unsigned long size =  std::strtol(values[0].c_str(), NULL, 10);
+	if (errno)
+	{
+		setError(400);
+		return 0;
+	}
+	return size;
 
-std::vector<Header *> Request::getHeaders(void)
+}
+
+void Request::read_request(int sd)
+{
+	char input[BUFFER_SIZE];
+	int bytes;
+	int pos;
+	int last;
+	std::string body;
+	std::string start_line;
+	bytes = recv(sd, input, BUFFER_SIZE, 0);
+	// bytes = read(fd, input, BUFFER_SIZE);
+	if (bytes == 0)
+		_state = "chill";
+	std::string to_interpret(input);
+	if (bytes > 0)
+	{
+		_state = "read";
+		std::cout << "kek " << std::endl;
+		pos = to_interpret.find("\n");
+		start_line = to_interpret.substr(0, pos - 1);
+		startLineReader(start_line);
+		last = to_interpret.find('\n', pos + 1);
+		std::string one_header;
+		while (pos + 1 != last && to_interpret.substr(pos + 1, last - pos) != CRLF)
+		{
+			std::cout << "KRK >" << std::endl;
+			one_header = to_interpret.substr(pos + 1, last - pos);
+			pos = last;
+			last = to_interpret.find("\n", last + 1);
+			// if (hed.isError())
+			// {
+			// 	setState("error");
+			// 	setError(400);
+			// }
+			addHeader(one_header);
+		}
+		if (isHeaderPresent("Content-Length"))
+		{
+			unsigned long content_size = contentLengthChecker(getHeaders());
+			body = to_interpret.substr(last + 1);
+			if (content_size != body.length() || getError() == 400)
+			{
+				setState("error");
+				setError(400);
+			}
+			setBody(body);
+		}
+		if (isHeaderPresent("Transfer-Encoding", "chunked"))
+		{
+			//In chunked requests data length is in hex. transform hex to Int
+			while ((bytes = recv(sd, input, BUFFER_SIZE, 0)) > 0)
+			{
+				to_interpret.assign(input, bytes);
+				std::cout << to_interpret << std::endl;
+			}
+		}
+	}
+	else if (bytes == -1)
+		_state = "end";
+}
+
+std::vector<Header> Request::getHeaders(void)
 {
 	return _headers;
 }

@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:05:05 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/06 15:34:25 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/17 15:30:50 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 class Header
 {
 	public:
+		Header(std::string line);
 		Header(std::string name, std::vector<std::string> value);
 		Header(Header const &src);
 		~Header(void);
