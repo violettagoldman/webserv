@@ -59,3 +59,12 @@ std::string		replacehtml(std::string src, std::string var, std::string value)
 	}
 	return (src);
 }
+
+time_t			getTime()
+{
+	struct timeval	tv;
+	struct timezone	tz;
+
+	gettimeofday(&tv, &tz);
+	return (tv.tv_sec + tz.tz_minuteswest * 60);
+}
