@@ -12,7 +12,7 @@
 
 #include "LimitExcept.class.hpp"
 
-LimitExcept::LimitExcept(ConfigFile &confFile) : ABlock(confFile)
+LimitExcept::LimitExcept(ConfigFile &confFile) : ABlock(confFile), _empty(true)
 {
 }
 
@@ -23,6 +23,7 @@ std::vector<std::string> LimitExcept::parseMethods(std::string line)
 	size_t pattern_end = line.find("{", pattern_start);
 	std::string pattern = line.substr(pattern_start, pattern_end-pattern_start);
 	trimWhitespace(pattern);
+	trimWhitespaceStart(pattern);
 	return ft_split(pattern, ' ');
 }
 
@@ -35,16 +36,19 @@ void LimitExcept::handleLine(std::string lineString)
 	if (isPresent(lineString, "limit_except"))
 	{
 		this->_methods = parseMethods(lineString);
+		this->_empty = false;
 	}
 	if (isPresent(lineString, "allow"))
 	{
 		appendix = ft_split(getStringDirective(lineString, "allow"), ' ');
 		this->_allow.insert(this->_allow.end(), appendix.begin(), appendix.end());
+		this->_empty = false;
 	}
 	if (isPresent(lineString, "deny"))
 	{
 		appendix = ft_split(getStringDirective(lineString, "deny"), ' ');
 		this->_deny.insert(this->_deny.end(), appendix.begin(), appendix.end());
+		this->_empty = false;
 	}
 }
 
@@ -62,4 +66,9 @@ std::vector<std::string> LimitExcept::getDeny(void) const
 std::vector<std::string> LimitExcept::getMethods(void) const
 {
 	return _methods;
+}
+
+bool LimitExcept::isEmpty(void) const
+{
+	return _empty;
 }

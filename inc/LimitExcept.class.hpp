@@ -29,11 +29,15 @@ public:
 	std::vector<std::string> getDeny(void) const;
 	std::vector<std::string> getMethods(void) const;
 
+	bool isEmpty(void) const;
+
 
 private:
 	std::vector<std::string> _allow;
 	std::vector<std::string> _deny;
 	std::vector<std::string> _methods;
+
+	bool _empty;
 
 };
 

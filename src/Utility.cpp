@@ -59,3 +59,25 @@ std::string		replacehtml(std::string src, std::string var, std::string value)
 	}
 	return (src);
 }
+
+/*
+** Split a string s, separated by delimiter c
+** @param s String that needs to be splitted
+** @param c The delimiter
+** @ret std::vector<std::string> the vector of resulting separated strings
+*/
+std::vector<std::string> ft_split(std::string s, char c)
+{
+	std::vector<std::string> ret;
+	if (s.size() == 0)
+		return ret;
+	int i = 0;
+	size_t pos;
+	while ((pos = s.find(c, i)) != std::string::npos)
+	{
+		ret.push_back(s.substr(i, pos-i));
+		i = pos+1;
+	}
+	ret.push_back(s.substr(i));
+	return ret;
+}

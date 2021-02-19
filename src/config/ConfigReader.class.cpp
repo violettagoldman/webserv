@@ -65,6 +65,8 @@ ConfigReader::ConfigReader(std::string filename) :
 		confFile.getLineString();
 		parse();
 	}
+	//check
+	_config.check();
 
 }
 

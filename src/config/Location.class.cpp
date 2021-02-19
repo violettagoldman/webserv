@@ -55,6 +55,10 @@ void Location::check()
 		throw Exception("Root and fcgi_pass on the same location.");
 	if (fcgiSet == true && uploadStoreSet == true)
 		throw Exception("Upload_store and fcgi_pass on the same location.");
+
+	if (!this->limitExcept.isEmpty() &&
+			this->limitExcept.getMethods().size() == 0)
+		throw Exception("limit_except must specify at least one method.");
 }
 
 // void Location::inheritParams(ABlock *parent)

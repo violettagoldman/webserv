@@ -69,6 +69,11 @@ void Config::check()
 			
 	}
 
+	for (size_t i = 0; i < virtualHostVector.size(); i++)
+	{
+		virtualHostVector[i].check();
+	}
+
 }
 
 void Config::handleLine(std::string lineString)

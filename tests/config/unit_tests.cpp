@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/18 12:49:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/02/19 10:54:37 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,9 @@ int main(void)
 	check(virtualHostVector[0].getLocations()[0].getPattern() == "/");
 	check(virtualHostVector[0].getLocations()[0].getRoot() == "/var/www/");
 
+	out("Host 0 | location 0 | no limit except");
+	check(virtualHostVector[0].getLocations()[0].getLimitExcept().isEmpty() == true);
+
 	check(virtualHostVector[0].getClientMaxBodySize() == 32);
 
 	out("Host 0 | Root inherited from config");
@@ -224,6 +227,21 @@ int main(void)
 
 	out("Exception | upload and fcgi on same location");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
+
+	out("Exception | limit_except without method");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/fake_limit_except.conf"), Exception, "limit_except must specify at least one method.");
+
+	out("Ft_split | empty string");
+	check(ft_split("", ' ').size() == 0);
+
+	out("Ft_split | normal string");
+	std::string s1("hello world");
+	std::vector<std::string> res;
+
+	res = ft_split(s1, ' ');
+	check(res.size() == 2);
+	check(res[0] == "hello");
+	check(res[1] == "world");
 
 	// TEST_EXCEPTION(ConfigReader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");

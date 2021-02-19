@@ -35,6 +35,8 @@ public:
 	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
 			std::vector<std::string> index);
 
+	void check(void);
+
 private:
 	std::vector<Location> locationBlockVector;
 

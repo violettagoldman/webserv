@@ -115,3 +115,12 @@ std::string VirtualHost::getRoot(void) const
 {
 	return this->root;
 }
+
+void VirtualHost::check(void)
+{
+	// specific checks
+	for (size_t i = 0; i < locations.size(); i++)
+	{
+		locations[i].check();
+	}
+}
