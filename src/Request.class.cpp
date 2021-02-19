@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 13:35:51 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 15:37:09 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,58 +30,27 @@ std::vector<std::string> remove_spaces(std::vector<std::string> values)
 	}
 	return values;
 }
-Header *header_split(std::string str)
-{
-	std::string header_name;
-	size_t index = str.find_first_of(":");
-	header_name = str.substr(0, index);
-	if (header_name.find(" ") != std::string::npos)
-	/*
-	* A
-	* server MUST reject any received request message that contains
-	* whitespace between a header field-name and colon with a response code
-	* of 400 (Bad Request).
-	*/
-		return NULL;
-	// std::cout << header_name << std::endl;
-	std::string value = str.substr(index + 1);
-	value.erase(value.find('\n'));
-	std::vector<std::string> values = ft_split(value, ',');
-	values = remove_spaces(values);
-	// std::cout << values[0] << std::endl;
-	Header *new_header = new Header(header_name, values);
-	// new_header->print_out();
-	// if (!isValidHeader(header_name))
-	// {
-	// 	new_header->setError(-1);
-	// 	return new_header;
-	// }
-	return new_header;
-}
 
-
-
-/*
-*	This is the function to split string.
-*	@param input String to be splited.
-*	@param word String by which input is going to be splited.
-*	@return vector<string> This returns vector of strings that are in input
-*	and separated by word.
-*/
-// std::vector<std::string> split(std::string input, std::string key = "")
+// Header *header_split(std::string str)
 // {
-// 	std::vector<std::string> names;
-// 	std::string word;
-// 	while (input.compare(word) != 0)
-// 	{
-// 		size_t index = input.find_first_of(key);
-// 		word = input.substr(0,index);
-// 		input = input.substr(index+1, input.length());
-// 		if (word.length() == 0)
-// 			continue;
-// 		names.push_back(word);
-// 	}
-// 	return names;
+// 	std::string header_name;
+// 	size_t index = str.find_first_of(":");
+// 	header_name = str.substr(0, index);
+// 	if (header_name.find(" ") != std::string::npos)
+// 	/*
+// 	* A
+// 	* server MUST reject any received request message that contains
+// 	* whitespace between a header field-name and colon with a response code
+// 	* of 400 (Bad Request).
+// 	*/
+// 		return NULL;
+// 	std::string value = str.substr(index + 1);
+// 	value.erase(value.find('\n'));
+// 	std::vector<std::string> values = ft_split(value, ',');
+// 	values = remove_spaces(values);
+//
+// 	Header *new_header = new Header(header_name, values);
+// 	return new_header;
 // }
 
 std::vector<std::string> ft_split(std::string s, char c);
@@ -144,9 +113,6 @@ void Request::uri_handler(std::string str)
 {
 	std::string scheme;
 	std::string authority;
-	std::string path;
-	// std::string query;
-	// std::string fragment;
 	std::size_t fragment_pos;
 	std::size_t query_pos;
 
@@ -162,8 +128,6 @@ void Request::uri_handler(std::string str)
 		str.erase(query_pos);
 	}
 	_path = str;
-	// std::cout << fragment << std::endl;
-	// std::cout << query;
 }
 
 int Request::startLineReader(std::string line)
@@ -273,19 +237,17 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 		return 0;
 	}
 	return size;
-
 }
 
 void Request::read_request(int sd)
 {
 	char input[BUFFER_SIZE];
 	int bytes;
-	int pos;
-	int last;
+	size_t pos;
+	size_t last;
 	std::string body;
 	std::string start_line;
 	bytes = recv(sd, input, BUFFER_SIZE, 0);
-	// bytes = read(fd, input, BUFFER_SIZE);
 	if (bytes == 0)
 		_state = "chill";
 	std::string to_interpret(input);
@@ -302,13 +264,10 @@ void Request::read_request(int sd)
 			one_header = to_interpret.substr(pos + 1, last - pos);
 			pos = last;
 			last = to_interpret.find("\n", last + 1);
-			// if (hed.isError())
-			// {
-			// 	setState("error");
-			// 	setError(400);
-			// }
 			addHeader(one_header);
 		}
+		if (!isHeaderPresent("Host"))
+			setError(400);
 		if (isHeaderPresent("Content-Length"))
 		{
 			unsigned long content_size = contentLengthChecker(getHeaders());
@@ -341,6 +300,7 @@ std::vector<Header>::iterator Request::getHeaderByName(std::string name)
 			return it;
 	return _headers.end();
 }
+
 std::vector<Header> Request::getHeaders(void)
 {
 	return _headers;

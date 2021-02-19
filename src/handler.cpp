@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 13:33:13 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 15:45:02 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,12 +98,12 @@ std::string create_final_path(Location loc, std::string request_path)
 	return final;
 }
 
-std::string handler(Request req, Config *conf)
+std::string handler(Request req, Config conf)
  {
-	 std::vector<VirtualHost> hosts(conf->getVirtualHostVector());
+	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
 	 std::string final("");
 	 Header host_header = *(req.getHeaderByName("Host"));
-	 // hosts = 
+
 	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	 {
 		 if (check_listen(*it, host_header))
@@ -114,11 +114,20 @@ std::string handler(Request req, Config *conf)
 			std::vector<Location>::iterator it_best = check_location(*it, request_path);
 			if (it_best != server_locations.end())
 			{
+				if (((*it_best).getLimitExcept()).getMethod() != "" && ((*it_best).getLimitExcept()).getMethod() != req.getMethod())
+				{
+					req.setError(405);
+					return final;
+				}
 			 	final = create_final_path(*it_best, request_path);
 				return final;
 			}
 			else
+			{
+				std::cout << "Not found" << std::endl;
+				req.setError(404);
 				std::cout << "404" << std::endl;
+			}
 		 }
 	}
 	return final;

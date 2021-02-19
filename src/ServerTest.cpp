@@ -10,7 +10,7 @@
 // #include "./read_request.cpp"
 
 Request *read_request(int sd, Request *req);
-std::string handler(Request req, Config *conf);
+std::string handler(Request req, Config conf);
 int main(void)
 {
     int     i;
@@ -22,7 +22,7 @@ int main(void)
 	// Request *request = new Request;
 	// int valread;
 	ConfigReader reader("./tests/config/test_configs/nginx.conf");
-	Config *conf = reader.createConfig();
+	Config conf = reader.getConfig();
 	Request request;
 	int sd;
 	int max_sd;
