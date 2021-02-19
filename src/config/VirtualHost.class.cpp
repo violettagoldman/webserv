@@ -1,46 +1,74 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   VirtualHost.cpp                                    :+:      :+:    :+:   */
+/*   VirtualHost.class.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/17 17:06:43 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/20 19:46:06 by ashishae         ###   ########.fr       */
+/*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
+/*   Updated: 2021/02/11 12:10:43 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "VirtualHost.class.hpp"
 
-
-VirtualHost::VirtualHost(int _listenIp, std::string _listenHost,
-				std::vector<std::string> _serverName,
-				std::vector<Location> _locations,
-				int _clientMaxBodySize, bool _autoindex)
+VirtualHost::VirtualHost(ConfigFile &confFile) : ABlock(confFile)
 {
-	listenIp = _listenIp;
-	listenHost = _listenHost;
-	serverName = _serverName;
-	locations = _locations;
-	clientMaxBodySize = _clientMaxBodySize;
-	autoindex = _autoindex;
-
 }
 
-VirtualHost::VirtualHost(virtualHostPrototype cp)
+void VirtualHost::handleLine(std::string lineString)
 {
-	listenIp = cp.listenIp;
-	listenHost = cp.listenHost;
-	serverName = cp.serverName;
-	locations = cp.locations;
-	clientMaxBodySize = cp.clientMaxBodySize;
-	autoindex = cp.autoindex;
-	index = cp.index;
-	uploadStore = cp.uploadStore;
+	// std::cout << "VirtualHost handled: " << lineString << std::endl;
+	if (lineString.find("location") != std::string::npos)
+	{
+		Location locBlock(this->getConfFile());
+
+		locBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
+			this->root, this->index, this->uploadStore);
+
+		locBlock.handle();
+
+		locations.push_back(locBlock);
+	}
+
+	if (isPresent(lineString, "listen"))
+	{
+		parseListen(lineString, this->listenHost, this->listenIp);
+	}
+	else if (isPresent(lineString, "server_name"))
+	{
+		this->serverName = ft_split(getStringDirective(lineString,
+										"server_name"), ' ');
+	}
+	else if (isPresent(lineString, "client_max_body_size"))
+	{
+		this->clientMaxBodySize = parseClientMaxBodySize(lineString);
+	}
+	else if (isPresent(lineString, "autoindex"))
+	{
+		this->autoindex = parseBoolDirective(lineString, "autoindex");
+	}
+	else if (isPresent(lineString, "index"))
+	{
+		this->index = ft_split(getStringDirective(lineString, "index"), ' ');
+	}
+	else if (isPresent(lineString, "upload_store"))
+	{
+		this->uploadStore = getStringDirective(lineString, "upload_store");
+	}
+	else if (isPresent(lineString, "root"))
+	{
+		this->root = getStringDirective(lineString, "root");
+	}
 }
 
-VirtualHost::~VirtualHost()
+void VirtualHost::inheritParams(int _clientMaxBodySize, bool _autoindex,
+		std::string _root, std::vector<std::string> _index)
 {
+	this->clientMaxBodySize = _clientMaxBodySize;
+	this->autoindex = _autoindex;
+	this->root = _root;
+	this->index = _index;
 }
 
 int VirtualHost::getListenIp(void) const
@@ -83,13 +111,7 @@ std::string VirtualHost::getUploadStore(void) const
 	return this->uploadStore;
 }
 
-// VirtualHost::VirtualHost(const VirtualHost &copy)
-// {
-	
-// }
-
-// VirtualHost::VirtualHost &operator= (const VirtualHost &operand)
-// {
-	
-// }
-
+std::string VirtualHost::getRoot(void) const
+{
+	return this->root;
+}

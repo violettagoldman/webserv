@@ -1,53 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   VirtualHost.hpp                                    :+:      :+:    :+:   */
+/*   VirtualHost.class.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/17 17:06:33 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:52:53 by ashishae         ###   ########.fr       */
+/*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
+/*   Updated: 2021/02/11 12:07:39 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VIRTUALHOST_CLASS_HPP
 # define VIRTUALHOST_CLASS_HPP
 
-# include <vector>
-# include <string>
-
+# include "ABlock.class.hpp"
 # include "Location.class.hpp"
 
-// Global VirtualHost object
-
-// TODO: atoi
-
-// TODO: exceptions
-
-typedef struct sVirtualHostPrototype
+class VirtualHost : public ABlock
 {
-	int listenIp;
-	std::string listenHost;
-	std::vector<std::string> serverName;
-	std::vector<Location> locations;
-	int clientMaxBodySize;
-	bool autoindex;
-	std::vector<std::string> index;
-	std::string uploadStore;
-}	virtualHostPrototype;
-
-class VirtualHost {
-
 public:
-	VirtualHost(int listenIp, std::string listenHost, std::vector<std::string> serverName,
-		std::vector<Location> locations, int clientMaxBodySize, bool autoindex);
-	VirtualHost(virtualHostPrototype cp);
-	// VirtualHost(std::vector<std::string> VirtualHostBlock);
-	// VirtualHost();
-	~VirtualHost();
-	// Пока сойдут implicit-версии
-	// VirtualHost(const VirtualHost &copy);
-	// VirtualHost &operator= (const VirtualHost &operand);
+	VirtualHost(ConfigFile &confFile);
+	void handleLine(std::string lineString);
+
 	int getListenIp(void) const;
 	std::string getListenHost(void) const;
 	std::vector<std::string> getServerName(void) const;
@@ -56,8 +30,14 @@ public:
 	bool getAutoindex(void) const;
 	std::vector<std::string> getIndex(void) const;
 	std::string getUploadStore(void) const;
+	std::string getRoot(void) const;
+
+	void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
+			std::vector<std::string> index);
 
 private:
+	std::vector<Location> locationBlockVector;
+
 	int listenIp;
 	int clientMaxBodySize;
 	bool autoindex;
@@ -66,6 +46,8 @@ private:
 	std::vector<Location> locations;
 	std::vector<std::string> index;
 	std::string uploadStore;
+	std::string root;
+
 };
 
 #endif

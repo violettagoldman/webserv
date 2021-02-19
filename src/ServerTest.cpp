@@ -2,26 +2,29 @@
 #include <unistd.h>
 #include "Request.class.hpp"
 #include "Config.class.hpp"
-#include "Reader.class.hpp"
+#include "ConfigReader.class.hpp"
 #include "Server.class.hpp"
 #include "Response.class.hpp"
 
-Request *read_request(int sd, Request *req);
-void handler(Request *req, Config *conf);
-int main(void)
+Request		*read_request(int sd, Request *req);
+std::string handler(Request req, Config conf);
+
+int		main(void)
 {
-	size_t		i;
-    Server		s;
-    fd_set		fds;
-    int			new_socket;
-	Request		*request = new Request;
-	Reader		reader("./tests/config/test_configs/nginx.conf");
-	Config		*conf = reader.createConfig();
-	int 		sd;
-	int 		max_sd;
-    s = Server();
-    s.setup();
-    s.listen();
+	size_t			i;
+	Server			s;
+	fd_set			fds;
+	int				new_socket;
+	Request			request;
+	ConfigReader	reader("./tests/config/test_configs/nginx.conf");
+	Config 			conf = reader.getConfig();
+	int 			sd;
+	int 			max_sd;
+	std::string 	final_path;
+
+	s = Server();
+	s.setup();
+	s.listen();
 
 	while(1)
 	{
@@ -61,22 +64,22 @@ int main(void)
 
 			if (FD_ISSET(sd , &fds))
 			{
-				request = read_request(sd, request);
-				if (request->getState() == "end")
+				request.read_request(sd);
+				if (request.getState() == "end")
 				{
 					s.close();
 					close(sd);
 					s.getClients()[i] = 0;
 				}
-				else if (request->getState() == "read")
+				else if (request.getState() == "read")
 				{
-					// request->print_headers();
-					handler(request, conf);
-					// cgi_dostuff(request);
-					Response response = Response(*request, conf);
-					s.send(sd, response.serialize());
+					(void)conf;
+					request.print_headers();
+					final_path = handler(request, conf);
+					// Response response = Response(*request, conf);
+					// s.send(sd, response.serialize());
 				}
-				else if (request->getState() == "error")
+				else if (request.getState() == "error")
 				{
 					std::cout << "Error";
 				}

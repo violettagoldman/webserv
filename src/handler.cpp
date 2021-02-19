@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/13 15:48:04 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 15:45:02 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 
 
 
-int check_listen(VirtualHost host, Header *host_header)
+int check_listen(VirtualHost host, Header host_header)
 {
 	std::string request_host;
 	std::vector<std::string>  server_names = host.getServerName();
@@ -29,16 +29,16 @@ int check_listen(VirtualHost host, Header *host_header)
 	int request_server_port;
 	std::string request_server_name;
 
-	request_host = host_header->getValue()[0];
+	request_host = host_header.getValue()[0];
 	std::cout << host.getListenIp() << std::endl;
-	if ((pos = host_header->getValue()[0].find(':')) != std::string::npos)
+	if ((pos = host_header.getValue()[0].find(':')) != std::string::npos)
 	{
-		request_server_name = host_header->getValue()[0].substr(0, pos);
-		request_server_port = std::atoi((host_header->getValue()[0].substr(pos + 1)).c_str());
+		request_server_name = host_header.getValue()[0].substr(0, pos);
+		request_server_port = std::atoi((host_header.getValue()[0].substr(pos + 1)).c_str());
 	}
 	else
 	{
-		request_server_name = host_header->getValue()[0];
+		request_server_name = host_header.getValue()[0];
 		//probably should set to default supported
 		request_server_port = 8880;
 	}
@@ -56,38 +56,79 @@ std::string path_to_pattern(std::string path)
 	return path.substr(0, pos + 1);
 }
 
-int check_location(VirtualHost host, std::string request_path)
+int count_match(std::string str1, std::string str2)
 {
-	std::vector<Location> server_locations = host.getLocations();
+	int count = 0;
+
+	int i = 0;
+	while (str1[i] != '\0' && str2[i] != '\0')
+	{
+		if (str1[i] == str2[i])
+			count++;
+		i++;
+	}
+	return count;
+}
+
+std::vector<Location>::iterator check_location(VirtualHost host, std::string request_path)
+{
 	std::string request_pattern = path_to_pattern(request_path);
+	std::vector<Location> server_locations = host.getLocations();
+	int count_max = 0;
+	int count_cur;
+	std::vector<Location>::iterator it_best;
 
 	for (std::vector<Location>::iterator it = server_locations.begin(); it < server_locations.end(); ++it)
 	{
-		std::cout << "Pattern :" << (*it).getPattern() << std::endl;
-		std::cout << "Request pattern :" << request_pattern << std::endl;
-		if ((*it).getPattern() == request_pattern)
-			return 1;
+		if ((count_cur = count_match((*it).getPattern(), request_pattern)) > count_max)
+		{
+			it_best = it;
+			count_max = count_cur;
+		}
 	}
-	return 0;
+	if (count_max > 0)
+		return it_best;
+	return server_locations.end();
 }
 
-void handler(Request *req, Config *conf)
+std::string create_final_path(Location loc, std::string request_path)
+{
+	std::string root = loc.getRoot();
+	std::string final(root + request_path.substr(1));
+	return final;
+}
+
+std::string handler(Request req, Config conf)
  {
-	 std::vector<Header *> headers;
-	 std::vector<VirtualHost> hosts;
-	 Header *host_header;
-	 hosts = conf->getVirtualHostVector();
-	 headers = req->getHeaders();
-	 for (std::vector<Header *>::iterator it = headers.begin(); it < headers.end(); ++it)
-	 	if ((*it)->getName() == "Host")
-			host_header = *it;
+	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
+	 std::string final("");
+	 Header host_header = *(req.getHeaderByName("Host"));
+
 	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	 {
 		 if (check_listen(*it, host_header))
 		 {
-			 std::string path = req->getPath();
-			 if (check_location(*it, path))
-			 	std::cout << "Need to create path pattern+root" << std::endl;
+			std::string request_path = req.getPath();
+			std::string request_pattern = path_to_pattern(request_path);
+			std::vector<Location> server_locations = (*it).getLocations();
+			std::vector<Location>::iterator it_best = check_location(*it, request_path);
+			if (it_best != server_locations.end())
+			{
+				if (((*it_best).getLimitExcept()).getMethod() != "" && ((*it_best).getLimitExcept()).getMethod() != req.getMethod())
+				{
+					req.setError(405);
+					return final;
+				}
+			 	final = create_final_path(*it_best, request_path);
+				return final;
+			}
+			else
+			{
+				std::cout << "Not found" << std::endl;
+				req.setError(404);
+				std::cout << "404" << std::endl;
+			}
 		 }
-	 }
+	}
+	return final;
  }
