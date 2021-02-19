@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/17 15:52:08 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 13:18:07 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,8 @@ Request::Request(void) :
 Request::Request(Request const &src) :
 	_read_bytes(src._read_bytes), _headers(src._headers),
 	_content_length(src._content_length), _status_line(src._status_line), _method(src._method),
- _body(src._body)
+ _body(src._body), _query(src._query), _path(src._path), _fragment(src._fragment),
+ _error(src._error), _state(src._state)
 {
 	std::cout << "Copy constructor for Request called\n";
 }
@@ -306,7 +307,6 @@ void Request::read_request(int sd)
 	if (bytes > 0)
 	{
 		_state = "read";
-		std::cout << "kek " << std::endl;
 		pos = to_interpret.find("\n");
 		start_line = to_interpret.substr(0, pos - 1);
 		startLineReader(start_line);
@@ -314,7 +314,6 @@ void Request::read_request(int sd)
 		std::string one_header;
 		while (pos + 1 != last && to_interpret.substr(pos + 1, last - pos) != CRLF)
 		{
-			std::cout << "KRK >" << std::endl;
 			one_header = to_interpret.substr(pos + 1, last - pos);
 			pos = last;
 			last = to_interpret.find("\n", last + 1);
@@ -350,6 +349,13 @@ void Request::read_request(int sd)
 		_state = "end";
 }
 
+std::vector<Header>::iterator Request::getHeaderByName(std::string name)
+{
+	for (std::vector<Header>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+		if ((*it).getName() == name)
+			return it;
+	return _headers.end();
+}
 std::vector<Header> Request::getHeaders(void)
 {
 	return _headers;

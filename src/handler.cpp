@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/15 21:16:54 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 13:20:57 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 
 
 
-int check_listen(VirtualHost host, Header *host_header)
+int check_listen(VirtualHost host, Header host_header)
 {
 	std::string request_host;
 	std::vector<std::string>  server_names = host.getServerName();
@@ -29,16 +29,16 @@ int check_listen(VirtualHost host, Header *host_header)
 	int request_server_port;
 	std::string request_server_name;
 
-	request_host = host_header->getValue()[0];
+	request_host = host_header.getValue()[0];
 	std::cout << host.getListenIp() << std::endl;
-	if ((pos = host_header->getValue()[0].find(':')) != std::string::npos)
+	if ((pos = host_header.getValue()[0].find(':')) != std::string::npos)
 	{
-		request_server_name = host_header->getValue()[0].substr(0, pos);
-		request_server_port = std::atoi((host_header->getValue()[0].substr(pos + 1)).c_str());
+		request_server_name = host_header.getValue()[0].substr(0, pos);
+		request_server_port = std::atoi((host_header.getValue()[0].substr(pos + 1)).c_str());
 	}
 	else
 	{
-		request_server_name = host_header->getValue()[0];
+		request_server_name = host_header.getValue()[0];
 		//probably should set to default supported
 		request_server_port = 8880;
 	}
@@ -98,22 +98,17 @@ std::string create_final_path(Location loc, std::string request_path)
 	return final;
 }
 
-std::string handler(Request *req, Config *conf)
+std::string handler(Request req, Config *conf)
  {
-	 std::vector<Header *> headers;
 	 std::vector<VirtualHost> hosts;
-	 Header *host_header;
-	std::string final("");
+	 std::string final("");
+	 Header host_header = *(req.getHeaderByName("Host"));
 	 hosts = conf->getVirtualHostVector();
-	 headers = req->getHeaders();
-	 for (std::vector<Header *>::iterator it = headers.begin(); it < headers.end(); ++it)
-	 	if ((*it)->getName() == "Host")
-			host_header = *it;
 	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	 {
 		 if (check_listen(*it, host_header))
 		 {
-			std::string request_path = req->getPath();
+			std::string request_path = req.getPath();
 			std::string request_pattern = path_to_pattern(request_path);
 			std::vector<Location> server_locations = (*it).getLocations();
 			std::vector<Location>::iterator it_best = check_location(*it, request_path);
@@ -124,12 +119,6 @@ std::string handler(Request *req, Config *conf)
 			}
 			else
 				std::cout << "404" << std::endl;
-			 // for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
-			 	// if (check_location())
-				 // if ((*it_loc).getPattern() == request_pattern)
-				 // 	std::cout << "Kek" << std::endl;
-			 // if (check_location(*it, path))
-			 	// create_final_path(*it)
 		 }
 	}
 	return final;
