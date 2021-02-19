@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/21 20:04:49 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/17 15:39:05 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 15:36:16 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ std::string accepted_headers[23] = {
 
 std::vector<std::string> ft_split(std::string s, char c);
 std::vector<std::string> remove_spaces(std::vector<std::string> values);
+
 Header::Header(void)
 {}
 
@@ -47,6 +48,7 @@ Header::Header(std::string line)
 {
 	size_t index = line.find_first_of(":");
 	_name = line.substr(0, index);
+	_error = 0;
 	if (_name.find(" ") != std::string::npos)
 	/*
 	* A
@@ -55,19 +57,12 @@ Header::Header(std::string line)
 	* of 400 (Bad Request).
 	*/
 		_error = 400;
-	// std::cout << header_name << std::endl;
 	std::string value = line.substr(index + 1);
 	value.erase(value.find('\n'));
 	_values = ft_split(value, ',');
 	_values = remove_spaces(_values);
-	// std::cout << values[0] << std::endl;
-	// new_header->print_out();
-	// if (!isValidHeader(header_name))
-	// {
-	// 	new_header->setError(-1);
-	// 	return new_header;
-	// }
 }
+
 Header::Header(std::string name, std::vector<std::string> value):
 	_name(name), _error(0)
 {
@@ -102,7 +97,7 @@ Header &Header::operator=(Header const &src)
 
 int Header::isError(void)
 {
-	if (_error == -1)
+	if (_error != 0)
 		return 1;
 	return 0;
 }
