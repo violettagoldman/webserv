@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include "../inc/Request.class.hpp"
 #include "../inc/Config.class.hpp"
-#include "../inc/Reader.class.hpp"
-
+// #include "../inc/Reader.class.hpp"
+#include "../inc/ConfigReader.class.hpp"
 // #include "../inc/Header.class.hpp"
 // #include "./read_request.cpp"
 
@@ -21,7 +21,7 @@ int main(void)
     int     new_socket;
 	// Request *request = new Request;
 	// int valread;
-	Reader reader("./tests/config/test_configs/nginx.conf");
+	ConfigReader reader("./tests/config/test_configs/nginx.conf");
 	Config *conf = reader.createConfig();
 	Request request;
 	int sd;
