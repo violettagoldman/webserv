@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.class.hpp                              :+:      :+:    :+:   */
+/*   ConfigFile.class.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,34 +10,34 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_CLASS_HPP
-# define CONFIG_CLASS_HPP
+#ifndef CONFIGFILE_CLASS_HPP
+# define CONFIGFILE_CLASS_HPP
 
-# include "ABlock.class.hpp"
-# include "VirtualHost.class.hpp"
+# include <string>
+# include "Exception.class.hpp"
+# include <fcntl.h>
+# include "get_next_line.h"
 
-class Config : public ABlock
+class ConfigFile
 {
 public:
-	Config(ConfigFile &confFile);
-	virtual void handleLine(std::string lineString);
-	void handle();
+	ConfigFile();
+	ConfigFile(std::string filename);
 
-	std::vector<VirtualHost> getVirtualHostVector(void) const;
-	int getClientMaxBodySize(void) const;
-	bool getAutoindex(void) const;
-	std::vector<std::string> getIndex(void) const;
-	std::string getRoot(void) const;
+	void openFile(std::string filename);
 
-	void check(void);
+	// void next();
+	int getNext();
+	std::string getLineString(void) const;
 
 private:
-	std::vector<VirtualHost> virtualHostVector;
-	int clientMaxBodySize;
-	bool autoindex;
-	std::vector<std::string> index;
-	std::string root;
+	int _fd;
+	int _ret;
+	char *_line;
 
+	bool _lastLineRead;
+	bool _lastLineSent;
+	std::string _lineString;
 };
 
-#endif
+# endif
