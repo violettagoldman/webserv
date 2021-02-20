@@ -2,6 +2,7 @@
 
 Response::Response(void)
 {
+	
 	_method = "GET";
 	_statusCode = 200;
 	statusCodeTranslation();
@@ -11,10 +12,9 @@ Response::Response(void)
 	handleMethod();
 }
 
-Response::Response(Request req, Config *conf)
+Response::Response(Request req)
 {
 	_req = req;
-	_config = conf;
 	_method = _req.getMethod();
 	_statusCode = 200;
 	statusCodeTranslation();
@@ -37,7 +37,7 @@ Response		&Response::operator=(Response const &src)
 	if (this != &src)
 	{
 		this->_req = src._req;
-		this->_config = src._config;
+		// this->_config = src._config;
 		this->_body = src._body;
 		this->_headers = src._headers;
 		this->_method = src._method;

@@ -9,10 +9,19 @@
 Request		*read_request(int sd, Request *req);
 std::string handler(Request req, Config conf);
 
+Server	s;
+
+void	shutdown(int signal)
+{
+	(void)signal;
+	std::cout << "Shutting down the server\n";
+	s.close();
+	exit(0);
+}
+
 int		main(void)
 {
 	size_t			i;
-	Server			s;
 	fd_set			fds;
 	int				new_socket;
 	Request			request;
@@ -26,6 +35,7 @@ int		main(void)
 	s.setup();
 	s.listen();
 
+	signal(SIGINT, shutdown);
 	while(1)
 	{
 		FD_ZERO(&fds);
@@ -33,35 +43,21 @@ int		main(void)
 		max_sd = s.getFd();
 		for (i = 0; i < s.getClients().size(); i++)
 		{
-			//socket descriptor
 			sd = s.getClients()[i];
-			//if valid socket descriptor then add to read list
 			if(sd > 0)
 				FD_SET( sd , &fds);
-			// highest file descriptor number, need it for the select function
 			if(sd > max_sd)
 				max_sd = sd;
 		}
-		// wait for an activity on one of the sockets
 		select(max_sd + 1 , &fds , NULL , NULL , NULL);
 		if (FD_ISSET(s.getFd(), &fds))
 		{
 			new_socket = s.accept();
-			// for (i = 0; i < s.getClients().size(); i++)
-			// {
-			// 	if(s.getClients()[i] == 0)
-			// 	{
-			// 		s.addClient(new_socket);
-			// 		break;
-			// 	}
-			// }
 			s.addClient(new_socket);
 		}
-		//else its some IO operation on some other socket
 		for (i = 0; i < s.getClients().size(); i++)
 		{
 			sd = s.getClients()[i];
-
 			if (FD_ISSET(sd , &fds))
 			{
 				request.read_request(sd);
@@ -76,17 +72,15 @@ int		main(void)
 					(void)conf;
 					request.print_headers();
 					final_path = handler(request, conf);
-					// Response response = Response(*request, conf);
-					// s.send(sd, response.serialize());
+					Response response = Response(request);
+					s.send(sd, response.serialize());
 				}
 				else if (request.getState() == "error")
 				{
 					std::cout << "Error";
 				}
-
 			}
 		}
 	}
-	// close ports
 	return (0);
 }

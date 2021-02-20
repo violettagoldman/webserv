@@ -13,7 +13,7 @@ class Response
 {
 	public:
 		Response(void);
-		Response(Request req, Config *conf);
+		Response(Request req);
 		// Response(CGI cgi);
 		Response(Response const &src);
 		~Response(void);
@@ -47,7 +47,7 @@ class Response
 		std::string								_body;
 		std::map<int, std::string>				_statusCodeTranslation;
 		Request									_req;
-		Config									*_config;
+		// Config									&_config;
 };
 
 #endif
