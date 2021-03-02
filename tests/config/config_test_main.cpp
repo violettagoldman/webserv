@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   unit_tests.cpp                                     :+:      :+:    :+:   */
+/*   config_test_main.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/02 12:54:59 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/02 13:54:03 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,22 @@ int main(void)
 	out("Config | Root");
 	check(conf.getRoot() == "/var/www/");
 
+	out("Config | error_pages");
+	check(conf.getErrorPage()[404] == "/404.html");
+	check(conf.getErrorPage()[500] == "/50x.html");
+	check(conf.getErrorPage()[502] == "/50x.html");
+	check(conf.getErrorPage()[503] == "/50x.html");
+	check(conf.getErrorPage()[504] == "/50x.html");
+	
+
 	out("Host 0 | Listen");
 	check(virtualHostVector[0].getListenIp() == 80);
 	check(virtualHostVector[0].getListenHost() == "");
 
-
+	out("Host 0 | Error page on host");
+	check(virtualHostVector[0].getErrorPage()[404] == "/404_custom.html");
+	check(virtualHostVector[0].getErrorPage()[500] == "/50x.html");
+	std::cout << virtualHostVector[0].getErrorPage()[404] << std::endl;
 
 	check(virtualHostVector[0].getServerName().size() == 2);
 	check(virtualHostVector[0].getServerName()[0] == "domain1.com");
@@ -76,6 +87,14 @@ int main(void)
 	out("Host 0 | location 0 | no limit except");
 	check(virtualHostVector[0].getLocations()[0].getLimitExcept().isEmpty() == true);
 
+	out("Host 0 | location 0 | error_page on location");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[42] == "/dontpanic.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[404] == "/404_custom.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[500] == "/50x.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[502] == "/50x.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[503] == "/50x.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[504] == "/50x.html");
+	
 	check(virtualHostVector[0].getClientMaxBodySize() == 32);
 
 	out("Host 0 | Root inherited from config");
@@ -187,6 +206,9 @@ int main(void)
 	out("Exception | limit_except without method");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/fake_limit_except.conf"), Exception, "limit_except must specify at least one method.");
 
+	out("Exception | error_pages has != 2 fields");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/error_page_wrong_format.conf"), Exception, "error_page has to specify error code and page.");
+
 	out("Ft_split | empty string");
 	check(ft_split("", ' ').size() == 0);
 
@@ -198,6 +220,16 @@ int main(void)
 	check(res.size() == 2);
 	check(res[0] == "hello");
 	check(res[1] == "world");
+
+
+	out("Ft_split | one field");
+	std::string s2("hello");
+	std::vector<std::string> res2;
+
+	res2 = ft_split(s2, ' ');
+	check(res2.size() == 1);
+	check(res2[0] == "hello");
+
 
 
 	test_results();

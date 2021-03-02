@@ -68,6 +68,33 @@ void ABlock::handle()
 		throw Exception("A block wasn't closed");
 }
 
+std::map<int, std::string> ABlock::parseErrorPage(std::string directiveValue)
+{
+	std::map<int, std::string> ret;
+
+	std::vector<std::string> directiveParts = ft_split(directiveValue, ' ');
+
+	if (directiveParts.size() < 2)
+		throw Exception("error_page has to specify error code and page.");
+
+	for (size_t i = 0; i < directiveParts.size()-1; i++)
+	{
+		ret[ft_atoi(directiveParts[i].c_str())] = directiveParts[directiveParts.size()-1];
+	}
+
+	return ret;
+}
+
+/*
+** std::map::insert doesn't overwrite existing elements. So in order to merge
+** the two maps, we first insert old map into the new map, and then swap them.
+*/
+void ABlock::insertErrorPages(std::map<int, std::string> &newErrorPages)
+{
+	newErrorPages.insert(_errorPage.begin(), _errorPage.end());
+	std::swap(_errorPage, newErrorPages);
+}
+
 void ABlock::handleLineCommon(std::string lineString)
 {
 	if (isPresent(lineString, "root"))
@@ -85,6 +112,13 @@ void ABlock::handleLineCommon(std::string lineString)
 	else if (isPresent(lineString, "index"))
 	{
 		this->_index = ft_split(getStringDirective(lineString, "index"), ' ');
+	}
+	else if (isPresent(lineString, "error_page"))
+	{
+		std::cout << "Error page dir: |" << getStringDirective(lineString, "error_page") << "|" << std::endl;
+		std::map<int, std::string> newErrorMap = parseErrorPage(getStringDirective(lineString, "error_page"));
+		// this->_errorPage.insert(newErrorMap.begin(), newErrorMap.end());
+		insertErrorPages(newErrorMap);
 	}
 }
 
@@ -155,31 +189,6 @@ void ABlock::trimWhitespaceStart(std::string &s)
 	{
 		s.erase(it);
 	}
-}
-
-// // TODO : test some more
-int	ft_atoi(const char *str)
-{
-	int		nbr;
-	int		sign;
-
-	nbr = 0;
-	sign = 1;
-	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
-			|| (*str) == '\r' || (*str) == ' ')
-		str++;
-	if ((*str) == '-' || (*str) == '+')
-	{
-		sign *= ((*str) == '-' ? -1 : 1);
-		str++;
-	}
-	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
-	{
-		nbr *= 10;
-		nbr += (*str) - '0';
-		str++;
-	}
-	return (nbr * sign);
 }
 
 int ABlock::parseClientMaxBodySize(std::string lineString)
@@ -275,4 +284,9 @@ std::vector<std::string> ABlock::getIndex(void) const
 std::string ABlock::getRoot(void) const
 {
 	return _root;
+}
+
+std::map<int, std::string> ABlock::getErrorPage(void) const
+{
+	return _errorPage;
 }
