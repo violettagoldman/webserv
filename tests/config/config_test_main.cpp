@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/02 13:54:03 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/02 14:10:47 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,6 +208,9 @@ int main(void)
 
 	out("Exception | error_pages has != 2 fields");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/error_page_wrong_format.conf"), Exception, "error_page has to specify error code and page.");
+
+	out("Exception | location with empty or no pattern");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_pattern.conf"), Exception, "location has to have a pattern.");
 
 	out("Ft_split | empty string");
 	check(ft_split("", ' ').size() == 0);

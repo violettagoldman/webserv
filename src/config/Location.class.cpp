@@ -41,6 +41,8 @@ std::string Location::parsePattern(std::string line)
 	size_t pattern_end = line.find("{", pattern_start);
 	std::string pattern = line.substr(pattern_start, pattern_end-pattern_start);
 	trimWhitespace(pattern);
+	if (pattern.size() == 0)
+		throw Exception("location has to have a pattern.");
 	return pattern;
 }
 

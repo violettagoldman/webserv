@@ -115,7 +115,6 @@ void ABlock::handleLineCommon(std::string lineString)
 	}
 	else if (isPresent(lineString, "error_page"))
 	{
-		std::cout << "Error page dir: |" << getStringDirective(lineString, "error_page") << "|" << std::endl;
 		std::map<int, std::string> newErrorMap = parseErrorPage(getStringDirective(lineString, "error_page"));
 		// this->_errorPage.insert(newErrorMap.begin(), newErrorMap.end());
 		insertErrorPages(newErrorMap);
