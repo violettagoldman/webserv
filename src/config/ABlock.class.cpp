@@ -12,17 +12,6 @@
 
 #include "ABlock.class.hpp"
 
-// const std::string ABlock::blockStartKeyword = "server";
-
-// bool ABlock::blockStarted(std::string lineString)
-// {
-// 	size_t pos;
-// 	if ((pos = lineString.find(blockStartKeyword)) != std::string::npos)
-// 	{
-// 		return true;
-// 	}
-// 	return false;
-// }
 
 ABlock::ABlock(ConfigFile &confFile) :
 	_confFile(confFile),
@@ -31,22 +20,6 @@ ABlock::ABlock(ConfigFile &confFile) :
 	_index(std::vector<std::string>())
 {
 }
-
-// ABlock::ABlock(ABlock &ab) :
-// 	_confFile(ab._confFile),
-// 	_clientMaxBodySize(ab._clientMaxBodySize),
-// 	_autoindex(ab._autoindex),
-// 	_index(ab._index)
-// {
-// }
-
-// ABlock::ABlock(ABlock *ab) :
-// 	_confFile(ab->_confFile),
-// 	_clientMaxBodySize(ab->_clientMaxBodySize),
-// 	_autoindex(ab->_autoindex),
-// 	_index(ab->_index)
-// {
-// }
 
 
 int ABlock::countOccurence(std::string s, char c)
