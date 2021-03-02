@@ -90,3 +90,28 @@ time_t			getTime()
 	gettimeofday(&tv, &tz);
 	return (tv.tv_sec + tz.tz_minuteswest * 60);
 }
+
+// TODO : test some more
+int	ft_atoi(const char *str)
+{
+	int		nbr;
+	int		sign;
+
+	nbr = 0;
+	sign = 1;
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+			|| (*str) == '\r' || (*str) == ' ')
+		str++;
+	if ((*str) == '-' || (*str) == '+')
+	{
+		sign *= ((*str) == '-' ? -1 : 1);
+		str++;
+	}
+	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
+	{
+		nbr *= 10;
+		nbr += (*str) - '0';
+		str++;
+	}
+	return (nbr * sign);
+}

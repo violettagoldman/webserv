@@ -14,5 +14,6 @@ std::string					readFile(std::string file);
 std::string					replacehtml(std::string src, std::string var, std::string value);
 time_t						getTime();
 std::vector<std::string>	ft_split(std::string, char delimiter);
+int							ft_atoi(const char *str);
 
 #endif
