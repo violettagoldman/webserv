@@ -6,11 +6,13 @@
 # include <iostream>
 # include <fcntl.h>
 # include <unistd.h>
+# include <sys/time.h>
 # include <vector>
 
-std::string		ft_itoa(int n);
-std::string		readFile(std::string file);
-std::string		replacehtml(std::string src, std::string var, std::string value);
-std::vector<std::string> ft_split(std::string, char delimiter);
+std::string					ft_itoa(int n);
+std::string					readFile(std::string file);
+std::string					replacehtml(std::string src, std::string var, std::string value);
+time_t						getTime();
+std::vector<std::string>	ft_split(std::string, char delimiter);
 
 #endif

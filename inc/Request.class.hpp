@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/07 16:36:57 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/02/19 13:06:34 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class Request
 		int isMethod(std::string line);
 		int startLineReader(std::string line);
 		std::string getMethod(void); //
-		void addHeader(Header *header);
+		void addHeader(std::string line);
 		int getBytes(void);
 		void setBody(std::string body);
 		std::string getBody(void); //
@@ -40,12 +40,16 @@ class Request
 		void print_headers(void);
 		void setError(int error);
 		int getError(void);
-		std::vector<Header *> getHeaders(void); //
+		std::string getPath(void) const;
+		std::vector<Header> getHeaders(void); //
 		void uri_handler(std::string str);
 		int isHeaderPresent(std::string name, std::string value = "");
+		void read_request(int sd);
+		unsigned long contentLengthChecker(std::vector<Header> headers);
+		std::vector<Header>::iterator getHeaderByName(std::string name);
 	private:
 		int _read_bytes;
-		std::vector<Header *> _headers;
+		std::vector<Header> _headers;
 		int _content_length;
 		std::string _status_line;
 		std::string _method;
@@ -54,7 +58,6 @@ class Request
 		std::string _path;
 		std::string _fragment;
 		int _error;
-
 		std::string _state;
 		std::string methods[8];
 };

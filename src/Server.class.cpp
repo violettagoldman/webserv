@@ -1,24 +1,20 @@
-#include "../inc/Server.class.hpp"
+#include "Server.class.hpp"
 
 Server::Server(void)
 {
-	std::cout << "Default constructor called\n";
 }
 
 Server::Server(Server const &src)
 {
-	std::cout << "Copy constructor called\n";
 	*this = src;
 }
 
 Server::~Server(void)
 {
-	std::cout << "Destructor called\n";
 }
 
-Server		&Server::operator=(Server const &src)
+Server					&Server::operator=(Server const &src)
 {
-	std::cout << "Assignation operator called\n";
 	if (this != &src)
 	{
 		_host = src._host;
@@ -35,7 +31,7 @@ Server		&Server::operator=(Server const &src)
 * 3. binding the address to set the port
 * @return int Error code
 */
-int			Server::setup(void)
+int						Server::setup(void)
 {
 	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -47,18 +43,10 @@ int			Server::setup(void)
 	_address.sin_port = htons(8880); //same
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
-		std::cerr << "Couldn't bind the port" << std::endl;
-		return (-1);
+		std::cerr << "Couldn't bind the port 8880" << std::endl;
+		exit(1);
 	}
-	return (0);
-}
-
-/*
-* This method is used to run the server
-* @return int Error code
-*/
-int			Server::run(void)
-{
+	std::cout << "Listening on port 8880" << std::endl; 
 	return (0);
 }
 
@@ -67,7 +55,7 @@ int			Server::run(void)
 * and wait for a connection to be established
 * @return int Error code
 */
-int			Server::listen(void)
+int						Server::listen(void)
 {
 	if (::listen(_fd, 10) == -1)
 	{
@@ -81,7 +69,7 @@ int			Server::listen(void)
 * This method is used to accept connection from a client
 * @return int Error code
 */
-int			Server::accept(void)
+int						Server::accept(void)
 {
 	int	addrlen;
 	int newSocket;
@@ -97,44 +85,13 @@ int			Server::accept(void)
 }
 
 /*
-* This method is used to read from the socket
-* @return int Error code
-*/
-std::string			Server::recieve(void)
-{
-	char		buffer[4096];
-	std::string	request;
-	int			res;
-
-	// while (res)
-	// {
-		// ft_memset(buffer, 0, 4096);
-		if ((res = recv(_fd, buffer, 4095, 0)) == -1)
-			std::cerr << "Coudn't recieve the request" << std::endl;
-		request += std::string(buffer);
-
-	// }
-	return (request);
-}
-
-/*
 * This method is used to write in the socket
 * @return int Error code
 */
-int			Server::send(int fd, std::string message) const
+int					Server::send(int fd, std::string message) const
 {
-
 	if (::send(fd, message.c_str(), message.size(), 0) == -1)
 		std::cerr << "Could not send response" << std::endl;
-	return (0);
-}
-
-/*
-* This method is used to end read/write in a socket
-* @return int Error code
-*/
-int			Server::shutdown(void)
-{
 	return (0);
 }
 
@@ -142,40 +99,50 @@ int			Server::shutdown(void)
 * This method is used to release all data
 * @return int Error code
 */
-int			Server::close(void)
+int					Server::close(void)
 {
-	// if (_socket > 0)
-	// 	::close(_fd);
-	// _socket = -1;
+	for (size_t i = 0; i < _clients.size(); i++)
+		::close(_clients[i]);
+	::close(_fd);
 	return (0);
 }
 
-std::string		Server::getHost(void) const
+std::vector<int>	Server::getClients(void) const
+{
+	return (_clients);
+}
+
+std::string			Server::getHost(void) const
 {
 	return (_host);
 }
 
-std::string		Server::getPort(void) const
+std::string			Server::getPort(void) const
 {
 	return (_port);
 }
 
-int			Server::getFd(void) const
+int					Server::getFd(void) const
 {
 	return (_fd);
 }
 
-void			Server::setHost(std::string host)
+void				Server::addClient(int fd)
+{
+	_clients.push_back(fd);
+}
+
+void				Server::setHost(std::string host)
 {
 	this->_host = host;
 }
 
-void			Server::setPort(std::string port)
+void				Server::setPort(std::string port)
 {
 	this->_port = port;
 }
 
-void			Server::setFd(int fd)
+void				Server::setFd(int fd)
 {
 	this->_fd = fd;
 }

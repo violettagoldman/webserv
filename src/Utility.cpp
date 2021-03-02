@@ -81,3 +81,12 @@ std::vector<std::string> ft_split(std::string s, char c)
 	ret.push_back(s.substr(i));
 	return ret;
 }
+
+time_t			getTime()
+{
+	struct timeval	tv;
+	struct timezone	tz;
+
+	gettimeofday(&tv, &tz);
+	return (tv.tv_sec + tz.tz_minuteswest * 60);
+}

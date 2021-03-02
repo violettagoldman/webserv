@@ -3,16 +3,17 @@
 
 # include <iostream>
 # include <map>
-# include <sys/time.h>
 # include <dirent.h>
 # include <sys/stat.h>
 # include "Utility.hpp"
+# include "Config.class.hpp"
+# include "Request.class.hpp"
 
 class Response
 {
 	public:
 		Response(void);
-		// Response(Request req);
+		Response(Request req);
 		// Response(CGI cgi);
 		Response(Response const &src);
 		~Response(void);
@@ -22,7 +23,6 @@ class Response
 		void		setErrorPage();
 		void		setIndexPage();
 		std::string	serialize();
-		time_t		getTime();
 		std::string	getDate(time_t time);
 		void		handleMethod();
 		void		get();
@@ -46,6 +46,8 @@ class Response
 		std::map<std::string, std::string>		_headers;
 		std::string								_body;
 		std::map<int, std::string>				_statusCodeTranslation;
+		Request									_req;
+		// Config									&_config;
 };
 
 #endif
