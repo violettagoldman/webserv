@@ -52,7 +52,6 @@ void LimitExcept::handleLine(std::string lineString)
 	}
 }
 
-
 std::vector<std::string> LimitExcept::getAllow(void) const
 {
 	return _allow;

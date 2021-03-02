@@ -47,6 +47,8 @@ public:
 
 	void insertErrorPages(std::map<int, std::string> &newErrorPages);
 
+	void parseErrorPage(std::string directiveValue);
+
 	static bool isPresent(std::string lineString, std::string keyword);
 
 	static std::string getStringDirective(std::string lineString, std::string key);
@@ -63,7 +65,6 @@ public:
 	static int countOccurence(std::string s, char c);
 
 	static void checkLine(std::string lineString);
-	static std::map<int, std::string> parseErrorPage(std::string directiveValue);
 
 
 	virtual ~ABlock();

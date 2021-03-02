@@ -68,21 +68,23 @@ void ABlock::handle()
 		throw Exception("A block wasn't closed");
 }
 
-std::map<int, std::string> ABlock::parseErrorPage(std::string directiveValue)
+void ABlock::parseErrorPage(std::string directiveValue)
 {
 	std::map<int, std::string> ret;
 
 	std::vector<std::string> directiveParts = ft_split(directiveValue, ' ');
 
 	if (directiveParts.size() < 2)
+	{
+		_confFile.rewind();
 		throw Exception("error_page has to specify error code and page.");
+	}
 
 	for (size_t i = 0; i < directiveParts.size()-1; i++)
 	{
 		ret[ft_atoi(directiveParts[i].c_str())] = directiveParts[directiveParts.size()-1];
 	}
-
-	return ret;
+	insertErrorPages(ret);
 }
 
 /*
@@ -115,9 +117,9 @@ void ABlock::handleLineCommon(std::string lineString)
 	}
 	else if (isPresent(lineString, "error_page"))
 	{
-		std::map<int, std::string> newErrorMap = parseErrorPage(getStringDirective(lineString, "error_page"));
+		parseErrorPage(getStringDirective(lineString, "error_page"));
 		// this->_errorPage.insert(newErrorMap.begin(), newErrorMap.end());
-		insertErrorPages(newErrorMap);
+		// insertErrorPages(newErrorMap);
 	}
 }
 

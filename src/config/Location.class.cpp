@@ -42,7 +42,10 @@ std::string Location::parsePattern(std::string line)
 	std::string pattern = line.substr(pattern_start, pattern_end-pattern_start);
 	trimWhitespace(pattern);
 	if (pattern.size() == 0)
+	{
+		this->getConfFile().rewind();
 		throw Exception("location has to have a pattern.");
+	}
 	return pattern;
 }
 
@@ -65,6 +68,10 @@ void Location::check()
 	if (!this->limitExcept.isEmpty() &&
 			this->limitExcept.getMethods().size() == 0)
 		throw Exception("limit_except must specify at least one method.");
+
+	std::cout << "Location: root: " << this->getRoot() <<", fp: " << this->fcgiPass << ", us: " << this->uploadStore << std::endl;
+	if (this->getRoot() == "" && this->fcgiPass == "" && this->uploadStore == "")
+		throw Exception("location has to specify either root, fastcgi_pass or upload.");
 }
 
 // void Location::inheritParams(ABlock *parent)

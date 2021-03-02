@@ -57,7 +57,7 @@ public:
 
 private:
 
-	static std::string parsePattern(std::string line);
+	std::string parsePattern(std::string line);
 
 	std::string pattern;
 	
