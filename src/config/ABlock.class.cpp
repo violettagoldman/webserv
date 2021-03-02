@@ -25,9 +25,29 @@
 // }
 
 ABlock::ABlock(ConfigFile &confFile) :
-	_confFile(confFile)
+	_confFile(confFile),
+	_clientMaxBodySize(0),
+	_autoindex(false),
+	_index(std::vector<std::string>())
 {
 }
+
+// ABlock::ABlock(ABlock &ab) :
+// 	_confFile(ab._confFile),
+// 	_clientMaxBodySize(ab._clientMaxBodySize),
+// 	_autoindex(ab._autoindex),
+// 	_index(ab._index)
+// {
+// }
+
+// ABlock::ABlock(ABlock *ab) :
+// 	_confFile(ab->_confFile),
+// 	_clientMaxBodySize(ab->_clientMaxBodySize),
+// 	_autoindex(ab->_autoindex),
+// 	_index(ab->_index)
+// {
+// }
+
 
 int ABlock::countOccurence(std::string s, char c)
 {
@@ -57,21 +77,42 @@ void ABlock::handle()
 	bool blockClosed = false;
 	do
 	{
-		checkLine(_confFile.getLineString());
+		std::string ls = _confFile.getLineString();
+		checkLine(ls);
 
-		if (_confFile.getLineString().find("}") != std::string::npos)
+		if (ls.find("}") != std::string::npos)
 		{
 			blockClosed = true;
 			break;
 		}
 
-		handleLine(_confFile.getLineString());
+		handleLineCommon(ls);
+		handleLine(ls);
 
 	}
 	while(_confFile.getNext());
 	if (!blockClosed)
 		throw Exception("A block wasn't closed");
-	check();
+}
+
+void ABlock::handleLineCommon(std::string lineString)
+{
+	if (isPresent(lineString, "root"))
+	{
+		this->_root = getStringDirective(lineString, "root");
+	}
+	else if (isPresent(lineString, "client_max_body_size"))
+	{
+		this->_clientMaxBodySize = parseClientMaxBodySize(lineString);
+	}
+	else if (isPresent(lineString, "autoindex"))
+	{
+		this->_autoindex = parseBoolDirective(lineString, "autoindex");
+	}
+	else if (isPresent(lineString, "index"))
+	{
+		this->_index = ft_split(getStringDirective(lineString, "index"), ' ');
+	}
 }
 
 void ABlock::handleLine(std::string lineString)
@@ -168,28 +209,6 @@ int	ft_atoi(const char *str)
 	return (nbr * sign);
 }
 
-/*
-** Split a string s, separated by delimiter c
-** @param s String that needs to be splitted
-** @param c The delimiter
-** @ret std::vector<std::string> the vector of resulting separated strings
-*/
-std::vector<std::string> ft_split(std::string s, char c)
-{
-	std::vector<std::string> ret;
-	int i = 0;
-	size_t pos;
-	while ((pos = s.find(c, i)) != std::string::npos)
-	{
-		ret.push_back(s.substr(i, pos-i));
-		i = pos+1;
-	}
-	ret.push_back(s.substr(i));
-	return ret;
-}
-
-
-// int parse_size(size_t needle, std::string lineString)
 int ABlock::parseClientMaxBodySize(std::string lineString)
 {
 	std::string value = getStringDirective(lineString, "client_max_body_size");
@@ -210,7 +229,6 @@ int ABlock::parseClientMaxBodySize(std::string lineString)
 	return raw_value;
 }
 
-// void Reader::parseFcgiParam(size_t needle)
 void ABlock::parseFastCGIParam(std::string lineString,
 			std::map<std::string, std::string> &params)
 {
@@ -263,4 +281,25 @@ void ABlock::parseListen(std::string lineString, std::string &listenHost,
 		listenHost = "";
 		listenIp = ft_atoi(directive.c_str());
 	}
+}
+
+int ABlock::getClientMaxBodySize(void) const
+{
+	return _clientMaxBodySize;
+}
+
+bool ABlock::getAutoindex(void) const
+{
+	return _autoindex;
+}
+
+std::vector<std::string> ABlock::getIndex(void) const
+{
+	return _index;
+
+}
+
+std::string ABlock::getRoot(void) const
+{
+	return _root;
 }

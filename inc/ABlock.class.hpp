@@ -28,9 +28,15 @@ class ABlock
 public:
 	ABlock(ConfigFile &confFile);
 
+	// ABlock(ABlock &ab);
+
+	// ABlock(ABlock *ab);
+
 	virtual void handle();
 
 	static bool blockStarted(std::string lineString);
+
+	void handleLineCommon(std::string lineString);
 
 	virtual void handleLine(std::string lineString);
 
@@ -56,8 +62,20 @@ public:
 	static void checkLine(std::string lineString);
 	virtual ~ABlock();
 
+	int getClientMaxBodySize(void) const;
+	bool getAutoindex(void) const;
+	std::vector<std::string> getIndex(void) const;
+	std::string getRoot(void) const;
+
 private:
 	ConfigFile &_confFile;
+
+	int _clientMaxBodySize;
+	bool _autoindex;
+	std::vector<std::string> _index;
+	std::string _root;
+
+
 
 };
 

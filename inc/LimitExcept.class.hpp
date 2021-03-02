@@ -23,17 +23,21 @@ public:
 	LimitExcept(ConfigFile &confFile);
 	virtual void handleLine(std::string lineString);
 
-	static std::string parseMethod(std::string line);
+	static std::vector<std::string> parseMethods(std::string line);
 	
 	std::vector<std::string> getAllow(void) const;
 	std::vector<std::string> getDeny(void) const;
-	std::string getMethod(void) const;
+	std::vector<std::string> getMethods(void) const;
+
+	bool isEmpty(void) const;
 
 
 private:
-	std::vector<std::string> allow;
-	std::vector<std::string> deny;
-	std::string method;
+	std::vector<std::string> _allow;
+	std::vector<std::string> _deny;
+	std::vector<std::string> _methods;
+
+	bool _empty;
 
 };
 
