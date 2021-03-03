@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 20:48:52 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/03 14:04:53 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int check_listen(VirtualHost host, Header host_header)
 	{
 		request_server_name = host_header.getValue()[0];
 		//probably should set to default supported
-		request_server_port = 8880;
+		request_server_port = 80;
 	}
 	for (std::vector<std::string>::iterator it = server_names.begin(); it < server_names.end(); ++it)
 		if (*it == request_server_name &&  host.getListenIp() == request_server_port)
@@ -98,6 +98,14 @@ std::string create_final_path(Location loc, std::string request_path)
 	return final;
 }
 
+bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_method)
+{
+	for (std::vector<std::string>::iterator it = exceptions.begin(); it < exceptions.end(); ++it)
+		if (*it == request_method)
+			return true;
+	return false;
+}
+
 std::string handler(Request req, Config conf)
  {
 	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
@@ -127,7 +135,7 @@ std::string handler(Request req, Config conf)
 				it_best = server_locations.end();
 			if (it_best != server_locations.end())
 			{
-				if (((*it_best).getLimitExcept()).getMethod() != "" && ((*it_best).getLimitExcept()).getMethod() != req.getMethod())
+				if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
 				{
 					req.setError(405);
 					return final;
