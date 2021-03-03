@@ -29,6 +29,7 @@ public:
 	// void next();
 	int getNext();
 	std::string getLineString(void) const;
+	void rewind(void);
 
 private:
 	int _fd;

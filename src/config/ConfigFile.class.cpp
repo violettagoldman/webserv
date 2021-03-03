@@ -59,6 +59,11 @@ std::string ConfigFile::getLineString(void) const
 {
 	if (this->_fd < 0)
 		throw Exception("File not open");
-
 	return this->_lineString;
+}
+
+void ConfigFile::rewind(void)
+{
+	while (this->getNext())
+		continue;
 }

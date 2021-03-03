@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:17:05 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/19 11:43:49 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/02 13:20:49 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,20 @@ void check(int expression);
 	catch (const exceptionType &e) \
 	{ \
 		exception_thrown = true; \
-		check((!strcmp(e.what(), exceptionString))); \
+		bool messageEqual = !strcmp(e.what(), exceptionString); \
+		check(messageEqual == true); \
+		if (!messageEqual) \
+		{ \
+			std::cout << "Expected exception: " << exceptionString \
+				<< ", but got: " << e.what() << std::endl;\
+		} \
 		std::cout << e.what() << std::endl;\
 	} \
 	check(exception_thrown == true); \
+	if (!exception_thrown)\
+	{\
+		std::cout << "Exception not thrown when expected" << std::endl;\
+	}\
 }
 
 int test_no = 1;
