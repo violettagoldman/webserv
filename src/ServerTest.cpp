@@ -19,17 +19,26 @@ void	shutdown(int signal)
 	exit(0);
 }
 
-int		main(void)
+int		main(int ac, char **av)
 {
 	size_t			i;
 	fd_set			fds;
 	int				new_socket;
 	Request			request;
-	ConfigReader	reader("./tests/config/test_configs/nginx.conf");
-	Config 			conf = reader.getConfig();
 	int 			sd;
 	int 			max_sd;
 	std::string 	final_path;
+	std::string path_to_conf("./tests/config/test_configs/nginx.conf");
+	
+	if (ac == 2)
+	{
+		path_to_conf = av[1];
+	}
+	std::cout << "Using config at " << path_to_conf << std::endl;
+	ConfigReader reader(path_to_conf);
+
+
+	Config conf = reader.getConfig();
 
 	s = Server();
 	s.setup();
