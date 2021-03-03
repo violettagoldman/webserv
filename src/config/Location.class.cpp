@@ -12,16 +12,24 @@
 
 #include "Location.class.hpp"
 
-Location::Location(ConfigFile &confFile) : ABlock(confFile), limitExcept(confFile)
+Location::Location(ConfigFile &confFile) :
+	ABlock(confFile),
+	limitExcept(confFile),
+	uploadStore(""),
+	rootSet(false),
+	fcgiSet(false),
+	uploadStoreSet(false)
 {
-	this->rootSet = false;
-	this->fcgiSet = false;
-	this->uploadStoreSet = false;
 }
 
-Location::Location(ABlock &ab) : ABlock(ab), limitExcept(ab.getConfFile())
+Location::Location(ABlock &ab) :
+	ABlock(ab),
+	limitExcept(ab.getConfFile()),
+	uploadStore(""),
+	rootSet(false),
+	fcgiSet(false),
+	uploadStoreSet(false)
 {
-
 }
 
 /*

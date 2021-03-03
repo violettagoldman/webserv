@@ -15,9 +15,10 @@
 
 ABlock::ABlock(ConfigFile &confFile) :
 	_confFile(confFile),
-	_clientMaxBodySize(0),
+	_clientMaxBodySize(1000000),
 	_autoindex(false),
-	_index(std::vector<std::string>())
+	_index(std::vector<std::string>(1, "index.html")),
+	_root("html")
 {
 }
 

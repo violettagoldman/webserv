@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/02 14:24:53 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/03 12:14:08 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,8 +212,11 @@ int main(void)
 	out("Exception | location with empty or no pattern");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_pattern.conf"), Exception, "location has to have a pattern.");
 
-	out("Exception | location has to specify either root, fastcgi_pass or upload");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, fastcgi_pass or upload.");
+	// out("Exception | location has to specify either root, fastcgi_pass or upload");
+	// TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, fastcgi_pass or upload.");
+
+	// out("Exception | VirtualHost has to either have a location, or specify root or upload");
+	// TEST_EXCEPTION(ConfigReader r3("./config/test_configs/empty_virtualhost.conf"), Exception, "VirtualHost has to either have a location, or specify root or upload.");
 
 	out("Ft_split | empty string");
 	check(ft_split("", ' ').size() == 0);
