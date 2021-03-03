@@ -19,6 +19,11 @@ Location::Location(ConfigFile &confFile) : ABlock(confFile), limitExcept(confFil
 	this->uploadStoreSet = false;
 }
 
+Location::Location(ABlock &ab) : ABlock(ab), limitExcept(ab.getConfFile())
+{
+
+}
+
 /*
 ** Parse a pattern from the first line of a location block.
 ** From this line:
@@ -36,18 +41,22 @@ std::string Location::parsePattern(std::string line)
 	size_t pattern_end = line.find("{", pattern_start);
 	std::string pattern = line.substr(pattern_start, pattern_end-pattern_start);
 	trimWhitespace(pattern);
+	if (pattern.size() == 0)
+	{
+		this->getConfFile().rewind();
+		throw Exception("location has to have a pattern.");
+	}
 	return pattern;
 }
 
-void Location::inheritParams(int _clientMaxBodySize, bool _autoindex,
-		std::string _root, std::vector<std::string> _index, std::string _uploadStore)
-{
-	this->clientMaxBodySize = _clientMaxBodySize;
-	this->autoindex = _autoindex;
-	this->root = _root;
-	this->index = _index;
-	this->uploadStore = _uploadStore;
-}
+// void Location::inheritParams(int _clientMaxBodySize, bool _autoindex,
+// 		std::string root, std::vector<std::string> _index, std::string _uploadStore)
+// {
+// 	this->clientMaxBodySize = _clientMaxBodySize;
+// 	this->autoindex = _autoindex;
+// 	this->index = _index;
+// 	this->uploadStore = _uploadStore;
+// }
 
 void Location::check()
 {
@@ -55,6 +64,14 @@ void Location::check()
 		throw Exception("Root and fcgi_pass on the same location.");
 	if (fcgiSet == true && uploadStoreSet == true)
 		throw Exception("Upload_store and fcgi_pass on the same location.");
+
+	if (!this->limitExcept.isEmpty() &&
+			this->limitExcept.getMethods().size() == 0)
+		throw Exception("limit_except must specify at least one method.");
+
+	std::cout << "Location: root: " << this->getRoot() <<", fp: " << this->fcgiPass << ", us: " << this->uploadStore << std::endl;
+	if (this->getRoot() == "" && this->fcgiPass == "" && this->uploadStore == "")
+		throw Exception("location has to specify either root, fastcgi_pass or upload.");
 }
 
 // void Location::inheritParams(ABlock *parent)
@@ -76,20 +93,12 @@ void Location::handleLine(std::string lineString)
 
 	if (isPresent(lineString, "root"))
 	{
-		this->root = getStringDirective(lineString, "root");
+		// this->root = getStringDirective(lineString, "root");
 		this->rootSet = true;
 	}
 	if (isPresent(lineString, "location"))
 	{
 		this->pattern = parsePattern(lineString);
-	}
-	if (isPresent(lineString, "client_max_body_size"))
-	{
-		this->clientMaxBodySize = parseClientMaxBodySize(lineString);
-	}
-	if (isPresent(lineString, "autoindex"))
-	{
-		this->autoindex = parseBoolDirective(lineString, "autoindex");
 	}
 	if (isPresent(lineString, "fastcgi_pass"))
 	{
@@ -99,10 +108,6 @@ void Location::handleLine(std::string lineString)
 	if (isPresent(lineString, "fastcgi_param"))
 	{
 		parseFastCGIParam(lineString, this->fcgiParams);
-	}
-	else if (isPresent(lineString, "index"))
-	{
-		this->index = ft_split(getStringDirective(lineString, "index"), ' ');
 	}
 	else if (isPresent(lineString, "upload_store"))
 	{
@@ -116,25 +121,25 @@ std::string Location::getPattern(void) const
 	return this->pattern;
 }
 
-std::string Location::getRoot(void) const
-{
-	return this->root;
-}
+// std::string Location::getRoot(void) const
+// {
+// 	return this->root;
+// }
 
-int Location::getClientMaxBodySize(void) const 
-{
-	return this->clientMaxBodySize;
-}
+// int Location::getClientMaxBodySize(void) const 
+// {
+// 	return this->clientMaxBodySize;
+// }
 
-bool Location::getAutoindex(void) const
-{
-	return this->autoindex;
-}
+// bool Location::getAutoindex(void) const
+// {
+// 	return this->autoindex;
+// }
 
-std::vector<std::string> Location::getIndex(void) const
-{
-	return this->index;
-}
+// std::vector<std::string> Location::getIndex(void) const
+// {
+// 	return this->index;
+// }
 
 LimitExcept Location::getLimitExcept(void) const
 {
@@ -169,4 +174,9 @@ bool Location::getFcgiSet(void) const
 bool Location::getUploadStoreSet(void) const
 {
 	return this->uploadStoreSet;
+}
+
+void Location::setUploadStore(std::string _uploadStore)
+{
+	this->uploadStore = _uploadStore;
 }

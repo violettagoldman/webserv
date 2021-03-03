@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:17:05 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/31 12:19:04 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/02 13:20:49 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@
 
 bool exception_thrown = false;
 
+int total_checks = 0;
+int tests_passed = 0;
+
 void check(int expression);
 
 #define TEST_EXCEPTION(expression, exceptionType, exceptionString) { \
@@ -34,10 +37,20 @@ void check(int expression);
 	catch (const exceptionType &e) \
 	{ \
 		exception_thrown = true; \
-		check((!strcmp(e.what(), exceptionString))); \
+		bool messageEqual = !strcmp(e.what(), exceptionString); \
+		check(messageEqual == true); \
+		if (!messageEqual) \
+		{ \
+			std::cout << "Expected exception: " << exceptionString \
+				<< ", but got: " << e.what() << std::endl;\
+		} \
 		std::cout << e.what() << std::endl;\
 	} \
 	check(exception_thrown == true); \
+	if (!exception_thrown)\
+	{\
+		std::cout << "Exception not thrown when expected" << std::endl;\
+	}\
 }
 
 int test_no = 1;
@@ -53,15 +66,23 @@ void check(int expression)
 {
 	// If expression doesn't evaluate to 1, the program will abort
 	// assert(expression == 1);
+	total_checks += 1;
 	if (expression == 1)
 	{
 		std::cout << "\033[92m✓ PASS\033[0m" << std::endl;
+		tests_passed += 1;
 	}
 	else 
 	{
 		std::cout << "\033[91m✓ FAIL\033[0m" << std::endl;
 	}
 	
+}
+
+void test_results()
+{
+	std::cout << "\n\n---------" << std::endl;
+	std::cout << "Total checks: " << total_checks << ", passed: " << tests_passed << ", failed: " << total_checks - tests_passed << std::endl;
 }
 
 template <typename T>

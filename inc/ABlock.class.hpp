@@ -18,6 +18,7 @@
 
 # include <vector>
 # include <map>
+# include <algorithm>
 # include "Utility.hpp"
 
 class ABlock
@@ -28,15 +29,25 @@ class ABlock
 public:
 	ABlock(ConfigFile &confFile);
 
+	// ABlock(ABlock &ab);
+
+	// ABlock(ABlock *ab);
+
 	virtual void handle();
 
 	static bool blockStarted(std::string lineString);
+
+	void handleLineCommon(std::string lineString);
 
 	virtual void handleLine(std::string lineString);
 
 	ConfigFile &getConfFile(void) const;
 
 	virtual void check(void);
+
+	void insertErrorPages(std::map<int, std::string> &newErrorPages);
+
+	void parseErrorPage(std::string directiveValue);
 
 	static bool isPresent(std::string lineString, std::string keyword);
 
@@ -54,10 +65,26 @@ public:
 	static int countOccurence(std::string s, char c);
 
 	static void checkLine(std::string lineString);
+
+
 	virtual ~ABlock();
+
+	int getClientMaxBodySize(void) const;
+	bool getAutoindex(void) const;
+	std::vector<std::string> getIndex(void) const;
+	std::string getRoot(void) const;
+	std::map<int, std::string> getErrorPage(void) const;
 
 private:
 	ConfigFile &_confFile;
+
+	int _clientMaxBodySize;
+	bool _autoindex;
+	std::vector<std::string> _index;
+	std::string _root;
+	std::map<int, std::string> _errorPage;
+
+
 
 };
 

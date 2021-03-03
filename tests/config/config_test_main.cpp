@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   unit_tests.cpp                                     :+:      :+:    :+:   */
+/*   config_test_main.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/17 16:01:26 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/02 14:24:53 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,55 +14,11 @@
 // Test-related stuff below
 
 // Needed to automatically fail tests;
-#include <assert.h>
-#include <string>
 
 #include <iostream>
 
-bool exception_thrown = false;
 
-void check(int expression);
-
-#define TEST_EXCEPTION(expression, exceptionType, exceptionString) { \
-	exception_thrown = false; \
-	try \
-	{ \
-		expression; \
-	} \
-	catch (const exceptionType &e) \
-	{ \
-		exception_thrown = true; \
-		check((!strcmp(e.what(), exceptionString))); \
-		std::cout << e.what() << std::endl;\
-	} \
-	if (!exception_thrown)\
-		std::cout << "Exception NOT thrown" << std::endl; \
-	check(exception_thrown == true); \
-}
-
-int test_no = 1;
-
-void out(std::string s)
-{
-	std::cout << std::endl;
-	std::cout << "\033[0;34m" << "Test " << test_no << " | " << s << "\033[0m" << std::endl;
-	test_no += 1;
-}
-
-void check(int expression)
-{
-	// If expression doesn't evaluate to 1, the program will abort
-	// assert(expression == 1);
-	if (expression == 1)
-	{
-		std::cout << "\033[92m✓ PASS\033[0m" << std::endl;
-	}
-	else 
-	{
-		std::cout << "\033[91m✓ FAIL\033[0m" << std::endl;
-	}
-	
-}
+# include "femtotest.hpp"
 
 #include "VirtualHost.class.hpp"
 #include "ConfigReader.class.hpp"
@@ -91,16 +47,27 @@ int main(void)
 
 
 	std::vector<VirtualHost> virtualHostVector = conf.getVirtualHostVector();
-	check(virtualHostVector.size() == 3);
+	check(virtualHostVector.size() == 4);
 
 	out("Config | Root");
 	check(conf.getRoot() == "/var/www/");
+
+	out("Config | error_pages");
+	check(conf.getErrorPage()[404] == "/404.html");
+	check(conf.getErrorPage()[500] == "/50x.html");
+	check(conf.getErrorPage()[502] == "/50x.html");
+	check(conf.getErrorPage()[503] == "/50x.html");
+	check(conf.getErrorPage()[504] == "/50x.html");
+	
 
 	out("Host 0 | Listen");
 	check(virtualHostVector[0].getListenIp() == 80);
 	check(virtualHostVector[0].getListenHost() == "");
 
-
+	out("Host 0 | Error page on host");
+	check(virtualHostVector[0].getErrorPage()[404] == "/404_custom.html");
+	check(virtualHostVector[0].getErrorPage()[500] == "/50x.html");
+	std::cout << virtualHostVector[0].getErrorPage()[404] << std::endl;
 
 	check(virtualHostVector[0].getServerName().size() == 2);
 	check(virtualHostVector[0].getServerName()[0] == "domain1.com");
@@ -117,6 +84,17 @@ int main(void)
 	check(virtualHostVector[0].getLocations()[0].getPattern() == "/");
 	check(virtualHostVector[0].getLocations()[0].getRoot() == "/var/www/");
 
+	out("Host 0 | location 0 | no limit except");
+	check(virtualHostVector[0].getLocations()[0].getLimitExcept().isEmpty() == true);
+
+	out("Host 0 | location 0 | error_page on location");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[42] == "/dontpanic.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[404] == "/404_custom.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[500] == "/50x.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[502] == "/50x.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[503] == "/50x.html");
+	check(virtualHostVector[0].getLocations()[0].getErrorPage()[504] == "/50x.html");
+	
 	check(virtualHostVector[0].getClientMaxBodySize() == 32);
 
 	out("Host 0 | Root inherited from config");
@@ -141,7 +119,8 @@ int main(void)
 
 	check(virtualHostVector[1].getLocations()[0].getRoot() == "/var/www/");
 	out("Host 1 | Location 0 | limit_except ");
-	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethod() == "GET");
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethods().size() == 1);
+	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getMethods()[0] == "GET");
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow().size() == 2);
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[0] == "127.0.0.1");
 	check(virtualHostVector[1].getLocations()[0].getLimitExcept().getAllow()[1] == "127.0.0.2");
@@ -178,6 +157,11 @@ int main(void)
 
 	out("Host 2 | Location 1 | autoindex off");
 	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
+
+	out("Host 3 | Location 0 | limit_except with multiple methods");
+	check(virtualHostVector[3].getLocations()[0].getLimitExcept().getMethods().size() == 2);
+	check(virtualHostVector[3].getLocations()[0].getLimitExcept().getMethods()[0] == "GET");
+	check(virtualHostVector[3].getLocations()[0].getLimitExcept().getMethods()[1] == "POST");
 
 	out("Exception | Missing semicolon");
 	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/unfinished_directive.conf"), Exception, "A semicolon is missing");
@@ -218,6 +202,44 @@ int main(void)
 
 	out("Exception | upload and fcgi on same location");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
+
+	out("Exception | limit_except without method");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/fake_limit_except.conf"), Exception, "limit_except must specify at least one method.");
+
+	out("Exception | error_pages has != 2 fields");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/error_page_wrong_format.conf"), Exception, "error_page has to specify error code and page.");
+
+	out("Exception | location with empty or no pattern");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_pattern.conf"), Exception, "location has to have a pattern.");
+
+	out("Exception | location has to specify either root, fastcgi_pass or upload");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, fastcgi_pass or upload.");
+
+	out("Ft_split | empty string");
+	check(ft_split("", ' ').size() == 0);
+
+	out("Ft_split | normal string");
+	std::string s1("hello world");
+	std::vector<std::string> res;
+
+	res = ft_split(s1, ' ');
+	check(res.size() == 2);
+	check(res[0] == "hello");
+	check(res[1] == "world");
+
+
+	out("Ft_split | one field");
+	std::string s2("hello");
+	std::vector<std::string> res2;
+
+	res2 = ft_split(s2, ' ');
+	check(res2.size() == 1);
+	check(res2[0] == "hello");
+
+
+
+	test_results();
+
 
 	// TEST_EXCEPTION(ConfigReader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\
 	// 				"A required directive wasn't found in a context.");

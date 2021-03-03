@@ -12,22 +12,15 @@
 
 #include "ABlock.class.hpp"
 
-// const std::string ABlock::blockStartKeyword = "server";
-
-// bool ABlock::blockStarted(std::string lineString)
-// {
-// 	size_t pos;
-// 	if ((pos = lineString.find(blockStartKeyword)) != std::string::npos)
-// 	{
-// 		return true;
-// 	}
-// 	return false;
-// }
 
 ABlock::ABlock(ConfigFile &confFile) :
-	_confFile(confFile)
+	_confFile(confFile),
+	_clientMaxBodySize(0),
+	_autoindex(false),
+	_index(std::vector<std::string>())
 {
 }
+
 
 int ABlock::countOccurence(std::string s, char c)
 {
@@ -57,21 +50,77 @@ void ABlock::handle()
 	bool blockClosed = false;
 	do
 	{
-		checkLine(_confFile.getLineString());
+		std::string ls = _confFile.getLineString();
+		checkLine(ls);
 
-		if (_confFile.getLineString().find("}") != std::string::npos)
+		if (ls.find("}") != std::string::npos)
 		{
 			blockClosed = true;
 			break;
 		}
 
-		handleLine(_confFile.getLineString());
+		handleLineCommon(ls);
+		handleLine(ls);
 
 	}
 	while(_confFile.getNext());
 	if (!blockClosed)
 		throw Exception("A block wasn't closed");
-	check();
+}
+
+void ABlock::parseErrorPage(std::string directiveValue)
+{
+	std::map<int, std::string> ret;
+
+	std::vector<std::string> directiveParts = ft_split(directiveValue, ' ');
+
+	if (directiveParts.size() < 2)
+	{
+		_confFile.rewind();
+		throw Exception("error_page has to specify error code and page.");
+	}
+
+	for (size_t i = 0; i < directiveParts.size()-1; i++)
+	{
+		ret[ft_atoi(directiveParts[i].c_str())] = directiveParts[directiveParts.size()-1];
+	}
+	insertErrorPages(ret);
+}
+
+/*
+** std::map::insert doesn't overwrite existing elements. So in order to merge
+** the two maps, we first insert old map into the new map, and then swap them.
+*/
+void ABlock::insertErrorPages(std::map<int, std::string> &newErrorPages)
+{
+	newErrorPages.insert(_errorPage.begin(), _errorPage.end());
+	std::swap(_errorPage, newErrorPages);
+}
+
+void ABlock::handleLineCommon(std::string lineString)
+{
+	if (isPresent(lineString, "root"))
+	{
+		this->_root = getStringDirective(lineString, "root");
+	}
+	else if (isPresent(lineString, "client_max_body_size"))
+	{
+		this->_clientMaxBodySize = parseClientMaxBodySize(lineString);
+	}
+	else if (isPresent(lineString, "autoindex"))
+	{
+		this->_autoindex = parseBoolDirective(lineString, "autoindex");
+	}
+	else if (isPresent(lineString, "index"))
+	{
+		this->_index = ft_split(getStringDirective(lineString, "index"), ' ');
+	}
+	else if (isPresent(lineString, "error_page"))
+	{
+		parseErrorPage(getStringDirective(lineString, "error_page"));
+		// this->_errorPage.insert(newErrorMap.begin(), newErrorMap.end());
+		// insertErrorPages(newErrorMap);
+	}
 }
 
 void ABlock::handleLine(std::string lineString)
@@ -143,53 +192,6 @@ void ABlock::trimWhitespaceStart(std::string &s)
 	}
 }
 
-// // TODO : test some more
-int	ft_atoi(const char *str)
-{
-	int		nbr;
-	int		sign;
-
-	nbr = 0;
-	sign = 1;
-	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
-			|| (*str) == '\r' || (*str) == ' ')
-		str++;
-	if ((*str) == '-' || (*str) == '+')
-	{
-		sign *= ((*str) == '-' ? -1 : 1);
-		str++;
-	}
-	while ((*str) != '\0' && (*str) >= '0' && (*str) <= '9')
-	{
-		nbr *= 10;
-		nbr += (*str) - '0';
-		str++;
-	}
-	return (nbr * sign);
-}
-
-/*
-** Split a string s, separated by delimiter c
-** @param s String that needs to be splitted
-** @param c The delimiter
-** @ret std::vector<std::string> the vector of resulting separated strings
-*/
-std::vector<std::string> ft_split(std::string s, char c)
-{
-	std::vector<std::string> ret;
-	int i = 0;
-	size_t pos;
-	while ((pos = s.find(c, i)) != std::string::npos)
-	{
-		ret.push_back(s.substr(i, pos-i));
-		i = pos+1;
-	}
-	ret.push_back(s.substr(i));
-	return ret;
-}
-
-
-// int parse_size(size_t needle, std::string lineString)
 int ABlock::parseClientMaxBodySize(std::string lineString)
 {
 	std::string value = getStringDirective(lineString, "client_max_body_size");
@@ -210,7 +212,6 @@ int ABlock::parseClientMaxBodySize(std::string lineString)
 	return raw_value;
 }
 
-// void Reader::parseFcgiParam(size_t needle)
 void ABlock::parseFastCGIParam(std::string lineString,
 			std::map<std::string, std::string> &params)
 {
@@ -263,4 +264,30 @@ void ABlock::parseListen(std::string lineString, std::string &listenHost,
 		listenHost = "";
 		listenIp = ft_atoi(directive.c_str());
 	}
+}
+
+int ABlock::getClientMaxBodySize(void) const
+{
+	return _clientMaxBodySize;
+}
+
+bool ABlock::getAutoindex(void) const
+{
+	return _autoindex;
+}
+
+std::vector<std::string> ABlock::getIndex(void) const
+{
+	return _index;
+
+}
+
+std::string ABlock::getRoot(void) const
+{
+	return _root;
+}
+
+std::map<int, std::string> ABlock::getErrorPage(void) const
+{
+	return _errorPage;
 }

@@ -26,8 +26,10 @@ void Config::handle()
 {
 	do
 	{
-		checkLine(getConfFile().getLineString());
-		handleLine(getConfFile().getLineString());
+		std::string ls = getConfFile().getLineString();
+		checkLine(ls);
+		handleLineCommon(ls);
+		handleLine(ls);
 
 	}
 	while(getConfFile().getNext());
@@ -69,6 +71,11 @@ void Config::check()
 			
 	}
 
+	for (size_t i = 0; i < virtualHostVector.size(); i++)
+	{
+		virtualHostVector[i].check();
+	}
+
 }
 
 void Config::handleLine(std::string lineString)
@@ -78,30 +85,31 @@ void Config::handleLine(std::string lineString)
 	if (lineString.find("server") != std::string::npos)
 	{
 		// std::cout << "Found server" << std::endl;
-		VirtualHost sBlock(this->getConfFile());
+		// VirtualHost sBlock(this->getConfFile());
+		VirtualHost sBlock(*this);
 
-		sBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
-			this->root, this->index);
+		// sBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
+			// this->root, this->index);
 		sBlock.handle();
 
 		virtualHostVector.push_back(sBlock);
 	}
-	else if (isPresent(lineString, "client_max_body_size"))
-	{
-		this->clientMaxBodySize = parseClientMaxBodySize(lineString);
-	}
-	else if (isPresent(lineString, "autoindex"))
-	{
-		this->autoindex = parseBoolDirective(lineString, "autoindex");
-	}
-	else if (isPresent(lineString, "index"))
-	{
-		this->index = ft_split(getStringDirective(lineString, "index"), ' ');
-	}
-	else if (isPresent(lineString, "root"))
-	{
-		this->root = getStringDirective(lineString, "root");
-	}
+	// else if (isPresent(lineString, "client_max_body_size"))
+	// {
+	// 	this->clientMaxBodySize = parseClientMaxBodySize(lineString);
+	// }
+	// else if (isPresent(lineString, "autoindex"))
+	// {
+	// 	this->autoindex = parseBoolDirective(lineString, "autoindex");
+	// }
+	// else if (isPresent(lineString, "index"))
+	// {
+	// 	this->index = ft_split(getStringDirective(lineString, "index"), ' ');
+	// }
+	// else if (isPresent(lineString, "root"))
+	// {
+	// 	this->root = getStringDirective(lineString, "root");
+	// }
 }
 
 std::vector<VirtualHost> Config::getVirtualHostVector(void) const
@@ -109,25 +117,25 @@ std::vector<VirtualHost> Config::getVirtualHostVector(void) const
 	return this->virtualHostVector;
 }
 
-int Config::getClientMaxBodySize(void) const
-{
-	return this->clientMaxBodySize;
-}
+// int Config::getClientMaxBodySize(void) const
+// {
+// 	return this->clientMaxBodySize;
+// }
 
-bool Config::getAutoindex(void) const
-{
-	return this->autoindex;
-}
+// bool Config::getAutoindex(void) const
+// {
+// 	return this->autoindex;
+// }
 
-std::vector<std::string> Config::getIndex(void) const
-{
-	return this->index;
-}
+// std::vector<std::string> Config::getIndex(void) const
+// {
+// 	return this->index;
+// }
 
-std::string Config::getRoot(void) const
-{
-	return this->root;
-}
+// std::string Config::getRoot(void) const
+// {
+// 	return this->root;
+// }
 
 
 

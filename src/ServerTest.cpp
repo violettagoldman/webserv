@@ -1,117 +1,86 @@
-#include "../inc/Server.class.hpp"
-
 #include <sys/time.h>
 #include <unistd.h>
-#include "../inc/Request.class.hpp"
-#include "../inc/Config.class.hpp"
-// #include "../inc/Reader.class.hpp"
-#include "../inc/ConfigReader.class.hpp"
-// #include "../inc/Header.class.hpp"
-// #include "./read_request.cpp"
+#include "Request.class.hpp"
+#include "Config.class.hpp"
+#include "ConfigReader.class.hpp"
+#include "Server.class.hpp"
+#include "Response.class.hpp"
 
-Request *read_request(int sd, Request *req);
+Request		*read_request(int sd, Request *req);
 std::string handler(Request req, Config conf);
-int main(void)
+
+Server	s;
+
+void	shutdown(int signal)
 {
-    int     i;
-    Server  s;
-    int	    clients[30]; //change to vector later
-    fd_set  fds;
-    // char    buffer[1024];
-    int     new_socket;
-	// Request *request = new Request;
-	// int valread;
-	ConfigReader reader("./tests/config/test_configs/nginx.conf");
-	Config conf = reader.getConfig();
-	Request request;
-	int sd;
-	int max_sd;
-	std::string final_path;
-    s = Server();
-    for (i = 0; i < 30; i++)
-		clients[i] = 0;
+	(void)signal;
+	std::cout << "Shutting down the server\n";
+	s.close();
+	exit(0);
+}
 
-    s.setup();
-    s.listen();
+int		main(void)
+{
+	size_t			i;
+	fd_set			fds;
+	int				new_socket;
+	Request			request;
+	ConfigReader	reader("./tests/config/test_configs/nginx.conf");
+	Config 			conf = reader.getConfig();
+	int 			sd;
+	int 			max_sd;
+	std::string 	final_path;
 
-	std::cout << "Waiting for connections ...\n";
+	s = Server();
+	s.setup();
+	s.listen();
 
+	signal(SIGINT, shutdown);
 	while(1)
 	{
-		//clear the socket set
 		FD_ZERO(&fds);
-
-		//add master socket to set
 		FD_SET(s.getFd(), &fds);
 		max_sd = s.getFd();
-
-		//add child sockets to set
-		for (i = 0 ; i < 30; i++)
+		for (i = 0; i < s.getClients().size(); i++)
 		{
-			//socket descriptor
-			sd = clients[i];
-			//if valid socket descriptor then add to read list
+			sd = s.getClients()[i];
 			if(sd > 0)
 				FD_SET( sd , &fds);
-			// highest file descriptor number, need it for the select function
 			if(sd > max_sd)
 				max_sd = sd;
 		}
-		// wait for an activity on one of the sockets
-		select( max_sd + 1 , &fds , NULL , NULL , NULL);
+		select(max_sd + 1 , &fds , NULL , NULL , NULL);
 		if (FD_ISSET(s.getFd(), &fds))
 		{
 			new_socket = s.accept();
-			s.send(new_socket, "Hello from the server\n");
-			for (i = 0; i < 30; i++)
-			{
-				//if position is empty
-				if( clients[i] == 0 )
-				{
-					clients[i] = new_socket;
-					printf("Adding to list of sockets as %d\n" , i);
-					break;
-				}
-			}
+			s.addClient(new_socket);
 		}
-		//else its some IO operation on some other socket
-		for (i = 0; i < 30; i++)
+		for (i = 0; i < s.getClients().size(); i++)
 		{
-			sd = clients[i];
-
-			if (FD_ISSET( sd , &fds))
+			sd = s.getClients()[i];
+			if (FD_ISSET(sd , &fds))
 			{
-				// request = read_request(sd, request);
 				request.read_request(sd);
-				// std::cout << request.getState() << std::endl;
 				if (request.getState() == "end")
 				{
-                    s.close();
-					printf("Host disconnected\n");
+					s.close();
 					close(sd);
-					clients[i] = 0;
+					s.getClients()[i] = 0;
 				}
 				else if (request.getState() == "read")
 				{
 					(void)conf;
 					request.print_headers();
 					final_path = handler(request, conf);
-					// cgi_dostuff(request);
-					// request.print_headers();
-					std::cout << "hehe " << final_path << std::endl;
-					std::cout << "Success" << std::endl;
-				// 	buffer[valread] = '\0';
-					// std::cout << "I just got your message: " << buffer << std::endl;
-				//
+					Response response = Response(request);
+					s.send(sd, response.serialize());
 				}
 				else if (request.getState() == "error")
 				{
 					std::cout << "Error";
 				}
-
 			}
 		}
 	}
-
-    return (0);
+	return (0);
 }

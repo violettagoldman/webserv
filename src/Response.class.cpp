@@ -2,34 +2,47 @@
 
 Response::Response(void)
 {
-	//test values
-	_method = "POST";
+	
+	_method = "GET";
 	_statusCode = 200;
 	statusCodeTranslation();
 	_headers["Date"] = getDate(getTime());
 	_headers["Server"] = "Webserv/1.0 (Unix)";
 	std::cout << "Default constructor called\n";
-	// setIndexPage();
-	// setErrorPage();
+	handleMethod();
+}
+
+Response::Response(Request req)
+{
+	_req = req;
+	_method = _req.getMethod();
+	_statusCode = 200;
+	statusCodeTranslation();
+	_headers["Date"] = getDate(getTime());
+	_headers["Server"] = "Webserv/1.0 (Unix)";
 	handleMethod();
 }
 
 Response::Response(Response const &src)
 {
-	std::cout << "Copy constructor called\n";
 	*this = src;
 }
 
 Response::~Response(void)
 {
-	std::cout << "Destructor called\n";
 }
 
 Response		&Response::operator=(Response const &src)
 {
-	std::cout << "Assignation operator called\n";
 	if (this != &src)
 	{
+		this->_req = src._req;
+		// this->_config = src._config;
+		this->_body = src._body;
+		this->_headers = src._headers;
+		this->_method = src._method;
+		this->_statusCode = src._statusCode;
+		this->_statusCodeTranslation = src._statusCodeTranslation;
 	}
 	return (*this);
 }
@@ -38,8 +51,6 @@ void			Response::handleMethod()
 {
 	std::string option;
 
-	// check for method from the request
-	// and check if they are in my config -> otherwise 405
 	option = _method;
 	if (option == "GET")
 		get();
@@ -57,7 +68,6 @@ void			Response::handleMethod()
 		trace();
 	else
 		error(405);
-		// return error 405 if not exist or not allowed
 }
 
 void		Response::get()
@@ -67,11 +77,12 @@ void		Response::get()
 	struct stat		fileStat;
 	int				fd;
 
-	path = "/tmp/servtest/a.jpeg"; // get path from request
+	path = _req.getPath();
 	autoindex = false;
 	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
 	{
 		error(404);
+		setContentType(".html");
 		return ;
 	}
 	if (fstat(fd, &fileStat) < 0)
@@ -96,16 +107,11 @@ void		Response::get()
 	else
 	{
 		_body = readFile(path);
-		// _headers["Last-Modified"] = getDate(fileStat.st_mtime);
+		_headers["Last-Modified"] = getDate(fileStat.st_mtime);
 		setLastModified(fd);
 		setContentType(path);
 	}
 	close(fd);
-	// if no autoindex and it's a folder => 403 - done
-	// if yes => 200 and page with index - done
-	// if exists => 200 and send body (last-modified, content type)
-	// if doesn't exist => 404 and send page with error - done
-	// no rights => 403 - done
 }
 
 void		Response::setContentType(std::string path)
@@ -203,6 +209,7 @@ void		Response::setErrorPage()
 {
 	std::string		html;
 
+	// check for customised pages
 	html = readFile("./pages/error.html");
 	html = replacehtml(html, "$1", ft_itoa(_statusCode));
 	html = replacehtml(html, "$2", _statusCodeTranslation[_statusCode]);
@@ -217,7 +224,7 @@ void		Response::setIndexPage()
 	struct dirent 	*dir;
 
 	html = readFile("./pages/index.html");
-	html = replacehtml(html, "$1", "/"); // change to path later
+	html = replacehtml(html, "$1", _req.getPath());
 	currentDirectory= opendir(".");
 	if (currentDirectory)
 	{
@@ -233,21 +240,22 @@ void		Response::post()
 {
 	int fd;
 	int exist;
+	std::string path;
 
 	fd = -1;
-	std::string path = "/tmp/privet";
+	path = _req.getPath();
 	exist = checkPathExistance(path);
 	if (exist == 1)
 	{
 		if ((fd = open(path.c_str(), O_WRONLY | O_APPEND, 0644)) > 0)
 		{
-			if (write(fd, "replace", std::string("replace").length()) == -1)
+			if (write(fd, _req.getBody().c_str(), _req.getBody().length()) == -1)
 				error(500);
 			else
 			{
 				_headers["Content-Location"] = "get url from request";
 				_statusCode = 200;
-				_body = "request body";
+				_body = _req.getBody();
 			}
 		}
 		else
@@ -272,7 +280,7 @@ void		Response::put()
 	{
 		if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) > 0)
 		{
-			if (write(fd, "replace", std::string("replace").length()) == -1)
+			if (write(fd, _req.getBody().c_str(), _req.getBody().length()) == -1)
 				error(500);
 			else
 				_statusCode = 204;
@@ -284,12 +292,12 @@ void		Response::put()
 	{
 		if ((fd = open(path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644)) > 0)
 		{
-			if (write(fd, "replace by the request body", std::string("replace by the request body").length()) == -1)
+			if (write(fd, _req.getBody().c_str(), _req.getBody().length()) == -1)
 				error(500);
 			else
 			{
 				_statusCode = 201;
-				_headers["Location"] = "get url from request";
+				_headers["Location"] = "get url from request"; // ask to add
 			}
 		}
 		else
@@ -300,17 +308,17 @@ void		Response::put()
 
 void		Response::deleteMethod()
 {
-	std::string path = "/tmp/a"; // get path from request
+	std::string path;
 	int	fd;
 
+	path = _req.getPath();
 	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
 	{
 		error(404);
 		return ;
 	}
-	// not alowed -> 405
 	if (unlink(path.c_str()) == 0)
-		_statusCode = 204; // 200 but without body
+		_statusCode = 204;
 	else
 		error(403);
 	close(fd);
@@ -333,16 +341,6 @@ void		Response::connect()
 
 void		Response::trace()
 {
-}
-
-// move to utility
-time_t			Response::getTime()
-{
-	struct timeval	tv;
-	struct timezone	tz;
-
-	gettimeofday(&tv, &tz);
-	return (tv.tv_sec + tz.tz_minuteswest * 60);
 }
 
 std::string		Response::getDate(time_t time)
@@ -385,7 +383,10 @@ std::string 	Response::serialize()
 	std::string res;
 
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
-		_headers["Content-Length"] = ft_itoa(_body.size());
+	{
+		_headers["Content-Length"] = ft_itoa(_body.length());
+		std::cout << _body;
+	}
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
