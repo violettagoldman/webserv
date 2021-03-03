@@ -14,17 +14,17 @@
 
 VirtualHost::VirtualHost(ConfigFile &confFile) : 
 	ABlock(confFile),
-	serverName(1, ""),
+	listenIp(80),
 	listenHost("*"),
-	listenIp(80)
+	serverName(1, "")
 {
 }
 
 VirtualHost::VirtualHost(ABlock &ab) :
 	ABlock(ab),
-	serverName(1, ""),
+	listenIp(80),
 	listenHost("*"),
-	listenIp(80)
+	serverName(1, "")
 {
 }
 
