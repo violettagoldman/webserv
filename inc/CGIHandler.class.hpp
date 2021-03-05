@@ -21,6 +21,7 @@
 # include <sys/wait.h>
 # include "get_next_line.h"
 # include "ICGIRequest.class.hpp"
+# include "Exception.class.hpp"
 
 
 # ifndef PHPCGI_PATH
@@ -47,6 +48,7 @@ typedef struct s_CGIRequest {
 	std::string pathToCGI;
 }	CGIRequest;
 
+std::string		ft_itostr(int n);
 
 class CGIHandler {
 
