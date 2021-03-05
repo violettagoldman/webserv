@@ -12,11 +12,19 @@
 
 #include "VirtualHost.class.hpp"
 
-VirtualHost::VirtualHost(ConfigFile &confFile) : ABlock(confFile)
+VirtualHost::VirtualHost(ConfigFile &confFile) : 
+	ABlock(confFile),
+	listenIp(80),
+	listenHost("*"),
+	serverName(1, "")
 {
 }
 
-VirtualHost::VirtualHost(ABlock &ab) : ABlock(ab)
+VirtualHost::VirtualHost(ABlock &ab) :
+	ABlock(ab),
+	listenIp(80),
+	listenHost("*"),
+	serverName(1, "")
 {
 }
 
@@ -56,15 +64,6 @@ void VirtualHost::handleLine(std::string lineString)
 	// }
 }
 
-// void VirtualHost::inheritParams(int _clientMaxBodySize, bool _autoindex,
-// 		std::string _root, std::vector<std::string> _index)
-// {
-// 	this->clientMaxBodySize = _clientMaxBodySize;
-// 	this->autoindex = _autoindex;
-// 	this->root = _root;
-// 	this->index = _index;
-// }
-
 int VirtualHost::getListenIp(void) const
 {
 	return this->listenIp;
@@ -85,34 +84,16 @@ std::vector<Location> VirtualHost::getLocations(void) const
 	return this->locations;
 }
 
-// int VirtualHost::getClientMaxBodySize(void) const
-// {
-// 	return this->clientMaxBodySize;
-// }
-
-// bool VirtualHost::getAutoindex(void) const
-// {
-// 	return this->autoindex;
-// }
-
-// std::vector<std::string> VirtualHost::getIndex(void) const
-// {
-// 	return this->index;
-// }
-
 std::string VirtualHost::getUploadStore(void) const
 {
 	return this->uploadStore;
 }
 
-// std::string VirtualHost::getRoot(void) const
-// {
-// 	return this->root;
-// }
-
 void VirtualHost::check(void)
 {
 	// specific checks
+	if (locations.size() == 0 && this->getRoot() == "" && this->getUploadStore() == "")
+		throw Exception("VirtualHost has to either have a location, or specify root or upload.");
 	for (size_t i = 0; i < locations.size(); i++)
 	{
 		locations[i].check();
