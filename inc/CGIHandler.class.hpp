@@ -47,6 +47,7 @@ typedef struct s_CGIRequest {
 	std::string pathToCGI;
 }	CGIRequest;
 
+std::string		ft_itostr(int n);
 
 class CGIHandler {
 
