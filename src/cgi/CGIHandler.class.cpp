@@ -308,14 +308,42 @@ void CGIHandler::writeBodyStringVector(int fd, std::vector<std::string> body)
 		write(fd, body[i].c_str(), body[i].size());
 }
 
+void cgi_response_select(int fd)
+{
+	fd_set rfds;
+
+	FD_ZERO(&rfds);
+
+	FD_SET(fd, &rfds);
+
+	struct timeval tv;
+
+	/* Wait up to five seconds. */
+
+	tv.tv_sec = 5;
+	tv.tv_usec = 0;
+
+	int retval = select(fd + 1, &rfds, NULL, NULL, &tv);
+
+	if (retval == -1)
+		throw Exception("Error while trying to select() CGI response.");
+	else if (retval)
+		return ;
+	else
+		throw Exception("Timeout while trying to read CGI response.");
+
+}
+
 void CGIHandler::readCgiResponse(int fd)
 {
 	char *respline;
 	std::string resplineString;
 	int ret;
 
+	cgi_response_select(fd);
 	while ((ret = fd_get_next_line(fd, &respline)))
 	{
+		cgi_response_select(fd);
 		resplineString.assign(respline);
 		this->cgiResponse += resplineString + "\n";
 	}

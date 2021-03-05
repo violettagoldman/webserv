@@ -21,6 +21,7 @@
 # include <sys/wait.h>
 # include "get_next_line.h"
 # include "ICGIRequest.class.hpp"
+# include "Exception.class.hpp"
 
 
 # ifndef PHPCGI_PATH
