@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/03 14:04:53 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/05 15:59:18 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,11 @@ std::string handler(Request req, Config conf)
 				{
 					req.setError(405);
 					return final;
+				}
+				if (req.getContentLength() == (*it_best).getClientMaxBodySize())
+				{
+					req.setError(413);
+					return "";
 				}
 			 	final = create_final_path(*it_best, request_path);
 				return final;
