@@ -4,7 +4,6 @@ import requests
 import argparse
 
 
-# Example case and block
 class BasicGet(TestCase):
 
     description = "Server serves index file at root"
@@ -24,6 +23,7 @@ class MainTestBlock(TestBlock):
     Specify the path to the config file with which Webserv will be run
     """
     config_path = "../config/test_configs/integration_1.conf"
+    nginx_config_path = "../config/test_configs/integration_1_nginx.conf"
     test_cases = [
         BasicGet()
     ]

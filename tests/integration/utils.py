@@ -3,20 +3,23 @@
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone, timedelta
 import subprocess
+from time import sleep
+import os
+import shlex
 
 
 class Printer:
     @staticmethod
     def print_fail(message):
-        print('\x1b[1;31m' + message.strip() + '\x1b[0m')
+        print('\x1b[1;31m' + message.strip() + '\x1b[0m', flush=True)
 
     @staticmethod
     def print_pass(message):
-        print('\x1b[1;32m' + message.strip() + '\x1b[0m')
+        print('\x1b[1;32m' + message.strip() + '\x1b[0m', flush=True)
 
     @staticmethod
     def print_info(message):
-        print('\x1b[1;34m' + message.strip() + '\x1b[0m')
+        print('\x1b[1;34m' + message.strip() + '\x1b[0m', flush=True)
 
 
 # Abstract classes defining common behavior
@@ -29,15 +32,35 @@ class TestBlock(Printer):
 
     def run_webserver(self):
         self.print_info("--- Webserver started ---")
-        subprocess.Popen(['../../webserv', self.config_path])
+        self.process = subprocess.Popen(['../../webserv', self.config_path])
+
+    def run_nginx(self):
+        true_config_path = os.path.join(os.getcwd(), self.nginx_config_path)
+
+        print(true_config_path)
+
+        s = f'docker run -it -p 80:80 -v /tmp/work:/tmp/work/ -v {true_config_path}:/etc/nginx/nginx.conf nginx'
+        self.process = subprocess.Popen(shlex.split(s))
 
     def run(self, port=8880, launch_webserver=True):
         self.print_info(f"--- Running test block {self.__class__.__name__} ---")
         if launch_webserver:
             self.run_webserver()
+            sleep(3)
+        else:
+            port = 80
+            self.run_nginx()
+            sleep(3)
 
         for case in self.test_cases:
             case.run(port)
+
+        if launch_webserver:
+            self.print_info("--- Killing webserver ---")
+            self.process.kill()
+        else:
+            self.print_info("--- Killing nginx ---")
+            self.process.terminate()
 
 
 class TestCase(Printer):

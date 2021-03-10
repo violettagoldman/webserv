@@ -34,3 +34,5 @@
 *.vscode
 *.iml
 *.idea
+
+__pycache__
