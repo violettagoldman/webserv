@@ -67,7 +67,7 @@ class TestBlock(Printer):
         used_config = self.config_path if self.nginx_config_path == '' else self.nginx_config_path
 
         true_config_path = os.path.join(os.getcwd(), used_config)
-        s = f'docker run -it -p 80:80 -v /tmp/work:/tmp/work/ -v {true_config_path}:/etc/nginx/nginx.conf nginx'
+        s = f'docker run -d -p 80:80 -v /tmp/work:/tmp/work/ -v {true_config_path}:/etc/nginx/nginx.conf --name nginx-webserv-test nginx'
         self.process = subprocess.Popen(shlex.split(s))
 
     def run(self, port=8880, launch_webserver=True):
@@ -95,7 +95,9 @@ class TestBlock(Printer):
             self.process.kill()
         else:
             self.print_info("--- Killing nginx ---")
-            self.process.terminate()
+            subprocess.run(shlex.split("docker stop nginx-webserv-test"))
+            subprocess.run(shlex.split("docker rm nginx-webserv-test"))
+            # self.process.terminate()
 
 
 class TestCase(Printer):
