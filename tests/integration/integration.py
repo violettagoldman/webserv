@@ -5,6 +5,9 @@ import argparse
 
 
 class BasicGet(TestCase):
+    """
+    Webserv must serve the file at /tmp/work/index.html to the GET request.
+    """
 
     description = "Server serves index file at root"
 
@@ -19,11 +22,14 @@ class BasicGet(TestCase):
 
 
 class MainTestBlock(TestBlock):
-    """
-    Specify the path to the config file with which Webserv will be run
-    """
+
+    # The config file for Webserv.
     config_path = "../config/test_configs/integration_1.conf"
+
+    # The config file for Nginx mode, if different.
     nginx_config_path = "../config/test_configs/integration_1_nginx.conf"
+
+    # TestCase instances that will be run against our Webserv/Nginx
     test_cases = [
         BasicGet()
     ]
@@ -31,8 +37,9 @@ class MainTestBlock(TestBlock):
 
 class Tester(AbstractTester):
     """
-    Specify all the test blocks to be run
+    All TestBlocks that will be run from main
     """
+
     blocks = [
         MainTestBlock()
     ]
@@ -40,13 +47,13 @@ class Tester(AbstractTester):
 
 def main():
 
+    # Console usage
     parser = argparse.ArgumentParser(description='Run tests on Webserver.')
     parser.add_argument('-p', type=int, default=8880, help="Specify a port to call")
     parser.add_argument('--nginx', default=True, action='store_false', help="Don't launch Webserv (useful when comparing to nginx)")
     args = parser.parse_args()
 
-    # print(args.accumulate(args.integers))
-
+    # Create Tester and run all tests.
     itests = Tester(args.p, args.nginx)
     itests.run()
 
