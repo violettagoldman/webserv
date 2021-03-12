@@ -77,7 +77,6 @@ void Location::check()
 			this->limitExcept.getMethods().size() == 0)
 		throw Exception("limit_except must specify at least one method.");
 
-	std::cout << "Location: root: " << this->getRoot() <<", fp: " << this->fcgiPass << ", us: " << this->uploadStore << std::endl;
 	if (this->getRoot() == "" && this->fcgiPass == "" && this->uploadStore == "")
 		throw Exception("location has to specify either root, fastcgi_pass or upload.");
 }

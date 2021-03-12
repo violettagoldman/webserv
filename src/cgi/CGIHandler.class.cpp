@@ -61,57 +61,35 @@ char	*ft_strdup(const char *s1)
 	return (p);
 }
 
-// static int	count_digits(int n)
-// {
-// 	int digits;
 
-// 	if (n == 0)
-// 		return (1);
-// 	digits = n < 0 ? 1 : 0;
-// 	while (n != 0)
-// 	{
-// 		n = n / 10;
-// 		digits++;
-// 	}
-// 	return (digits);
-// }
+std::string		ft_itostr(int n)
+{
+	std::string		result;
+	long long int	nbr;
 
-char		*ft_itoa(int n);
-// {
-// 	char			*result;
-// 	int				digits;
-// 	int				i;
-// 	int				stop;
-// 	long long int	nbr;
-
-// 	digits = count_digits(n);
-// 	i = digits - 1;
-// 	stop = ((n < 0) ? 0 : -1);
-// 	if (n < 0)
-// 		nbr = n == -2147483648 ? 2147483648 : -n;
-// 	else
-// 		nbr = n;
-// 	if (!(result = cppalloc(sizeof(char) * (digits + 1))))
-// 		return (NULL);
-// 	result[digits] = '\0';
-// 	while (i > stop)
-// 	{
-// 		result[i--] = nbr % 10 + '0';
-// 		nbr = nbr / 10;
-// 	}
-// 	if (stop == 0)
-// 		result[0] = '-';
-// 	return (result);
-// }
+	if (n < 0)
+		nbr = n == -2147483648 ? 2147483648 : -n;
+	else
+		nbr = n;
+	do
+	{
+		result.insert(0, std::string(1, nbr % 10 + '0'));
+		nbr /= 10;
+	}
+	while (nbr != 0);
+	if (n < 0)
+		result.insert(0, "-");
+	return (result);
+}
 
 // TODO redo without free
-std::string ft_itostr(int n)
-{
-	char *s = ft_itoa(n);
-	std::string str(s);
-	free(s);
-	return str;
-}
+// std::string ft_itostr(int n)
+// {
+// 	char *s = ft_itoa(n);
+// 	std::string str(s);
+// 	free(s);
+// 	return str;
+// }
 
 char **create_envp(std::vector<std::string> mvars)
 {
@@ -330,16 +308,44 @@ void CGIHandler::writeBodyStringVector(int fd, std::vector<std::string> body)
 		write(fd, body[i].c_str(), body[i].size());
 }
 
+void cgi_response_select(int fd)
+{
+	fd_set rfds;
+
+	FD_ZERO(&rfds);
+
+	FD_SET(fd, &rfds);
+
+	struct timeval tv;
+
+	/* Wait up to five seconds. */
+
+	tv.tv_sec = 5;
+	tv.tv_usec = 0;
+
+	int retval = select(fd + 1, &rfds, NULL, NULL, &tv);
+
+	if (retval == -1)
+		throw Exception("Error while trying to select() CGI response.");
+	else if (retval)
+		return ;
+	else
+		throw Exception("Timeout while trying to read CGI response.");
+
+}
+
 void CGIHandler::readCgiResponse(int fd)
 {
 	char *respline;
 	std::string resplineString;
 	int ret;
 
+	cgi_response_select(fd);
 	while ((ret = fd_get_next_line(fd, &respline)))
 	{
+		cgi_response_select(fd);
 		resplineString.assign(respline);
 		this->cgiResponse += resplineString + "\n";
 	}
-	this->cgiResponse += resplineString + "\n";
+	// this->cgiResponse += resplineString + "\n";
 }

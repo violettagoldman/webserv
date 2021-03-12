@@ -31,6 +31,31 @@ ConfigFile::ConfigFile(std::string filename) :
 		throw Exception("Couldn't open file");
 }
 
+void pass_through_select(int fd)
+{
+	fd_set rfds;
+
+	FD_ZERO(&rfds);
+
+	FD_SET(fd, &rfds);
+
+	struct timeval tv;
+
+	/* Wait up to five seconds. */
+
+	tv.tv_sec = 5;
+	tv.tv_usec = 0;
+
+	int retval = select(fd + 1, &rfds, NULL, NULL, &tv);
+
+	if (retval == -1)
+		throw Exception("Error while trying to select().");
+	else if (retval)
+		return ;
+	else
+		throw Exception("Timeout while trying to read from config file.");
+}
+
 int ConfigFile::getNext()
 {
 	if (this->_fd < 0)
@@ -44,6 +69,9 @@ int ConfigFile::getNext()
 		_lastLineSent = true;
 		return 0;
 	}
+
+	pass_through_select(this->_fd);
+
 	this->_ret = fd_get_next_line(this->_fd, &(this->_line));
 	this->_lineString.assign(this->_line);
 	if (_ret == 0)
