@@ -46,7 +46,6 @@ void			Response::handleMethod(Location loc)
 		error(_req.getError());
 		return;
 	}
-	std::cout << "error: " << _req.getError() << std::endl;
 	if (option == "GET")
 		get();
 	else if (option == "POST")
@@ -56,7 +55,7 @@ void			Response::handleMethod(Location loc)
 	else if (option == "DELETE")
 		deleteMethod();
 	else if (option == "OPTIONS")
-		options();
+		options(loc);
 	else if (option == "CONNECT")
 		connect();
 	else if (option == "TRACE")
@@ -321,12 +320,23 @@ void		Response::deleteMethod()
 	
 }
 
-void		Response::options()
+void		Response::options(Location loc)
 {
 	// connect to config
-	std::string		methods;
+	std::string		methods = "";
 
-	_headers["Allow"] = "GET, PUT, CONNECT";
+	if (loc.getLimitExcept().getMethods().size() == 0)
+		methods = "GET, POST, PUT, DELETE, CONNECT, TRACE, OPTIONS";
+	else
+	{
+		for (size_t i = 0; i < loc.getLimitExcept().getMethods().size(); ++i)
+		{
+			methods += loc.getLimitExcept().getMethods()[i];
+			if (i < loc.getLimitExcept().getMethods().size() - 1)
+				methods += ", ";
+		}
+	}
+	_headers["Allow"] = methods;
 	_statusCode = 200;
 }
 

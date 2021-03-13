@@ -29,7 +29,7 @@ class Response
 		void		post();
 		void		put();
 		void		deleteMethod();
-		void		options();
+		void		options(Location loc);
 		void		connect();
 		void		trace();
 		void		error(int status);
