@@ -242,6 +242,7 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 void Request::read_request(int sd)
 {
 	char input[BUFFER_SIZE];
+	bzero(input, BUFFER_SIZE);
 	int bytes;
 	size_t pos;
 	size_t last;
@@ -251,6 +252,7 @@ void Request::read_request(int sd)
 	if (bytes == 0)
 		_state = "chill";
 	std::string to_interpret(input);
+	// std::cout << "LOL SMOTRI: \n"  << to_interpret << std::endl;
 	if (bytes > 0)
 	{
 		_state = "read";
