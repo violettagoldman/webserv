@@ -21,11 +21,11 @@ void	shutdown(int signal)
 int		main(int argc, char **argv)
 {
 	size_t		i;
-	fd_set		fds, fds_read;
-	int				new_socket;
-	Request		request;
-	int 			sd;
-	int 			max_sd;
+	fd_set		fds;
+	fd_set		fds_read;
+	int			new_socket;
+	int 		sd;
+	int 		max_sd;
 	std::string	final_path;
 	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
 	
@@ -73,6 +73,7 @@ int		main(int argc, char **argv)
 			if (FD_ISSET(sd , &fds_read))
 			{
 				std::cout << "3\n";
+				Request request;
 				request.read_request(sd);
 				std::cout << "4\n";
 				if (request.getState() == "end")

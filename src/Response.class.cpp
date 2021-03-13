@@ -41,9 +41,9 @@ void			Response::handleMethod(Location loc)
 	(void)loc;
 
 	option = _method;
-	if (_req.getError() == 405)
+	if (_req.getError() != 0)
 	{
-		error(405);
+		error(_req.getError());
 		return;
 	}
 	std::cout << "error: " << _req.getError() << std::endl;
@@ -337,6 +337,16 @@ void		Response::connect()
 
 void		Response::trace()
 {
+	std::string response = "";
+	for (size_t i = 0; i < _req.getHeaders().size(); ++i)
+	{
+		response += _req.getHeaders()[i].getName() + ": " + _req.getHeaders()[i].getValue()[0];
+		response += "\r\n";
+	}
+	response += "\r\n";
+	response += _req.getBody();
+	_body = response;
+	_statusCode = 200;
 }
 
 std::string		Response::getDate(time_t time)
