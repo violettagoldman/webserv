@@ -24,6 +24,12 @@ Server					&Server::operator=(Server const &src)
 	return (*this);
 }
 
+unsigned short	ft_htons(unsigned short x)
+{
+	x = x >> 8 | x << 8;
+	return (x);
+}
+
 /*
 * This method is used to setup the server by:
 * 1. creting the socket
@@ -39,8 +45,11 @@ int						Server::setup(VirtualHost conf)
 		return (-1);
 	}
 	_address.sin_family = AF_INET;
-	_address.sin_addr.s_addr = INADDR_ANY; //change by ft custom function
-	_address.sin_port = htons(conf.getListenIp()); //same // loop for several servers
+	if (conf.getListenHost().size())
+		_address.sin_addr.s_addr = inet_addr(conf.getListenHost().c_str());
+	else
+		_address.sin_addr.s_addr = INADDR_ANY;
+	_address.sin_port = ft_htons(conf.getListenIp()); //same // loop for several servers
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
 		std::cerr << "Couldn't bind the port " << conf.getListenIp() << std::endl;

@@ -8,7 +8,6 @@
 Request		*read_request(int sd, Request *req);
 
 Server	s;
-// std::vector<Server> servers;
 
 void	shutdown(int signal)
 {
