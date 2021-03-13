@@ -1,15 +1,14 @@
 #include <sys/time.h>
 #include <unistd.h>
-#include "Request.class.hpp"
-#include "Config.class.hpp"
 #include "ConfigReader.class.hpp"
 #include "Server.class.hpp"
 #include "Response.class.hpp"
+#include "Handler.hpp"
 
 Request		*read_request(int sd, Request *req);
-std::string handler(Request req, Config conf);
 
 Server	s;
+// std::vector<Server> servers;
 
 void	shutdown(int signal)
 {
@@ -19,36 +18,36 @@ void	shutdown(int signal)
 	exit(0);
 }
 
-int		main(int ac, char **av)
+int		main(int argc, char **argv)
 {
-	size_t			i;
-	fd_set			fds;
+	size_t		i;
+	fd_set		fds, fds_read;
 	int				new_socket;
-	Request			request;
+	Request		request;
 	int 			sd;
 	int 			max_sd;
-	std::string 	final_path;
-	std::string path_to_conf("./tests/config/test_configs/nginx.conf");
+	std::string	final_path;
+	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
 	
-	if (ac == 2)
+	if (argc == 2)
 	{
-		path_to_conf = av[1];
+		path_to_conf = argv[1];
 	}
 	std::cout << "Using config at " << path_to_conf << std::endl;
 	ConfigReader reader(path_to_conf);
 
-
 	Config conf = reader.getConfig();
 
 	s = Server();
-	s.setup();
+	s.setup(conf.getVirtualHostVector()[0]); // loop
 	s.listen();
 
 	signal(SIGINT, shutdown);
+
+	FD_ZERO(&fds);
+	FD_SET(s.getFd(), &fds);
 	while(1)
 	{
-		FD_ZERO(&fds);
-		FD_SET(s.getFd(), &fds);
 		max_sd = s.getFd();
 		for (i = 0; i < s.getClients().size(); i++)
 		{
@@ -58,30 +57,38 @@ int		main(int ac, char **av)
 			if(sd > max_sd)
 				max_sd = sd;
 		}
-		select(max_sd + 1 , &fds , NULL , NULL , NULL);
-		if (FD_ISSET(s.getFd(), &fds))
+		fds_read = fds;
+		std::cout << "1\n";
+		select(max_sd + 1 , &fds_read , NULL , NULL , NULL);
+		std::cout << "2\n";
+		if (FD_ISSET(s.getFd(), &fds_read))
 		{
 			new_socket = s.accept();
 			s.addClient(new_socket);
+			// FD_SET(sd, &fds);
 		}
 		for (i = 0; i < s.getClients().size(); i++)
 		{
 			sd = s.getClients()[i];
-			if (FD_ISSET(sd , &fds))
+			if (FD_ISSET(sd , &fds_read))
 			{
+				std::cout << "3\n";
 				request.read_request(sd);
+				std::cout << "4\n";
 				if (request.getState() == "end")
 				{
 					s.close();
 					close(sd);
 					s.getClients()[i] = 0;
+					// FD_CLR(sd, &fds);
 				}
 				else if (request.getState() == "read")
 				{
-					(void)conf;
+					std::cout << "5\n";
 					request.print_headers();
-					final_path = handler(request, conf);
-					Response response = Response(request);
+					final_path = handler(request, conf, conf.getVirtualHostVector()[0]);
+					Location loc = handlerGetLocation(request, conf.getVirtualHostVector()[0]); // loop
+					Response response(request, loc, final_path);
 					s.send(sd, response.serialize());
 				}
 				else if (request.getState() == "error")

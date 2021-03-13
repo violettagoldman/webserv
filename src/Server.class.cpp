@@ -31,7 +31,7 @@ Server					&Server::operator=(Server const &src)
 * 3. binding the address to set the port
 * @return int Error code
 */
-int						Server::setup(void)
+int						Server::setup(VirtualHost conf)
 {
 	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -40,13 +40,13 @@ int						Server::setup(void)
 	}
 	_address.sin_family = AF_INET;
 	_address.sin_addr.s_addr = INADDR_ANY; //change by ft custom function
-	_address.sin_port = htons(8880); //same
+	_address.sin_port = htons(conf.getListenIp()); //same // loop for several servers
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
-		std::cerr << "Couldn't bind the port 8880" << std::endl;
+		std::cerr << "Couldn't bind the port " << conf.getListenIp() << std::endl;
 		exit(1);
 	}
-	std::cout << "Listening on port 8880" << std::endl; 
+	std::cout << "Listening on port " << conf.getListenIp() << std::endl; 
 	return (0);
 }
 

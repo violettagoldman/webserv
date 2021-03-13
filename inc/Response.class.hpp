@@ -13,7 +13,7 @@ class Response
 {
 	public:
 		Response(void);
-		Response(Request req);
+		Response(Request req, Location loc, std::string fp);
 		// Response(CGI cgi);
 		Response(Response const &src);
 		~Response(void);
@@ -24,7 +24,7 @@ class Response
 		void		setIndexPage();
 		std::string	serialize();
 		std::string	getDate(time_t time);
-		void		handleMethod();
+		void		handleMethod(Location loc);
 		void		get();
 		void		post();
 		void		put();
@@ -41,13 +41,13 @@ class Response
 
 		
 	private:
-		int										_statusCode;
-		std::string								_method;
-		std::map<std::string, std::string>		_headers;
-		std::string								_body;
-		std::map<int, std::string>				_statusCodeTranslation;
-		Request									_req;
-		// Config									&_config;
+		int									_statusCode;
+		std::string							_method;
+		std::map<std::string, std::string>	_headers;
+		std::string							_body;
+		std::map<int, std::string>			_statusCodeTranslation;
+		Request								_req;
+		std::string							_fp;
 };
 
 #endif

@@ -1,26 +1,15 @@
 #include "Response.class.hpp"
 
-Response::Response(void)
+Response::Response(Request req, Location loc, std::string fp)
 {
-	
-	_method = "GET";
-	_statusCode = 200;
-	statusCodeTranslation();
-	_headers["Date"] = getDate(getTime());
-	_headers["Server"] = "Webserv/1.0 (Unix)";
-	std::cout << "Default constructor called\n";
-	handleMethod();
-}
-
-Response::Response(Request req)
-{
+	_fp = fp;
 	_req = req;
 	_method = _req.getMethod();
 	_statusCode = 200;
 	statusCodeTranslation();
 	_headers["Date"] = getDate(getTime());
 	_headers["Server"] = "Webserv/1.0 (Unix)";
-	handleMethod();
+	handleMethod(loc);
 }
 
 Response::Response(Response const &src)
@@ -37,7 +26,6 @@ Response		&Response::operator=(Response const &src)
 	if (this != &src)
 	{
 		this->_req = src._req;
-		// this->_config = src._config;
 		this->_body = src._body;
 		this->_headers = src._headers;
 		this->_method = src._method;
@@ -47,11 +35,18 @@ Response		&Response::operator=(Response const &src)
 	return (*this);
 }
 
-void			Response::handleMethod()
+void			Response::handleMethod(Location loc)
 {
 	std::string option;
+	(void)loc;
 
 	option = _method;
+	if (_req.getError() == 405)
+	{
+		error(405);
+		return;
+	}
+	std::cout << "error: " << _req.getError() << std::endl;
 	if (option == "GET")
 		get();
 	else if (option == "POST")
@@ -77,12 +72,13 @@ void		Response::get()
 	struct stat		fileStat;
 	int				fd;
 
-	path = _req.getPath();
+	path = _fp;
 	autoindex = false;
 	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
 	{
 		error(404);
 		setContentType(".html");
+		close(fd);
 		return ;
 	}
 	if (fstat(fd, &fileStat) < 0)
@@ -243,7 +239,7 @@ void		Response::post()
 	std::string path;
 
 	fd = -1;
-	path = _req.getPath();
+	path = _fp;
 	exist = checkPathExistance(path);
 	if (exist == 1)
 	{
@@ -274,7 +270,7 @@ void		Response::put()
 	int exist;
 
 	fd = -1;
-	std::string path = "/tmp/test_put1";
+	std::string path = _fp;
 	exist = checkPathExistance(path);
 	if (exist == 1)
 	{
@@ -297,7 +293,7 @@ void		Response::put()
 			else
 			{
 				_statusCode = 201;
-				_headers["Location"] = "get url from request"; // ask to add
+				_headers["Location"] = _req.getPath();
 			}
 		}
 		else
@@ -311,7 +307,7 @@ void		Response::deleteMethod()
 	std::string path;
 	int	fd;
 
-	path = _req.getPath();
+	path = _fp;
 	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
 	{
 		error(404);
