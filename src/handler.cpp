@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handler.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/03 14:04:53 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/13 13:28:43 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include "../inc/Request.class.hpp"
 
 
-
+//лдобавить и подумать насчет файлов *.bla
 
 int check_listen(VirtualHost host, Header host_header)
 {
@@ -114,9 +114,11 @@ std::string handler(Request req, Config conf)
 
 	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	 {
+	 	std::cout << "Check listen res: " << check_listen(*it, host_header) << std::endl;
 		 if (check_listen(*it, host_header))
 		 {
 			std::string request_path = req.getPath();
+			std::cout << "Request path in handler: " << request_path << std::endl;
 			std::string request_pattern = path_to_pattern(request_path);
 			std::vector<Location> server_locations = (*it).getLocations();
 			// std::vector<Location>::iterator it_best = check_location(*it, request_path);

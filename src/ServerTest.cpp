@@ -81,6 +81,8 @@ int		main(int ac, char **av)
 					(void)conf;
 					request.print_headers();
 					final_path = handler(request, conf);
+					std::cout << "requst error: "  << request.getError() << std::endl;
+					std::cout << "Final path: " << final_path << std::endl;
 					Response response = Response(request);
 					s.send(sd, response.serialize());
 				}
