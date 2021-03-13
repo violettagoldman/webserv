@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+		/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   handler.cpp                                        :+:      :+:    :+:   */
@@ -29,6 +29,7 @@ int check_listen(VirtualHost host, Header host_header)
 	int request_server_port;
 	std::string request_server_name;
 
+
 	request_host = host_header.getValue()[0];
 	std::cout << host.getListenIp() << std::endl;
 	if ((pos = host_header.getValue()[0].find(':')) != std::string::npos)
@@ -40,11 +41,16 @@ int check_listen(VirtualHost host, Header host_header)
 	{
 		request_server_name = host_header.getValue()[0];
 		//probably should set to default supported
-		request_server_port = 80;
+		request_server_port = host.getListenIp();
 	}
 	for (std::vector<std::string>::iterator it = server_names.begin(); it < server_names.end(); ++it)
+	{
+		std::cout << "Server name: " <<*it << std::endl;
+		if (*it == "" && host.getListenIp() == request_server_port)
+			return 1;
 		if (*it == request_server_name &&  host.getListenIp() == request_server_port)
 			return 1;
+	}
 	return 0;
 }
 
@@ -95,6 +101,7 @@ std::string create_final_path(Location loc, std::string request_path)
 {
 	std::string root = loc.getRoot();
 	std::string final(root + request_path.substr(1));
+	std::cout << "Root "<< root << std::endl;
 	return final;
 }
 
