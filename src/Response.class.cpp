@@ -72,7 +72,6 @@ void		Response::get(Location loc)
 	struct stat		fileStat;
 	int				fd;
 
-	std::cout << "GEEEEEEEEET\n";
 	path = _fp;
 	autoindex = loc.getAutoindex();
 	fd = open(path.c_str(), O_RDONLY);
@@ -86,12 +85,27 @@ void		Response::get(Location loc)
 	fstat(fd, &fileStat);
 	if (S_ISDIR(fileStat.st_mode))
 	{
+		bool is_index = false;
 		close(fd);
-		if (autoindex)
-			setIndexPage(loc);
-		else
-			error(403);
-		return ;
+		for (size_t i = 0; i < loc.getIndex().size(); ++i)
+		{
+			std::string index = path + loc.getIndex()[i];
+			int fd_try = open(index.c_str(), O_RDONLY);
+			if (fd_try >= 0)
+			{
+				close(fd);
+				path = index;
+				is_index = true;
+			}
+		}
+		if (!is_index)
+		{
+			if (autoindex)
+				setIndexPage(loc);
+			else
+				error(403);
+			return ;
+		}
 	}
 	_body = readFile(path);
 	_headers["Last-Modified"] = getDate(fileStat.st_mtime);
@@ -393,10 +407,7 @@ std::string 	Response::serialize()
 	std::string res;
 
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
-	{
 		_headers["Content-Length"] = ft_itoa(_body.length());
-		std::cout << _body;
-	}
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{

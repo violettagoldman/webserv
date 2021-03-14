@@ -50,7 +50,6 @@ int						Server::setup(VirtualHost conf)
 	else
 		_address.sin_addr.s_addr = INADDR_ANY;
 	_address.sin_port = ft_htons(conf.getListenIp());
-	std::cout << "AAA: " << ft_htons(conf.getListenIp()) << std::endl;
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
 		std::cerr << "Couldn't bind the port " << conf.getListenIp() << std::endl;
