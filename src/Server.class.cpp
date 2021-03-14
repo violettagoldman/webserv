@@ -141,6 +141,11 @@ void				Server::addClient(int fd)
 	_clients.push_back(fd);
 }
 
+void				Server::removeClient(int fd)
+{
+	_clients.erase(std::find(_clients.begin(), _clients.end(), fd));
+}
+
 void				Server::setHost(std::string host)
 {
 	this->_host = host;

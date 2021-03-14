@@ -64,7 +64,7 @@ int		main(int argc, char **argv)
 		{
 			new_socket = s.accept();
 			s.addClient(new_socket);
-			// FD_SET(sd, &fds);
+			FD_SET(new_socket, &fds);
 		}
 		for (i = 0; i < s.getClients().size(); i++)
 		{
@@ -75,12 +75,13 @@ int		main(int argc, char **argv)
 				Request request;
 				request.read_request(sd);
 				std::cout << "4\n";
-				if (request.getState() == "end")
+				std::cout << "RESPONSE STATE " << request.getState() << std::endl;
+				if (request.getState() == "end" || request.getState() == "chill")
 				{
-					s.close();
+					// s.close();
+					s.removeClient(sd);
+					FD_CLR(sd, &fds);
 					close(sd);
-					s.getClients()[i] = 0;
-					// FD_CLR(sd, &fds);
 				}
 				else if (request.getState() == "read")
 				{
@@ -93,7 +94,10 @@ int		main(int argc, char **argv)
 				}
 				else if (request.getState() == "error")
 				{
-					std::cout << "Error";
+					std::cout << "ERROR: " << request.getError() << std::endl;
+					s.removeClient(sd);
+					FD_CLR(sd, &fds);
+					close(sd);
 				}
 			}
 		}

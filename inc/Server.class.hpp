@@ -30,6 +30,7 @@ class Server
 		std::vector<int>	getClients(void) const;
 
 		void				addClient(int fd);
+		void				removeClient(int fd);
 		void				setHost(std::string host);
 		void				setPort(std::string port);
 		void				setFd(int fd);
