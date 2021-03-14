@@ -116,54 +116,50 @@ std::string handler(Request req, Config conf, VirtualHost vh)
 	 std::string final("");
 	 Header host_header = *(req.getHeaderByName("Host"));
 
-	//  for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
-	//  {
-		//  if (check_listen(*it, host_header))
-		//  {
-			// std::vector<VirtualHost>::iterator it(vh);
-			// std::cout << "vhost: " << it->getListenIp() << std::endl;
-			std::string request_path = req.getPath();
-			std::cout << "Request path in handler: " << request_path << std::endl;
-			std::string request_pattern = path_to_pattern(request_path);
-			std::vector<Location> server_locations = vh.getLocations();
-			// std::vector<Location>::iterator it_best = check_location(*it, request_path);
-			int count_max = 0;
-			int count_cur;
-			std::vector<Location>::iterator it_best;
-			for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
-			{
-				if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
-				{
-					it_best = it_loc;
-					count_max = count_cur;
-				}
-			}
-			if (count_max == 0)
-				it_best = server_locations.end();
-			if (it_best != server_locations.end())
-			{
-				if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
-				{
-					req.setError(405);
-					return final;
-				}
-			 	final = create_final_path(*it_best, request_path);
-				return final;
-			}
-			else
-			{
-				std::cout << "Not found" << std::endl;
-				req.setError(404);
-				std::cout << "404" << std::endl;
-			}
-		//  }
-	// }
+	std::string request_path = req.getPath();
+	std::cout << "Request path in handler: " << request_path << std::endl;
+	std::string request_pattern = path_to_pattern(request_path);
+	std::vector<Location> server_locations = vh.getLocations();
+	int count_max = 0;
+	int count_cur;
+	std::vector<Location>::iterator it_best;
+	for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
+	{
+		if (it_loc->getPattern() == request_pattern)
+		{
+			it_best = it_loc;
+			break;
+		}
+		if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
+		{
+			it_best = it_loc;
+			count_max = count_cur;
+		}
+	}
+	if (count_max == 0)
+		it_best = server_locations.end();
+	if (it_best != server_locations.end())
+	{
+		if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
+		{
+			req.setError(405);
+			return final;
+		}
+		final = create_final_path(*it_best, request_path);
+		return final;
+	}
+	else
+	{
+		std::cout << "Not found" << std::endl;
+		req.setError(404);
+		std::cout << "404" << std::endl;
+	}
 	return final;
 }
 
 Location	handlerGetLocation(Request req, VirtualHost conf)
 {
-	 Header host_header = *(req.getHeaderByName("Host"));
+	Header host_header = *(req.getHeaderByName("Host"));
 
 	std::string request_path = req.getPath();
 	std::string request_pattern = path_to_pattern(request_path);
@@ -173,6 +169,8 @@ Location	handlerGetLocation(Request req, VirtualHost conf)
 	std::vector<Location>::iterator it_best;
 	for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 	{
+		if (it_loc->getPattern() == request_pattern)
+			return (*it_loc);
 		if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
 		{
 			it_best = it_loc;
