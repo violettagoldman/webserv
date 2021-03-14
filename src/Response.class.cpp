@@ -40,6 +40,7 @@ void			Response::handleMethod(Location loc)
 	std::string option;
 	(void)loc;
 
+	_errorPages = loc.getErrorPage();
 	option = _method;
 	if (_req.getError() != 0)
 	{
@@ -194,7 +195,10 @@ void		Response::setErrorPage()
 	std::string		html;
 
 	// check for customised pages
-	html = readFile("./pages/error.html");
+	if (_errorPages.count(_statusCode) > 0)
+		html = readFile(_errorPages[_statusCode]);
+	else
+		html = readFile("./pages/error.html");
 	html = replacehtml(html, "$1", ft_itoa(_statusCode));
 	html = replacehtml(html, "$2", _statusCodeTranslation[_statusCode]);
 	_body = html;

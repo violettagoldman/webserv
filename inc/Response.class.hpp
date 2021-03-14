@@ -48,6 +48,7 @@ class Response
 		std::map<int, std::string>			_statusCodeTranslation;
 		Request								_req;
 		std::string							_fp;
+		std::map<int, std::string>			_errorPages;
 };
 
 #endif
