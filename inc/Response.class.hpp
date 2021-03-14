@@ -21,11 +21,11 @@ class Response
 
 		Response	&operator=(Response const &src);
 		void		setErrorPage();
-		void		setIndexPage();
+		void		setIndexPage(Location loc);
 		std::string	serialize();
 		std::string	getDate(time_t time);
 		void		handleMethod(Location loc);
-		void		get();
+		void		get(Location loc);
 		void		post();
 		void		put();
 		void		deleteMethod();

@@ -4,7 +4,6 @@
 # include <iostream>
 # include <sys/types.h>
 # include <sys/socket.h>
-# include <netinet/in.h> // not to use
 # include <arpa/inet.h>
 # include <vector>
 # include <unistd.h>

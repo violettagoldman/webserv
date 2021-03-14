@@ -47,7 +47,7 @@ void			Response::handleMethod(Location loc)
 		return;
 	}
 	if (option == "GET")
-		get();
+		get(loc);
 	else if (option == "POST")
 		post();
 	else if (option == "PUT")
@@ -64,7 +64,7 @@ void			Response::handleMethod(Location loc)
 		error(405);
 }
 
-void		Response::get()
+void		Response::get(Location loc)
 {
 	bool			autoindex;
 	std::string		path;
@@ -72,40 +72,29 @@ void		Response::get()
 	int				fd;
 
 	path = _fp;
-	autoindex = false;
-	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
+	autoindex = loc.getAutoindex();
+	fd = open(path.c_str(), O_RDONLY);
+	if (fd < 0)
 	{
 		error(404);
 		setContentType(".html");
 		close(fd);
 		return ;
 	}
-	if (fstat(fd, &fileStat) < 0)
-	{
-		error(403);
-		close(fd);
-		return ;
-	}
-	if (!(fileStat.st_mode & S_IREAD))
-	{
-		error(403);
-		close(fd);
-		return ;
-	}
+	fstat(fd, &fileStat);
 	if (S_ISDIR(fileStat.st_mode))
 	{
+		close(fd);
 		if (autoindex)
-			setIndexPage();
+			setIndexPage(loc);
 		else
 			error(403);
+		return ;
 	}
-	else
-	{
-		_body = readFile(path);
-		_headers["Last-Modified"] = getDate(fileStat.st_mtime);
-		setLastModified(fd);
-		setContentType(path);
-	}
+	_body = readFile(path);
+	_headers["Last-Modified"] = getDate(fileStat.st_mtime);
+	setLastModified(fd);
+	setContentType(path);
 	close(fd);
 }
 
@@ -211,7 +200,7 @@ void		Response::setErrorPage()
 	_body = html;
 }
 
-void		Response::setIndexPage()
+void		Response::setIndexPage(Location loc)
 {
 	std::string		html;
 	std::string		li;
@@ -220,7 +209,7 @@ void		Response::setIndexPage()
 
 	html = readFile("./pages/index.html");
 	html = replacehtml(html, "$1", _req.getPath());
-	currentDirectory= opendir(".");
+	currentDirectory= opendir(loc.getRoot().c_str());
 	if (currentDirectory)
 	{
 		while ((dir = readdir(currentDirectory)) != NULL)

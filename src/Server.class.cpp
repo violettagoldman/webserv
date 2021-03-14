@@ -49,7 +49,7 @@ int						Server::setup(VirtualHost conf)
 		_address.sin_addr.s_addr = inet_addr(conf.getListenHost().c_str());
 	else
 		_address.sin_addr.s_addr = INADDR_ANY;
-	_address.sin_port = ft_htons(conf.getListenIp()); //same // loop for several servers
+	_address.sin_port = ft_htons(conf.getListenIp());
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
 		std::cerr << "Couldn't bind the port " << conf.getListenIp() << std::endl;
