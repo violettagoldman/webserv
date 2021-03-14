@@ -7,13 +7,14 @@
 
 Request		*read_request(int sd, Request *req);
 
-Server	s;
+std::vector<Server> servers;
 
 void	shutdown(int signal)
 {
 	(void)signal;
 	std::cout << "Shutting down the server\n";
-	s.close();
+	for (size_t i = 0; i < servers.size(); ++i)
+		servers[i].close();
 	exit(0);
 }
 
@@ -24,7 +25,6 @@ int		main(int argc, char **argv)
 	fd_set		fds_read;
 	int			new_socket;
 	int 		sd;
-	int 		max_sd;
 	std::string	final_path;
 	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
 	
@@ -37,67 +37,62 @@ int		main(int argc, char **argv)
 
 	Config conf = reader.getConfig();
 
-	s = Server();
-	s.setup(conf.getVirtualHostVector()[0]); // loop
-	s.listen();
+	for (size_t i = 0; i < conf.getVirtualHostVector().size(); ++i)
+	{
+		Server server;
+		server.setup(conf.getVirtualHostVector()[i]);
+		server.listen();
+		servers.push_back(server);
+	}
 
 	signal(SIGINT, shutdown);
 
 	FD_ZERO(&fds);
-	FD_SET(s.getFd(), &fds);
+	for (size_t i = 0; i < servers.size(); ++i) {
+		FD_SET(servers[i].getFd(), &fds);
+	}
 	while(1)
 	{
-		max_sd = s.getFd();
-		for (i = 0; i < s.getClients().size(); i++)
-		{
-			sd = s.getClients()[i];
-			if(sd > 0)
-				FD_SET( sd , &fds);
-			if(sd > max_sd)
-				max_sd = sd;
-		}
 		fds_read = fds;
-		std::cout << "1\n";
-		select(max_sd + 1 , &fds_read , NULL , NULL , NULL);
-		std::cout << "2\n";
-		if (FD_ISSET(s.getFd(), &fds_read))
+		select(FD_SETSIZE, &fds_read , NULL , NULL , NULL);
+
+		for (size_t s = 0; s < servers.size(); ++s)
 		{
-			new_socket = s.accept();
-			s.addClient(new_socket);
-			FD_SET(new_socket, &fds);
-		}
-		for (i = 0; i < s.getClients().size(); i++)
-		{
-			sd = s.getClients()[i];
-			if (FD_ISSET(sd , &fds_read))
+			int server_socket = servers[s].getFd();
+			if (FD_ISSET(server_socket, &fds_read))
 			{
-				std::cout << "3\n";
-				Request request;
-				request.read_request(sd);
-				std::cout << "4\n";
-				std::cout << "RESPONSE STATE " << request.getState() << std::endl;
-				if (request.getState() == "end" || request.getState() == "chill")
+				new_socket = servers[s].accept();
+				servers[s].addClient(new_socket);
+				FD_SET(new_socket, &fds);
+			}
+			for (i = 0; i < servers[s].getClients().size(); i++)
+			{
+				sd = servers[s].getClients()[i];
+				if (FD_ISSET(sd , &fds_read))
 				{
-					// s.close();
-					s.removeClient(sd);
-					FD_CLR(sd, &fds);
-					close(sd);
-				}
-				else if (request.getState() == "read")
-				{
-					std::cout << "5\n";
-					request.print_headers();
-					final_path = handler(request, conf, conf.getVirtualHostVector()[0]);
-					Location loc = handlerGetLocation(request, conf.getVirtualHostVector()[0]); // loop
-					Response response(request, loc, final_path);
-					s.send(sd, response.serialize());
-				}
-				else if (request.getState() == "error")
-				{
-					std::cout << "ERROR: " << request.getError() << std::endl;
-					s.removeClient(sd);
-					FD_CLR(sd, &fds);
-					close(sd);
+					Request request;
+					request.read_request(sd);
+					if (request.getState() == "end")
+					{
+						servers[s].removeClient(sd);
+						FD_CLR(sd, &fds);
+						close(sd);
+					}
+					else if (request.getState() == "read")
+					{
+						request.print_headers();
+						final_path = handler(request, conf, conf.getVirtualHostVector()[s]);
+						Location loc = handlerGetLocation(request, conf.getVirtualHostVector()[s]);
+						Response response(request, loc, final_path);
+						servers[s].send(sd, response.serialize());
+					}
+					else if (request.getState() == "error")
+					{
+						std::cout << "ERROR: " << request.getError() << std::endl;
+						servers[s].removeClient(sd);
+						FD_CLR(sd, &fds);
+						close(sd);
+					}
 				}
 			}
 		}

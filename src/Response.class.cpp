@@ -72,6 +72,7 @@ void		Response::get(Location loc)
 	struct stat		fileStat;
 	int				fd;
 
+	std::cout << "GEEEEEEEEET\n";
 	path = _fp;
 	autoindex = loc.getAutoindex();
 	fd = open(path.c_str(), O_RDONLY);
