@@ -78,20 +78,13 @@ int		main(int argc, char **argv)
 						FD_CLR(sd, &fds);
 						close(sd);
 					}
-					else if (request.getState() == "read")
+					else if (request.getState() == "read" || request.getState() == "error")
 					{
 						request.print_headers();
 						final_path = handler(request, conf, conf.getVirtualHostVector()[s]);
 						Location loc = handlerGetLocation(request, conf.getVirtualHostVector()[s]);
 						Response response(request, loc, final_path);
 						servers[s].send(sd, response.serialize());
-					}
-					else if (request.getState() == "error")
-					{
-						std::cout << "ERROR: " << request.getError() << std::endl;
-						servers[s].removeClient(sd);
-						FD_CLR(sd, &fds);
-						close(sd);
 					}
 				}
 			}
