@@ -24,6 +24,12 @@ Server					&Server::operator=(Server const &src)
 	return (*this);
 }
 
+unsigned short	ft_htons(unsigned short x)
+{
+	x = x >> 8 | x << 8;
+	return (x);
+}
+
 /*
 * This method is used to setup the server by:
 * 1. creting the socket
@@ -31,7 +37,7 @@ Server					&Server::operator=(Server const &src)
 * 3. binding the address to set the port
 * @return int Error code
 */
-int						Server::setup(void)
+int						Server::setup(VirtualHost conf)
 {
 	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -39,14 +45,17 @@ int						Server::setup(void)
 		return (-1);
 	}
 	_address.sin_family = AF_INET;
-	_address.sin_addr.s_addr = INADDR_ANY; //change by ft custom function
-	_address.sin_port = htons(8880); //same
+	if (conf.getListenHost().size())
+		_address.sin_addr.s_addr = inet_addr(conf.getListenHost().c_str());
+	else
+		_address.sin_addr.s_addr = INADDR_ANY;
+	_address.sin_port = ft_htons(conf.getListenIp());
 	if (::bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) == -1)
 	{
-		std::cerr << "Couldn't bind the port 8880" << std::endl;
+		std::cerr << "Couldn't bind the port " << conf.getListenIp() << std::endl;
 		exit(1);
 	}
-	std::cout << "Listening on port 8880" << std::endl; 
+	std::cout << "Listening on port " << conf.getListenIp() << std::endl; 
 	return (0);
 }
 
@@ -130,6 +139,11 @@ int					Server::getFd(void) const
 void				Server::addClient(int fd)
 {
 	_clients.push_back(fd);
+}
+
+void				Server::removeClient(int fd)
+{
+	_clients.erase(std::find(_clients.begin(), _clients.end(), fd));
 }
 
 void				Server::setHost(std::string host)

@@ -4,9 +4,10 @@
 # include <iostream>
 # include <sys/types.h>
 # include <sys/socket.h>
-# include <netinet/in.h> // not to use
+# include <arpa/inet.h>
 # include <vector>
 # include <unistd.h>
+# include "VirtualHost.class.hpp"
 
 class Server
 {
@@ -18,7 +19,7 @@ class Server
 		struct sockaddr_in		_address;
 
 		Server				&operator=(Server const &src);
-		int					setup(void);
+		int					setup(VirtualHost conf);
 		int					accept(void);
 		int					listen(void);
 		int					send(int fd, std::string message) const;
@@ -29,13 +30,14 @@ class Server
 		std::vector<int>	getClients(void) const;
 
 		void				addClient(int fd);
+		void				removeClient(int fd);
 		void				setHost(std::string host);
 		void				setPort(std::string port);
 		void				setFd(int fd);
 
 	private:
-		std::string 			_host;
-		std::string 			_port;
+		std::string				_host;
+		std::string				_port;
 		int						_fd;
 		std::vector<int>		_clients;
 };
