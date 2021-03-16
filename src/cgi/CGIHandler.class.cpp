@@ -147,7 +147,7 @@ void CGIHandler::prepareEnvp(void)
 		v.push_back("CONTENT_LENGTH=" + ft_itostr(bodySize));
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
-	v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
+	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
 	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
 	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
@@ -226,30 +226,44 @@ std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
 // 	std::vector<std::string> words = split(authValue, ' ');
 // }
 
-// CGIHandler::CGIHandler(ICGIRequest icr, std::string _requestedFile)
-// {
-// 	requestedFile = _requestedFile;
-// 	_cgiRequest.scriptFilename = requestedFile;
-
-// 	std::vector<Header *> hds = icr.getHeaders();
-
-// 	// _cgiRequest.remoteAddr = ;
-// // 	_cgiRequest.remoteHost = ;
-// 	_cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
-// // 	_cgiRequest.remoteIdent = ;
-// // 	_cgiRequest.remoteUser = ;
-// // 	_cgiRequest.contentType = ;
-
-// // 	_cgiRequest.requestMethod = ;
-// // 	_cgiRequest.requestURI = ;
-// // 	_cgiRequest.serverPort = ;
-// // 	_cgiRequest.serverName = ;
-// // 	_cgiRequest.scriptFilename = ;
-// // 	_cgiRequest.pathToCGI = ;
 
 
+CGIHandler::CGIHandler(ICGIRequest icr, CGIRequires cr)
+{
+	// requestedFile = _requestedFile;
+	_cgiRequest.scriptFilename = requestedFile;
 
-// // }
+	std::vector<Header *> hds = icr.getHeaders();
+
+
+	// From Request headers
+	
+	// Auth
+	_cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
+// 	_cgiRequest.remoteIdent = ; // TODO
+// 	_cgiRequest.remoteUser = ; // TODO
+
+
+// 	_cgiRequest.contentType = ; // TODO
+
+// 	_cgiRequest.pathInfo = ;
+// 	_cgiRequest.pathTranslated = ;
+// 	_cgiRequest.queryString = ;
+
+	_cgiRequest.requestMethod = icr.getMethod();
+
+
+	// Passed as parameter from matching phase and request
+
+	// 	_cgiRequest.remoteHost = ; // not present in subject
+	_cgiRequest.remoteAddr = cr.remoteAddr;
+	_cgiRequest.requestURI = cr.requestURI;
+	_cgiRequest.serverPort = cr.serverPort;
+	_cgiRequest.serverName = cr.serverName;
+	_cgiRequest.scriptFilename = cr.scriptName;
+	_cgiRequest.pathToCGI = cr.pathToCGI;
+
+}
 
 CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
 	requestedFile(cr.scriptFilename), _cgiRequest(cr)

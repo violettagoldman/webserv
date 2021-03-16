@@ -32,7 +32,7 @@
 
 typedef struct s_CGIRequest {
 	std::string remoteAddr;
-	std::string remoteHost;
+	// std::string remoteHost;
 	std::string authType;
 	std::string remoteIdent;
 	std::string remoteUser;
@@ -48,13 +48,23 @@ typedef struct s_CGIRequest {
 	std::string pathToCGI;
 }	CGIRequest;
 
+typedef struct s_CGIRequires {
+	std::string scriptName;
+	std::string remoteAddr;
+	std::string requestURI; // ?????
+	std::string serverPort;
+	std::string serverName;
+	std::string pathToCGI;
+} CGIRequires;
+
 std::string		ft_itostr(int n);
 
 class CGIHandler {
 
 public:
 	CGIHandler(std::string body, CGIRequest cr);
-	// CGIHandler(ICGIRequest icr, std::string requestedFile);
+
+	CGIHandler(ICGIRequest icr, CGIRequires cr);
 
 	// ~CGIHandler();
 	// CGIHandler(const CGIHandler &copy);

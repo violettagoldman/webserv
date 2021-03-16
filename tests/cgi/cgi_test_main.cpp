@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/16 12:49:03 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/16 13:30:37 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ std::string testBodyWrite(std::string stringToWrite,
 {
 	CGIRequest cr3 = {
 		"127.0.0.1", // remoteAddr
-		"testRemoteHost", // remoteHost
+		// "testRemoteHost", // remoteHost
 		"testAuthType", // authType
 		"testRemoteIdent", // remoteIdent
 		"testRemoteUser", // remoteUser
@@ -108,7 +108,7 @@ int main(void)
 
 	CGIRequest cr2 = {
 		"127.0.0.1", // remoteAddr
-		"testRemoteHost", // remoteHost
+		// "testRemoteHost", // remoteHost
 		"testAuthType", // authType
 		"testRemoteIdent", // remoteIdent
 		"testRemoteUser", // remoteUser
@@ -130,8 +130,8 @@ int main(void)
 
 	std::map<std::string, std::string> envVarMap = responseToMap(resp2);
 
-	check(envVarMap["REMOTE_ADDR"] == "127.0.0.1");
-	check(envVarMap["REMOTE_HOST"] == "testRemoteHost");
+	check(envVarMap["REMOTE_ADDR"] == "127.0.0.1"); 
+	// check(envVarMap["REMOTE_HOST"] == "testRemoteHost");
 	check(envVarMap["REMOTE_IDENT"] == "testRemoteIdent");
 	check(envVarMap["REMOTE_USER"] == "testRemoteUser");
 	check(envVarMap["AUTH_TYPE"] == "testAuthType");
@@ -143,8 +143,7 @@ int main(void)
 	check(envVarMap["SCRIPT_FILENAME"] != "");
 	check(envVarMap["SCRIPT_FILENAME"].find("test-cgi.php") != std::string::npos);
 	check(envVarMap["SCRIPT_NAME"].find("test-cgi.php") != std::string::npos);
-	std::cout << "Here" << std::endl;
-	check(envVarMap["PATH_INFO"] == "examplePathiInfo");
+	check(envVarMap["PATH_INFO"] == "examplePathInfo");
 	check(envVarMap["GATEWAY_INTERFACE"] == "CGI/1.1");
 	check(envVarMap["SERVER_PROTOCOL"] == "HTTP/1.1");
 	check(envVarMap["SERVER_SOFTWARE"] == "Webserv/1.1");
@@ -212,5 +211,6 @@ int main(void)
 	check(tcr.getPath() == "testPath");
 	check(tcr.getFragment() == "testFragment");
 
+	test_results();
 
 }
