@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/16 14:54:33 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/16 15:04:34 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,9 +229,30 @@ int main(void)
 
 	// std::cout << "Lsls" << std::endl;
 	std::string resp3 = h3.getCgiResponse();
-	std::cout << resp3 << std::endl;
+	// std::cout << resp3 << std::endl;
 
 	envVarMap = responseToMap(resp3);
+
+	check(envVarMap["REMOTE_ADDR"] == "127.0.0.1"); 
+	// check(envVarMap["REMOTE_HOST"] == "testRemoteHost");
+	// check(envVarMap["REMOTE_IDENT"] == "testRemoteIdent");
+	// check(envVarMap["REMOTE_USER"] == "testRemoteUser");
+	// check(envVarMap["AUTH_TYPE"] == "testAuthType");
+	// check(envVarMap["CONTENT_TYPE"] == "testContentType");
+	// check(envVarMap["REQUEST_METHOD"] == "GET");
+	check(envVarMap["REQUEST_URI"] == "http://example.com/cgi/test.php");
+	check(envVarMap["SERVER_PORT"] == "80");
+	check(envVarMap["SERVER_NAME"] == "example.com");
+	check(envVarMap["SCRIPT_FILENAME"] != "");
+	check(envVarMap["SCRIPT_FILENAME"].find("test-cgi.php") != std::string::npos);
+	
+	check(envVarMap["SCRIPT_NAME"].find("test-cgi.php") != std::string::npos);
+	
+	// check(envVarMap["PATH_INFO"] == "examplePathInfo"); 
+	
+	check(envVarMap["GATEWAY_INTERFACE"] == "CGI/1.1");
+	check(envVarMap["SERVER_PROTOCOL"] == "HTTP/1.1");
+	check(envVarMap["SERVER_SOFTWARE"] == "Webserv/1.1");
 
 	// std::cout <<  << std::endl;
 
