@@ -61,7 +61,6 @@ char	*ft_strdup(const char *s1)
 	return (p);
 }
 
-
 std::string		ft_itostr(int n)
 {
 	std::string		result;
@@ -81,15 +80,6 @@ std::string		ft_itostr(int n)
 		result.insert(0, "-");
 	return (result);
 }
-
-// TODO redo without free
-// std::string ft_itostr(int n)
-// {
-// 	char *s = ft_itoa(n);
-// 	std::string str(s);
-// 	free(s);
-// 	return str;
-// }
 
 char **create_envp(std::vector<std::string> mvars)
 {
@@ -227,19 +217,16 @@ std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
 // }
 
 
-
-CGIHandler::CGIHandler(ICGIRequest icr, CGIRequires cr)
+CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 {
-	// requestedFile = _requestedFile;
-	_cgiRequest.scriptFilename = requestedFile;
 
-	std::vector<Header *> hds = icr.getHeaders();
+	std::vector<Header> hds = icr.getHeaders();
 
 
 	// From Request headers
 	
 	// Auth
-	_cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
+	// _cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
 // 	_cgiRequest.remoteIdent = ; // TODO
 // 	_cgiRequest.remoteUser = ; // TODO
 
@@ -263,10 +250,18 @@ CGIHandler::CGIHandler(ICGIRequest icr, CGIRequires cr)
 	_cgiRequest.scriptFilename = cr.scriptName;
 	_cgiRequest.pathToCGI = cr.pathToCGI;
 
+	pipeline(icr.getBody());
 }
 
-CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
-	requestedFile(cr.scriptFilename), _cgiRequest(cr)
+CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
+{
+	pipeline(body);
+}
+
+/*
+** Does all the internal work
+*/
+void CGIHandler::pipeline(std::string body)
 {
 	countBodySize(body);
 	openPipes();
@@ -276,7 +271,6 @@ CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
 	close(pipe_out[1]);
 	readCgiResponse(pipe_out[0]);
 }
-
 
 
 void CGIHandler::countBodySize(std::string s)

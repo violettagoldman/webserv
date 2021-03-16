@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/16 13:30:37 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/16 14:54:33 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,36 +180,60 @@ int main(void)
 
 	out("TestCGIRequest | Constructor");
 
-	std::vector<Header *> hds;
+	std::vector<Header> hds;
 
 	std::vector<std::string> values;
 	values.push_back("testValue1");
 	values.push_back("testValue2");
 
-	Header *header = new Header("testKey", values);
+	Header header = Header("testKey", values);
 
 	hds.push_back(header);
 
 	TestCGIRequest tcr("GET",
 		"testBody",
 		hds,
-		"testQuery",
-		"testPath",
-		"testFragment"
+		// "testQuery",
+		"testPath"
+		// "testFragment"
 	);
 
 	check(tcr.getMethod() == "GET");
 	check(tcr.getBody() == "testBody");
 
 	check(tcr.getHeaders().size() == 1);
-	check(tcr.getHeaders()[0]->getName() == "testKey");
-	check(tcr.getHeaders()[0]->getValue().size() == 2);
-	check(tcr.getHeaders()[0]->getValue()[0] == "testValue1");
-	check(tcr.getHeaders()[0]->getValue()[1] == "testValue2");
+	check(tcr.getHeaders()[0].getName() == "testKey");
+	check(tcr.getHeaders()[0].getValue().size() == 2);
+	check(tcr.getHeaders()[0].getValue()[0] == "testValue1");
+	check(tcr.getHeaders()[0].getValue()[1] == "testValue2");
 
-	check(tcr.getQuery() == "testQuery");
+	// check(tcr.getQuery() == "testQuery");
 	check(tcr.getPath() == "testPath");
-	check(tcr.getFragment() == "testFragment");
+	// check(tcr.getFragment() == "testFragment");
+
+	out("CGIHandler from Request and a few params");
+
+	CGIRequires crs = {
+		s_pwd + "/cgi/test-cgi.php", // scriptFilename
+		"127.0.0.1", // remoteAddr
+		"http://example.com/cgi/test.php", // requestURI
+		"80", // serverPort
+		"example.com", // serverName
+		path_to_pcgi // pathToCGI
+	};
+
+
+
+	CGIHandler h3(tcr, crs);
+
+
+	// std::cout << "Lsls" << std::endl;
+	std::string resp3 = h3.getCgiResponse();
+	std::cout << resp3 << std::endl;
+
+	envVarMap = responseToMap(resp3);
+
+	// std::cout <<  << std::endl;
 
 	test_results();
 
