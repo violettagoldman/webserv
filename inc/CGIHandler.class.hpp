@@ -37,9 +37,9 @@ typedef struct s_CGIRequest {
 	std::string remoteIdent;
 	std::string remoteUser;
 	std::string contentType;
-	// std::string pathInfo;
-	// std::string pathTranslated;
-	// std::string queryString;
+	std::string pathInfo;
+	std::string pathTranslated;
+	std::string queryString;
 	std::string requestMethod;
 	std::string requestURI;
 	std::string serverPort;

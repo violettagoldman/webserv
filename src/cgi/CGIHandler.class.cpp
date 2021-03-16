@@ -151,10 +151,10 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
 	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
-	v.push_back("PATH_INFO=" + _cgiRequest.requestURI);
+	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
 
-	v.push_back("PATH_TRANSLATED=");
-	v.push_back("QUERY_STRING=");
+	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
+	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
 
 	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
@@ -178,19 +178,6 @@ void CGIHandler::prepareEnvp(void)
 
 	this->envp = create_envp(v);
 
-
-	// char **envp2 = envp;
-	// while (*envp2)
-	// {
-	// 	std::cout << *envp2 << std::endl;
-	// 	envp2++;
-	// }
-
-	// while (*envp)
-	// {
-	// 	// std::cout << "Envp: " << *envp << std::endl;
-	// 	// envp++;
-	// }
 }
 
 void CGIHandler::handleCgi(void)

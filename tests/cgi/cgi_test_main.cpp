@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/05 14:55:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/16 12:49:03 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,9 @@ std::string testBodyWrite(std::string stringToWrite,
 		"testRemoteIdent", // remoteIdent
 		"testRemoteUser", // remoteUser
 		"testContentType", // contentType
+		"examplePathInfo", // pathInfo,
+		"examplePathTranslated", // pathTranslated,
+		"exampleQueryString", // queryString
 		"GET", // requestMethod
 		"http://example.com/cgi/test.php", // requestURI
 		"80", // serverPort
@@ -99,6 +102,8 @@ int main(void)
 	else
 		path_to_pcgi = "/usr/local/bin/php-cgi";
 
+	std::cout << "Calculated php-cgi to be at: " << path_to_pcgi << std::endl;
+
 	out("CGI Variables test");
 
 	CGIRequest cr2 = {
@@ -107,7 +112,10 @@ int main(void)
 		"testAuthType", // authType
 		"testRemoteIdent", // remoteIdent
 		"testRemoteUser", // remoteUser
-		"testContentType", // contentType
+		"testContentType", // contentType,
+		"examplePathInfo", // pathInfo,
+		"examplePathTranslated", // pathTranslated,
+		"exampleQueryString", // queryString
 		"GET", // requestMethod
 		"http://example.com/cgi/test.php", // requestURI
 		"80", // serverPort
@@ -135,7 +143,8 @@ int main(void)
 	check(envVarMap["SCRIPT_FILENAME"] != "");
 	check(envVarMap["SCRIPT_FILENAME"].find("test-cgi.php") != std::string::npos);
 	check(envVarMap["SCRIPT_NAME"].find("test-cgi.php") != std::string::npos);
-	check(envVarMap["PATH_INFO"] == "http://example.com/cgi/test.php");
+	std::cout << "Here" << std::endl;
+	check(envVarMap["PATH_INFO"] == "examplePathiInfo");
 	check(envVarMap["GATEWAY_INTERFACE"] == "CGI/1.1");
 	check(envVarMap["SERVER_PROTOCOL"] == "HTTP/1.1");
 	check(envVarMap["SERVER_SOFTWARE"] == "Webserv/1.1");
@@ -168,8 +177,6 @@ int main(void)
 	check(testBodyWrite("testBody", s_pwd, path_to_pcgi) == "testBody\n");
 	check(testBodyWrite("testBody\nlol", s_pwd, path_to_pcgi) == "testBody\nlol\n");
 	check(testBodyWrite("testBody\nlol\nonemoreline", s_pwd, path_to_pcgi) == "testBody\nlol\nonemoreline\n");
-
-
 
 
 	out("TestCGIRequest | Constructor");
