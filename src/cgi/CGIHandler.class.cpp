@@ -61,7 +61,6 @@ char	*ft_strdup(const char *s1)
 	return (p);
 }
 
-
 std::string		ft_itostr(int n)
 {
 	std::string		result;
@@ -81,15 +80,6 @@ std::string		ft_itostr(int n)
 		result.insert(0, "-");
 	return (result);
 }
-
-// TODO redo without free
-// std::string ft_itostr(int n)
-// {
-// 	char *s = ft_itoa(n);
-// 	std::string str(s);
-// 	free(s);
-// 	return str;
-// }
 
 char **create_envp(std::vector<std::string> mvars)
 {
@@ -147,14 +137,14 @@ void CGIHandler::prepareEnvp(void)
 		v.push_back("CONTENT_LENGTH=" + ft_itostr(bodySize));
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
-	v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
+	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
 	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
 	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
-	v.push_back("PATH_INFO=" + _cgiRequest.requestURI);
+	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
 
-	v.push_back("PATH_TRANSLATED=");
-	v.push_back("QUERY_STRING=");
+	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
+	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
 
 	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
@@ -178,19 +168,6 @@ void CGIHandler::prepareEnvp(void)
 
 	this->envp = create_envp(v);
 
-
-	// char **envp2 = envp;
-	// while (*envp2)
-	// {
-	// 	std::cout << *envp2 << std::endl;
-	// 	envp2++;
-	// }
-
-	// while (*envp)
-	// {
-	// 	// std::cout << "Envp: " << *envp << std::endl;
-	// 	// envp++;
-	// }
 }
 
 void CGIHandler::handleCgi(void)
@@ -239,33 +216,52 @@ std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
 // 	std::vector<std::string> words = split(authValue, ' ');
 // }
 
-// CGIHandler::CGIHandler(ICGIRequest icr, std::string _requestedFile)
-// {
-// 	requestedFile = _requestedFile;
-// 	_cgiRequest.scriptFilename = requestedFile;
 
-// 	std::vector<Header *> hds = icr.getHeaders();
+CGIHandler::CGIHandler(Request icr, CGIRequires cr)
+{
 
-// 	// _cgiRequest.remoteAddr = ;
-// // 	_cgiRequest.remoteHost = ;
-// 	_cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
-// // 	_cgiRequest.remoteIdent = ;
-// // 	_cgiRequest.remoteUser = ;
-// // 	_cgiRequest.contentType = ;
-
-// // 	_cgiRequest.requestMethod = ;
-// // 	_cgiRequest.requestURI = ;
-// // 	_cgiRequest.serverPort = ;
-// // 	_cgiRequest.serverName = ;
-// // 	_cgiRequest.scriptFilename = ;
-// // 	_cgiRequest.pathToCGI = ;
+	std::vector<Header> hds = icr.getHeaders();
 
 
+	// From Request headers
+	
+	// Auth
+	// _cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
+// 	_cgiRequest.remoteIdent = ; // TODO
+// 	_cgiRequest.remoteUser = ; // TODO
 
-// // }
 
-CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
-	requestedFile(cr.scriptFilename), _cgiRequest(cr)
+// 	_cgiRequest.contentType = ; // TODO
+
+// 	_cgiRequest.pathInfo = ;
+// 	_cgiRequest.pathTranslated = ;
+// 	_cgiRequest.queryString = ;
+
+	_cgiRequest.requestMethod = icr.getMethod();
+
+
+	// Passed as parameter from matching phase and request
+
+	// 	_cgiRequest.remoteHost = ; // not present in subject
+	_cgiRequest.remoteAddr = cr.remoteAddr;
+	_cgiRequest.requestURI = cr.requestURI;
+	_cgiRequest.serverPort = cr.serverPort;
+	_cgiRequest.serverName = cr.serverName;
+	_cgiRequest.scriptFilename = cr.scriptName;
+	_cgiRequest.pathToCGI = cr.pathToCGI;
+
+	pipeline(icr.getBody());
+}
+
+CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
+{
+	pipeline(body);
+}
+
+/*
+** Does all the internal work
+*/
+void CGIHandler::pipeline(std::string body)
 {
 	countBodySize(body);
 	openPipes();
@@ -275,7 +271,6 @@ CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
 	close(pipe_out[1]);
 	readCgiResponse(pipe_out[0]);
 }
-
 
 
 void CGIHandler::countBodySize(std::string s)

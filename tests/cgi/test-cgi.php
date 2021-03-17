@@ -1,6 +1,6 @@
 <?php
 echo "REMOTE_ADDR: " . $_SERVER['REMOTE_ADDR'] . "\n";
-echo "REMOTE_HOST: " . $_SERVER['REMOTE_HOST'] . "\n";
+// echo "REMOTE_HOST: " . $_SERVER['REMOTE_HOST'] . "\n";
 echo "REMOTE_IDENT: " . $_SERVER['REMOTE_IDENT'] . "\n";
 echo "REMOTE_USER: " . $_SERVER['REMOTE_USER'] . "\n";
 echo "AUTH_TYPE: " . $_SERVER['AUTH_TYPE'] . "\n";

@@ -15,12 +15,11 @@
 TestCGIRequest::TestCGIRequest(
 	std::string method,
 	std::string body,
-	std::vector<Header *> headers,
-	std::string query,
-	std::string path,
-	std::string fragment) :
-	_method(method), _body(body), _headers(headers), _query(query),
-	_path(path), _fragment(fragment)
+	std::vector<Header> headers,
+	// std::string query,
+	std::string path) :
+	_method(method), _body(body), _headers(headers),
+	_path(path)
 {
 }
 
@@ -35,22 +34,22 @@ std::string TestCGIRequest::getBody(void)
 	return _body;
 }
 
-std::vector<Header *> TestCGIRequest::getHeaders(void)
+std::vector<Header> TestCGIRequest::getHeaders(void)
 {
 	return _headers;
 }
 
-std::string TestCGIRequest::getQuery(void)
-{
-	return _query;
-}
+// std::string TestCGIRequest::getQuery(void)
+// {
+// 	return _query;
+// }
 
 std::string TestCGIRequest::getPath(void)
 {
 	return _path;
 }
 
-std::string TestCGIRequest::getFragment(void)
-{
-	return _fragment;
-}
+// std::string TestCGIRequest::getFragment(void)
+// {
+// 	return _fragment;
+// }
