@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/16 15:04:34 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/17 18:47:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,20 @@
 #include <cstdlib>
 #include <map>
 #include "Utility.hpp"
+#include "Base64.class.hpp"
 
+
+std::string flatten(std::vector<std::string> v)
+{
+	std::string ret = "";
+
+	for (size_t i = 0; i < v.size(); i++)
+	{
+		ret += v[i] + ' ';
+	}
+
+	return ret;
+}
 
 // Turn CGI reponse containing key:value pairs into a map for testing
 std::map<std::string, std::string> responseToMap(std::string cgi_response)
@@ -34,12 +47,25 @@ std::map<std::string, std::string> responseToMap(std::string cgi_response)
 	std::vector<std::string> l;
 	while (j != lines.size())
 	{
+		// std::cout << "L: " << lines[j] << std::endl;
 		l = ft_split(lines[j], ' ');
 		if (l.size() == 2)
 		{
 			key = l[0];
 			value = l[1];
 			key.erase(key.size()-1, 1);
+
+			// std::cout << "K: " << key << ", V: " << value << std::endl;
+			envVarMap[key] = value;
+		}
+		else if (l.size() > 2)
+		{
+			key = l[0];
+			key.erase(key.size()-1, 1);
+			l.erase(l.begin());
+
+			std::string value = flatten(l);
+			value.erase(value.size()-1, 1);
 			envVarMap[key] = value;
 		}
 		j++;
@@ -94,10 +120,16 @@ int main(void)
 
 	const char *logname = std::getenv("LOGNAME");
 
+	const char *phpcgienv = std::getenv("PHPCGI");
+
+	std::cout << logname << std::endl;
+
 	std::string path_to_pcgi;
 
+	if (phpcgienv != NULL)
+		path_to_pcgi = phpcgienv;
 	// If we're at campus, php-cgi will be installed at brew
-	if (logname != NULL)
+	else if (logname != NULL)
 		path_to_pcgi = "/Users/" + std::string(logname) + "/.brew/bin/php-cgi";
 	else
 		path_to_pcgi = "/usr/local/bin/php-cgi";
@@ -190,6 +222,18 @@ int main(void)
 
 	hds.push_back(header);
 
+	values.clear();
+
+	values.push_back("Basic YWxhZGRpbjpvcGVuc2VzYW1l");
+
+	hds.push_back(Header("Authorization", values));
+
+	values.clear();
+
+	values.push_back("text/html; charset=UTF-8");
+
+	hds.push_back(Header("Content-Type", values));
+
 	TestCGIRequest tcr("GET",
 		"testBody",
 		hds,
@@ -201,7 +245,7 @@ int main(void)
 	check(tcr.getMethod() == "GET");
 	check(tcr.getBody() == "testBody");
 
-	check(tcr.getHeaders().size() == 1);
+	check(tcr.getHeaders().size() == 3);
 	check(tcr.getHeaders()[0].getName() == "testKey");
 	check(tcr.getHeaders()[0].getValue().size() == 2);
 	check(tcr.getHeaders()[0].getValue()[0] == "testValue1");
@@ -229,16 +273,18 @@ int main(void)
 
 	// std::cout << "Lsls" << std::endl;
 	std::string resp3 = h3.getCgiResponse();
-	// std::cout << resp3 << std::endl;
+	std::cout << resp3 << std::endl;
 
 	envVarMap = responseToMap(resp3);
 
 	check(envVarMap["REMOTE_ADDR"] == "127.0.0.1"); 
-	// check(envVarMap["REMOTE_HOST"] == "testRemoteHost");
-	// check(envVarMap["REMOTE_IDENT"] == "testRemoteIdent");
-	// check(envVarMap["REMOTE_USER"] == "testRemoteUser");
-	// check(envVarMap["AUTH_TYPE"] == "testAuthType");
-	// check(envVarMap["CONTENT_TYPE"] == "testContentType");
+	// check(envVarMap["REMOTE_HOST"] == "testRemoteHost"); // not present in subject
+	check(envVarMap["REMOTE_IDENT"] == "opensesame");
+	check(envVarMap["REMOTE_USER"] == "aladdin");
+	check(envVarMap["AUTH_TYPE"] == "Basic");
+	std::cout << "Here" << std::endl;
+	std::cout << envVarMap["CONTENT_TYPE"] << std::endl;
+	check(envVarMap["CONTENT_TYPE"] == "text/html; charset=UTF-8");
 	// check(envVarMap["REQUEST_METHOD"] == "GET");
 	check(envVarMap["REQUEST_URI"] == "http://example.com/cgi/test.php");
 	check(envVarMap["SERVER_PORT"] == "80");
@@ -255,6 +301,18 @@ int main(void)
 	check(envVarMap["SERVER_SOFTWARE"] == "Webserv/1.1");
 
 	// std::cout <<  << std::endl;
+
+	out("Base64 decoding");
+	Base64 b("QUJD");
+	check(b.decode() == "ABC");
+
+	out("Authorization header parsing");
+
+	authResult res = CGIHandler::parseAuth("Basic YWxhZGRpbjpvcGVuc2VzYW1l");
+
+	check(res.authType == "Basic");
+	check(res.user == "aladdin");
+	check(res.password == "opensesame");
 
 	test_results();
 

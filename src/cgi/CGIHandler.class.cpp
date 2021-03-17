@@ -138,8 +138,10 @@ void CGIHandler::prepareEnvp(void)
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
 	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
+
 	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
+
 	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
 	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
 
@@ -184,19 +186,19 @@ void CGIHandler::handleCgi(void)
 	waitpid(pid, NULL, 0);
 }
 
-std::vector<std::string> getHeaderByKey(std::vector<Header *> hds, std::string key)
+std::vector<std::string> getHeaderByKey(std::vector<Header> hds, std::string key)
 {
-	for (size_t i = 0; i < hds.size(); ++i)
+	for (size_t i = 0; i < hds.size(); i++)
 	{
-		if (hds[i]->getName() == key)
+		if (hds[i].getName() == key)
 		{
-			return hds[i]->getValue();
+			return hds[i].getValue();
 		}
 	}
 	return std::vector<std::string>();
 }
 
-std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
+std::string getHeaderStringByKey(std::vector<Header> hds, std::string key)
 {
 	std::vector<std::string> result = getHeaderByKey(hds, key);
 
@@ -209,6 +211,40 @@ std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
 		std::cout << "[CGI] Warning: header by key " << key << " contains too many variables" << std::endl;
 		return "";
 	}
+}
+
+/*
+** Parse the Authorization header
+** @param authHeader the value of the Authorization header
+** @ret authResult the structure containing parsed auth type and credentials
+*/
+authResult CGIHandler::parseAuth(std::string authHeader)
+{
+	authResult ret;
+
+	std::vector<std::string> parts = ft_split(authHeader, ' ');
+
+	if (parts.size() != 2)
+		throw Exception("Wrong Authorization header format.");
+
+	if (parts[0] == "Basic")
+	{
+		ret.authType = "Basic";
+
+		std::string decodedCreds = Base64(parts[1]).decode();
+
+		std::vector<std::string> creds = ft_split(decodedCreds, ':');
+		if (creds.size() != 2)
+			throw Exception("Wrong Basic Auth credentials format.");
+		ret.user = creds[0];
+		ret.password = creds[1];
+	}
+	else
+	{
+		throw Exception("Wrong Authorization scheme.");
+	}
+
+	return ret;
 }
 
 // std::string parseAuth(std::string authValue)
@@ -226,16 +262,21 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	// From Request headers
 	
 	// Auth
-	// _cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
-// 	_cgiRequest.remoteIdent = ; // TODO
-// 	_cgiRequest.remoteUser = ; // TODO
+	std::string authValue;
+	if ((authValue = getHeaderStringByKey(hds, "Authorization")) != "")
+	{
+		authResult ar = parseAuth(authValue);
+		_cgiRequest.authType = ar.authType;
+		_cgiRequest.remoteUser = ar.user;
+		_cgiRequest.remoteIdent = ar.password;
+	}
 
+	_cgiRequest.contentType = getHeaderStringByKey(hds, "Content-Type");
 
-// 	_cgiRequest.contentType = ; // TODO
-
-// 	_cgiRequest.pathInfo = ;
-// 	_cgiRequest.pathTranslated = ;
-// 	_cgiRequest.queryString = ;
+	// TODO
+	// _cgiRequest.pathInfo = ;
+	// _cgiRequest.pathTranslated = ;
+	// _cgiRequest.queryString = ;
 
 	_cgiRequest.requestMethod = icr.getMethod();
 

@@ -23,6 +23,8 @@
 # include "ICGIRequest.class.hpp"
 # include "Exception.class.hpp"
 # include "Request.class.hpp"
+# include "Utility.hpp"
+# include "Base64.class.hpp"
 
 # ifndef PHPCGI_PATH
 #  ifdef __APPLE__
@@ -55,7 +57,13 @@ typedef struct s_CGIRequires {
 	std::string serverPort;
 	std::string serverName;
 	std::string pathToCGI;
-} CGIRequires;
+}	CGIRequires;
+
+typedef struct s_authResult {
+	std::string authType;
+	std::string user;
+	std::string password;
+}	authResult;
 
 std::string		ft_itostr(int n);
 
@@ -72,6 +80,8 @@ public:
 	// CGIHandler &operator= (const CGIHandler &operand);
 
 	std::string getCgiResponse(void) const;
+
+	static authResult parseAuth(std::string authHeader);
 
 private:
 	// std::string requestedFile;
