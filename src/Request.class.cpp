@@ -58,7 +58,7 @@ std::vector<std::string> ft_split(std::string s, char c);
 Request::Request(void) :
 	_read_bytes(0)
 {
-
+	_error = 0;
    	methods[0] = "GET";
    	methods[1] = "HEAD";
    	methods[2] = "POST";

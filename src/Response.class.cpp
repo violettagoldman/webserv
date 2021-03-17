@@ -12,10 +12,10 @@ Response::Response(Request req, Location loc, std::string fp)
 	handleMethod(loc);
 }
 
-Response::Response(Response const &src)
-{
-	*this = src;
-}
+// Response::Response(Response const &src)
+// {
+// 	*this = src;
+// }
 
 Response::~Response(void)
 {
@@ -46,6 +46,7 @@ void			Response::handleMethod(Location loc)
 	{
 		error(_req.getError());
 		return;
+
 	}
 	if (option == "GET")
 		get(loc);
