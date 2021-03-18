@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/17 18:47:19 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/18 12:52:09 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,6 +313,60 @@ int main(void)
 	check(res.authType == "Basic");
 	check(res.user == "aladdin");
 	check(res.password == "opensesame");
+
+
+	out("Path transformations | Base case");
+
+	std::string requestUri = "http://example.com/cgi/index.php/test_sector?query=here";
+	std::string scriptName = "/var/www/index.php";
+	std::string pathInfo = "/test_sector?query=here";
+	std::string queryString = "query=here";
+	std::string pathTranslated = "/var/www/test_sector?query=here";
+
+	pathResult pr = CGIHandler::parsePath(requestUri, scriptName);
+	check(pr.pathInfo == pathInfo);
+	check(pr.queryString == queryString);
+	check(pr.pathTranslated == pathTranslated);
+
+	out("ft_atoi_base");
+	check(ft_atoi_base("5", "0123456789") == 5);
+	check(ft_atoi_base("-5", "0123456789") == -5);
+	check(ft_atoi_base("0", "0123456789") == 0);
+	TEST_EXCEPTION(ft_atoi_base("Z", "0123456789"), Exception, "Invalid character in ft_atoi_base.");
+	check(ft_atoi_base("2147483647", "0123456789") == 2147483647);
+	// check(ft_atoi_base("2147483648", "0123456789") == 2147483648);
+
+	out("Path transformations | url decode");
+	check(CGIHandler::urldecode("hehe%20") == "hehe ");
+	check(CGIHandler::urldecode("hehe%3b") == "hehe;");
+	check(CGIHandler::urldecode("hehe%3Es") == "hehe>s");
+	check(CGIHandler::urldecode("hehe") == "hehe");
+	// check(CGIHandler::urldecode("hehe%20") == "hehe ");
+
+	out("Path transformations | Empty queryString, urldecode");
+	requestUri = "http://example.com/cgi/index.php/test_sec%3btor/";
+	scriptName = "/var/www/index.php";
+	pathInfo = "/test_sec;tor/";
+	queryString = "";
+	pathTranslated = "/var/www/test_sec;tor/";
+
+	pr = CGIHandler::parsePath(requestUri, scriptName);
+	check(pr.pathInfo == pathInfo);
+	check(pr.queryString == queryString);
+	check(pr.pathTranslated == pathTranslated);
+
+	out("Path transformations | Empty pathInfo");
+	requestUri = "http://example.com/cgi/index.php/";
+	scriptName = "/var/www/index.php";
+	pathInfo = "/"; // or ""?
+	queryString = "";
+	pathTranslated = "/var/www/";
+
+	pr = CGIHandler::parsePath(requestUri, scriptName);
+	check(pr.pathInfo == pathInfo);
+	check(pr.queryString == queryString);
+	check(pr.pathTranslated == pathTranslated);
+	// check(pr.pathInfo == pr.pathInfo);
 
 	test_results();
 

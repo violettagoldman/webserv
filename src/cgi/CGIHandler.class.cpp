@@ -316,3 +316,99 @@ void CGIHandler::readCgiResponse(int fd)
 	}
 	// this->cgiResponse += resplineString + "\n";
 }
+
+pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
+{
+	pathResult ret;
+	size_t scriptNameStart = scriptName.rfind('/');
+	std::string scriptFilename = scriptName.substr(scriptNameStart);
+
+	size_t scriptPosition = requestURI.rfind(scriptFilename);
+	std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
+
+	ret.pathInfo = urldecode(afterScript);
+
+	size_t queryStringStart = afterScript.find("?");
+
+	if (queryStringStart != std::string::npos)
+		ret.queryString = afterScript.substr(queryStringStart+1);
+	else
+		ret.queryString = "";
+
+	std::string localPath = scriptName.substr(0, scriptNameStart);
+	ret.pathTranslated = localPath + ret.pathInfo;
+
+	return ret;
+
+}
+
+int ft_find(const char *str, const char c)
+{
+	size_t i = 0;
+	while (str[i])
+	{
+		if (str[i] == c)
+			return i;
+		i++;
+	}
+	return -1;
+}
+
+int	ft_atoi_base(const char *str, const char *base)
+{
+	int		nbr;
+	int		sign;
+	int		newval;
+
+	nbr = 0;
+	sign = 1;
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+			|| (*str) == '\r' || (*str) == ' ')
+		str++;
+	if ((*str) == '-' || (*str) == '+')
+	{
+		sign *= ((*str) == '-' ? -1 : 1);
+		str++;
+	}
+	while ((*str) != '\0')
+	{
+		nbr *= ft_strlen(base);
+		newval = ft_find(base, *str);
+		if (newval == -1)
+			throw Exception("Invalid character in ft_atoi_base.");
+		nbr += newval;
+		str++;
+	}
+	return (nbr * sign);
+}
+
+char convert(std::string byte)
+{
+	char res = 0;
+	const std::string capitals = "ABCDEF";
+	if (capitals.find(byte[0]) != std::string::npos || capitals.find(byte[1]) != std::string::npos)
+		res = (char) ft_atoi_base(byte.c_str(), "0123456789ABCDEF");
+	else
+		res = (char) ft_atoi_base(byte.c_str(), "0123456789abcdef");
+	return res;
+
+}
+
+std::string CGIHandler::urldecode(std::string encodedString)
+{
+	size_t pos;
+	std::string encodedSection;
+	char replacement;
+	std::string replacementString;
+
+	while ((pos = encodedString.find("%")) != std::string::npos)
+	{
+		encodedSection = encodedString.substr(pos+1, 2);
+		replacement = convert(encodedSection);
+		replacementString.clear();
+		replacementString.push_back(replacement);
+		encodedString.replace(pos, 3, replacementString);
+
+	}
+	return encodedString;
+}
