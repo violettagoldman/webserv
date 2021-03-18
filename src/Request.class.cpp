@@ -67,7 +67,6 @@ Request::Request(void) :
    	methods[5] = "CONNECT";
    	methods[6] = "OPTIONS";
    	methods[7] = "TRACE";
-	std::cout << "Defualt constructor for Request called\n";
 }
 
 Request::Request(Request const &src) :
@@ -75,18 +74,13 @@ Request::Request(Request const &src) :
 	_content_length(src._content_length), _status_line(src._status_line), _method(src._method),
  _body(src._body), _query(src._query), _path(src._path), _fragment(src._fragment),
  _error(src._error), _state(src._state)
-{
-	std::cout << "Copy constructor for Request called\n";
-}
+{}
 
 Request::~Request(void)
-{
-	std::cout << "Default destructor for Request called\n";
-}
+{}
 
 Request		&Request::operator=(Request const &src)
 {
-	std::cout << "Assignation operator called\n";
 	_headers = src._headers;
 	_status_line = src._status_line;
 	_method = src._method;
