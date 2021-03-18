@@ -205,9 +205,10 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	_cgiRequest.contentType = getHeaderStringByKey(hds, "Content-Type");
 
 	// TODO
-	// _cgiRequest.pathInfo = ;
-	// _cgiRequest.pathTranslated = ;
-	// _cgiRequest.queryString = ;
+	pathResult pr = parsePath(cr.requestURI, cr.scriptName);
+	_cgiRequest.pathInfo = pr.pathInfo;
+	_cgiRequest.pathTranslated = pr.pathTranslated;
+	_cgiRequest.queryString = pr.queryString;
 
 	_cgiRequest.requestMethod = icr.getMethod();
 
@@ -324,6 +325,8 @@ pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 	std::string scriptFilename = scriptName.substr(scriptNameStart);
 
 	size_t scriptPosition = requestURI.rfind(scriptFilename);
+
+
 	std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
 
 	ret.pathInfo = urldecode(afterScript);

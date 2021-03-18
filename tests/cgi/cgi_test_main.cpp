@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/18 12:52:09 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/18 14:19:18 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,13 +260,11 @@ int main(void)
 	CGIRequires crs = {
 		s_pwd + "/cgi/test-cgi.php", // scriptFilename
 		"127.0.0.1", // remoteAddr
-		"http://example.com/cgi/test.php", // requestURI
+		"http://example.com/cgi/test-cgi.php/addition/?query=true", // requestURI
 		"80", // serverPort
 		"example.com", // serverName
 		path_to_pcgi // pathToCGI
 	};
-
-
 
 	CGIHandler h3(tcr, crs);
 
@@ -286,7 +284,7 @@ int main(void)
 	std::cout << envVarMap["CONTENT_TYPE"] << std::endl;
 	check(envVarMap["CONTENT_TYPE"] == "text/html; charset=UTF-8");
 	// check(envVarMap["REQUEST_METHOD"] == "GET");
-	check(envVarMap["REQUEST_URI"] == "http://example.com/cgi/test.php");
+	check(envVarMap["REQUEST_URI"] == "http://example.com/cgi/test-cgi.php/addition/?query=true");
 	check(envVarMap["SERVER_PORT"] == "80");
 	check(envVarMap["SERVER_NAME"] == "example.com");
 	check(envVarMap["SCRIPT_FILENAME"] != "");
@@ -294,7 +292,9 @@ int main(void)
 	
 	check(envVarMap["SCRIPT_NAME"].find("test-cgi.php") != std::string::npos);
 	
-	// check(envVarMap["PATH_INFO"] == "examplePathInfo"); 
+	check(envVarMap["PATH_INFO"] == "/addition/?query=true"); 
+	check(envVarMap["PATH_TRANSLATED"] == s_pwd + "/cgi/addition/?query=true"); 
+	check(envVarMap["QUERY_STRING"] == "query=true"); 
 	
 	check(envVarMap["GATEWAY_INTERFACE"] == "CGI/1.1");
 	check(envVarMap["SERVER_PROTOCOL"] == "HTTP/1.1");
@@ -367,6 +367,20 @@ int main(void)
 	check(pr.queryString == queryString);
 	check(pr.pathTranslated == pathTranslated);
 	// check(pr.pathInfo == pr.pathInfo);
+
+	out("Path transformations | Another check");
+	requestUri = "http://example.com/cgi/test.php/addition/?query=true";
+	scriptName = "/var/www/test.php";
+	pathInfo = "/addition/?query=true"; // or ""?
+	queryString = "query=true";
+	pathTranslated = "/var/www/addition/?query=true";
+
+	pr = CGIHandler::parsePath(requestUri, scriptName);
+	check(pr.pathInfo == pathInfo);
+	check(pr.queryString == queryString);
+	check(pr.pathTranslated == pathTranslated);
+
+
 
 	test_results();
 
