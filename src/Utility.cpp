@@ -115,3 +115,72 @@ int	ft_atoi(const char *str)
 	}
 	return (nbr * sign);
 }
+
+size_t	ft_strlen(const char *str)
+{
+	char *start;
+
+	start = (char *)str;
+	while (*str)
+		str++;
+	return ((size_t)(str - start));
+}
+
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+	unsigned int i;
+	unsigned int limit;
+
+	i = 0;
+	limit = (unsigned int)(dstsize - 1);
+	if (!dst || !src)
+		return (0);
+	if (dstsize == 0)
+		return (ft_strlen(src));
+	while (src[i] != '\0' && i < limit)
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	dst[i] = '\0';
+	return (ft_strlen(src));
+}
+
+char *cppalloc(size_t size)
+{
+	char *ret = new char[size];
+	return ret;
+}
+
+char	*ft_strdup(const char *s1)
+{
+	char	*p;
+	size_t	len;
+
+	len = ft_strlen(s1);
+	if ((p = cppalloc(sizeof(char) * (len + 1))) == NULL)
+		return (NULL);
+	ft_strlcpy(p, s1, len + 1);
+	p[len] = '\0';
+	return (p);
+}
+
+std::string		ft_itostr(int n)
+{
+	std::string		result;
+	long long int	nbr;
+
+	if (n < 0)
+		nbr = n == -2147483648 ? 2147483648 : -n;
+	else
+		nbr = n;
+	do
+	{
+		result.insert(0, std::string(1, nbr % 10 + '0'));
+		nbr /= 10;
+	}
+	while (nbr != 0);
+	if (n < 0)
+		result.insert(0, "-");
+	return (result);
+}

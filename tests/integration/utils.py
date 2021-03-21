@@ -76,6 +76,7 @@ class TestBlock(Printer):
         from here.
         """
         self.print_info(f"--- Running test block {self.__class__.__name__} ---")
+        self.setup()
         if launch_webserver:
             self.run_webserver()
         else:

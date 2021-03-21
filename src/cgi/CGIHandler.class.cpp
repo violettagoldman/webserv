@@ -12,75 +12,6 @@
 
 #include "CGIHandler.class.hpp"
 
-size_t	ft_strlen(const char *str)
-{
-	char *start;
-
-	start = (char *)str;
-	while (*str)
-		str++;
-	return ((size_t)(str - start));
-}
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	unsigned int i;
-	unsigned int limit;
-
-	i = 0;
-	limit = (unsigned int)(dstsize - 1);
-	if (!dst || !src)
-		return (0);
-	if (dstsize == 0)
-		return (ft_strlen(src));
-	while (src[i] != '\0' && i < limit)
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (ft_strlen(src));
-}
-
-char *cppalloc(size_t size)
-{
-	char *ret = new char[size];
-	return ret;
-}
-
-char	*ft_strdup(const char *s1)
-{
-	char	*p;
-	size_t	len;
-
-	len = ft_strlen(s1);
-	if ((p = cppalloc(sizeof(char) * (len + 1))) == NULL)
-		return (NULL);
-	ft_strlcpy(p, s1, len + 1);
-	p[len] = '\0';
-	return (p);
-}
-
-std::string		ft_itostr(int n)
-{
-	std::string		result;
-	long long int	nbr;
-
-	if (n < 0)
-		nbr = n == -2147483648 ? 2147483648 : -n;
-	else
-		nbr = n;
-	do
-	{
-		result.insert(0, std::string(1, nbr % 10 + '0'));
-		nbr /= 10;
-	}
-	while (nbr != 0);
-	if (n < 0)
-		result.insert(0, "-");
-	return (result);
-}
-
 char **create_envp(std::vector<std::string> mvars)
 {
 	char **ret = new char*[mvars.size()+1];
@@ -274,9 +205,10 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	_cgiRequest.contentType = getHeaderStringByKey(hds, "Content-Type");
 
 	// TODO
-	// _cgiRequest.pathInfo = ;
-	// _cgiRequest.pathTranslated = ;
-	// _cgiRequest.queryString = ;
+	pathResult pr = parsePath(cr.requestURI, cr.scriptName);
+	_cgiRequest.pathInfo = pr.pathInfo;
+	_cgiRequest.pathTranslated = pr.pathTranslated;
+	_cgiRequest.queryString = pr.queryString;
 
 	_cgiRequest.requestMethod = icr.getMethod();
 
@@ -384,4 +316,102 @@ void CGIHandler::readCgiResponse(int fd)
 		this->cgiResponse += resplineString + "\n";
 	}
 	// this->cgiResponse += resplineString + "\n";
+}
+
+pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
+{
+	pathResult ret;
+	size_t scriptNameStart = scriptName.rfind('/');
+	std::string scriptFilename = scriptName.substr(scriptNameStart);
+
+	size_t scriptPosition = requestURI.rfind(scriptFilename);
+
+
+	std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
+
+	ret.pathInfo = urldecode(afterScript);
+
+	size_t queryStringStart = afterScript.find("?");
+
+	if (queryStringStart != std::string::npos)
+		ret.queryString = afterScript.substr(queryStringStart+1);
+	else
+		ret.queryString = "";
+
+	std::string localPath = scriptName.substr(0, scriptNameStart);
+	ret.pathTranslated = localPath + ret.pathInfo;
+
+	return ret;
+
+}
+
+int ft_find(const char *str, const char c)
+{
+	size_t i = 0;
+	while (str[i])
+	{
+		if (str[i] == c)
+			return i;
+		i++;
+	}
+	return -1;
+}
+
+int	ft_atoi_base(const char *str, const char *base)
+{
+	int		nbr;
+	int		sign;
+	int		newval;
+
+	nbr = 0;
+	sign = 1;
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+			|| (*str) == '\r' || (*str) == ' ')
+		str++;
+	if ((*str) == '-' || (*str) == '+')
+	{
+		sign *= ((*str) == '-' ? -1 : 1);
+		str++;
+	}
+	while ((*str) != '\0')
+	{
+		nbr *= ft_strlen(base);
+		newval = ft_find(base, *str);
+		if (newval == -1)
+			throw Exception("Invalid character in ft_atoi_base.");
+		nbr += newval;
+		str++;
+	}
+	return (nbr * sign);
+}
+
+char convert(std::string byte)
+{
+	char res = 0;
+	const std::string capitals = "ABCDEF";
+	if (capitals.find(byte[0]) != std::string::npos || capitals.find(byte[1]) != std::string::npos)
+		res = (char) ft_atoi_base(byte.c_str(), "0123456789ABCDEF");
+	else
+		res = (char) ft_atoi_base(byte.c_str(), "0123456789abcdef");
+	return res;
+
+}
+
+std::string CGIHandler::urldecode(std::string encodedString)
+{
+	size_t pos;
+	std::string encodedSection;
+	char replacement;
+	std::string replacementString;
+
+	while ((pos = encodedString.find("%")) != std::string::npos)
+	{
+		encodedSection = encodedString.substr(pos+1, 2);
+		replacement = convert(encodedSection);
+		replacementString.clear();
+		replacementString.push_back(replacement);
+		encodedString.replace(pos, 3, replacementString);
+
+	}
+	return encodedString;
 }
