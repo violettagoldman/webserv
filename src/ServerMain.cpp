@@ -80,8 +80,8 @@ int		main(int argc, char **argv)
 					else if (request.getState() == "read" || request.getState() == "error")
 					{
 						request.print_headers();
-						final_path = handler(request, conf, conf.getVirtualHostVector()[s]); // use all virtual hosts
-						Location loc = handlerGetLocation(request, conf.getVirtualHostVector()[s]); // use all virtual hosts
+						final_path = handler(request, conf);
+						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
 						if (loc.getFcgiPass() != "")
 						{
 							CGIRequires cr =
