@@ -21,6 +21,21 @@ TestCGIRequest::TestCGIRequest(
 	_method(method), _body(body), _headers(headers),
 	_path(path)
 {
+	std::string longValue;
+	std::vector<std::string> valueVector;
+	std::string finalString;
+
+	for (size_t i = 0; i < headers.size(); ++i)
+	{
+		valueVector = headers[i].getValue();
+		longValue = "";
+		for (size_t j = 0; j < valueVector.size(); j++)
+			longValue += valueVector[j];
+
+		Request::addHeader(headers[i].getName() + ": " + longValue + "\n");
+		/* code */
+	}
+	// std::cout << "Constructor got: " << headers.size() << std::endl;
 }
 
 
