@@ -14,7 +14,7 @@ class Response
 	public:
 		Response(void);
 		Response(Request req, Location loc, std::string fp);
-		// Response(CGI cgi);
+		Response(std::string cgi_response);
 		Response(Response const &src);
 		~Response(void);
 

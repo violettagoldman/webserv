@@ -62,7 +62,6 @@ std::string path_to_pattern(std::string path)
 int count_match(std::string str1, std::string str2)
 {
 	int count = 0;
-
 	int i = 0;
 	while (str1[i] != '\0' && str2[i] != '\0')
 	{
@@ -125,7 +124,7 @@ std::string handler(Request req, Config conf, VirtualHost vh)
 	std::vector<Location>::iterator it_best;
 	for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 	{
-		if (it_loc->getPattern() == request_pattern)
+		if (it_loc->getPattern() == request_path)
 		{
 			it_best = it_loc;
 			break;
@@ -169,7 +168,7 @@ Location	handlerGetLocation(Request req, VirtualHost conf)
 	std::vector<Location>::iterator it_best;
 	for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 	{
-		if (it_loc->getPattern() == request_pattern)
+		if (it_loc->getPattern() == request_path)
 			return (*it_loc);
 		if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
 		{

@@ -12,6 +12,12 @@ Response::Response(Request req, Location loc, std::string fp)
 	handleMethod(loc);
 }
 
+Response::Response(std::string cgi_response)
+{
+	(void)cgi_response;
+	// handleCGI(cgi_response);
+}
+
 // Response::Response(Response const &src)
 // {
 // 	*this = src;
