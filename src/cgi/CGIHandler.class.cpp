@@ -12,6 +12,11 @@
 
 #include "CGIHandler.class.hpp"
 
+/*
+** Create an environment pointer
+** @param mvars The vector of key=value environment variable strings
+** @ret char ** Envp to pass to execve
+*/
 char **create_envp(std::vector<std::string> mvars)
 {
 	char **ret = new char*[mvars.size()+1];
@@ -23,6 +28,10 @@ char **create_envp(std::vector<std::string> mvars)
 	return ret;
 }
 
+/*
+** Return true if the CGI called is php-cgi binary, and false otherwise.
+** @param pathToCGI the path to the CGI executable called
+*/
 bool isCgiPhpCgi(std::string pathToCGI)
 {
 	if (pathToCGI == "/usr/local/bin/php-cgi" || pathToCGI.find("php-cgi") != std::string::npos)
@@ -30,45 +39,60 @@ bool isCgiPhpCgi(std::string pathToCGI)
 	return false;
 }
 
+/*
+** Execute the CGI binary, passing the script name as argument
+*/
 void CGIHandler::execute_cgi()
 {
 	char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
 	char *cgiPath = const_cast<char *>(_cgiRequest.pathToCGI.c_str());
 
+	// Apparently, php-cgi doesn't like the script name as argument
 	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
 		reqfile = NULL;
 
 	char *const argv[] = {cgiPath, reqfile};
 
-	execve(cgiPath, argv, envp);
+	execve(cgiPath, argv, _envp);
 }
 
+/*
+** Prepare all the pipes (pipe to write in stdin, pipe to read from stdout)
+** and launch the CGI binary.
+*/
 void CGIHandler::launch_cgi()
 {
 	close(STDIN_FILENO);
-	dup(pipe_in[0]);
+	dup(_pipeIn[0]);
 	close(STDOUT_FILENO);
-	dup(pipe_out[1]);
+	dup(_pipeOut[1]);
 	execute_cgi();
 }
 
+/*
+** Create the pipes to write in stdin, and to read from stdout
+*/
 void CGIHandler::openPipes(void)
 {
-	pipe(pipe_in);
-	pipe(pipe_out);
+	pipe(_pipeIn);
+	pipe(_pipeOut);
 }
 
+/*
+** Create the environment variables that are required by the CGI standard,
+** and save them as a vector of strings
+*/
 void CGIHandler::prepareEnvp(void)
 {
 	std::vector<std::string> v;
 
 	v.push_back("AUTH_TYPE=" + _cgiRequest.authType); // basic / digest (request.Authorization)
 
-	if (bodySize > 0)
-		v.push_back("CONTENT_LENGTH=" + ft_itostr(bodySize));
+	if (_bodySize > 0)
+		v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
-	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
+	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost); // not present in the subject
 
 	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
@@ -86,23 +110,22 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
 	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
 
-
 	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
 	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
-
 
 	v.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	v.push_back("SERVER_SOFTWARE=Webserv/1.1");
 
-
 	v.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	v.push_back("REDIRECT_STATUS=200");
 
-
-	this->envp = create_envp(v);
+	_envp = create_envp(v);
 
 }
 
+/*
+** Launch the CGI binary in a child process, and wait for it to finish
+*/
 void CGIHandler::handleCgi(void)
 {
 	pid_t pid;
@@ -117,6 +140,13 @@ void CGIHandler::handleCgi(void)
 	waitpid(pid, NULL, 0);
 }
 
+/*
+** Find a header in a vector of headers by key, and return all its values
+** @param key The key that has to be equal to the key in header
+** @param hds The vector of headers to be searched in
+** @ret vector<string> All the values of the header if present, empty vector
+** 	if no header was found.
+*/
 std::vector<std::string> getHeaderByKey(std::vector<Header> hds, std::string key)
 {
 	for (size_t i = 0; i < hds.size(); i++)
@@ -129,6 +159,17 @@ std::vector<std::string> getHeaderByKey(std::vector<Header> hds, std::string key
 	return std::vector<std::string>();
 }
 
+
+/*
+** Find a header in a vector of headers by key, and return its only,
+** or first value (and print a warning if there is many values).
+** This is useful because in Request headers are only splited by ; so 
+** most of headers will only have 1 value.
+** @param key The key to look for.
+** @param hds The vector of headers to look in.
+** @ret string The value, or an empty string if no header found.
+** 
+*/
 std::string getHeaderStringByKey(std::vector<Header> hds, std::string key)
 {
 	std::vector<std::string> result = getHeaderByKey(hds, key);
@@ -139,7 +180,7 @@ std::string getHeaderStringByKey(std::vector<Header> hds, std::string key)
 		return result[0];
 	else
 	{
-		std::cout << "[CGI] Warning: header by key " << key << " contains too many variables" << std::endl;
+		std::cout << "[CGI] Warning: header by key " << key << " contains too many values" << std::endl;
 		return "";
 	}
 }
@@ -178,12 +219,11 @@ authResult CGIHandler::parseAuth(std::string authHeader)
 	return ret;
 }
 
-// std::string parseAuth(std::string authValue)
-// {
-// 	std::vector<std::string> words = split(authValue, ' ');
-// }
-
-
+/*
+** A constructor from a Request and a structure of necessary parameters.
+** @param icr The request that was matched to be served by CGI
+** @param cr All other necessary information in a structure
+*/
 CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 {
 
@@ -204,7 +244,6 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 
 	_cgiRequest.contentType = getHeaderStringByKey(hds, "Content-Type");
 
-	// TODO
 	pathResult pr = parsePath(cr.requestURI, cr.scriptName);
 	_cgiRequest.pathInfo = pr.pathInfo;
 	_cgiRequest.pathTranslated = pr.pathTranslated;
@@ -232,50 +271,53 @@ CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
 }
 
 /*
-** Does all the internal work
+** This is the dispatch function that controls what CGI will do, 
+** and in what order, to prevent repetition in constructors.
+** @param body The request body.
 */
 void CGIHandler::pipeline(std::string body)
 {
 	countBodySize(body);
 	openPipes();
 	prepareEnvp();
-	writeBodyString(pipe_in[1], body);
+	writeBodyString(_pipeIn[1], body);
 	handleCgi();
-	close(pipe_out[1]);
-	readCgiResponse(pipe_out[0]);
+	close(_pipeOut[1]);
+	readCgiResponse(_pipeOut[0]);
 }
 
-
+/*
+** Count the body size in octets to pass to CGI.
+** @param s The request body.
+*/
 void CGIHandler::countBodySize(std::string s)
 {
-	this->bodySize = s.size();
+	_bodySize = s.size();
 }
 
-void CGIHandler::countBodySize(std::vector<std::string> vs)
-{
-	this->bodySize = 0;
-	for (size_t i = 0; i < vs.size(); i++)
-	{
-		bodySize += vs[i].size();
-	}
-}
-
+/*
+** The getter for cgiResponse
+*/
 std::string CGIHandler::getCgiResponse(void) const
 {
-	return cgiResponse;
+	return _cgiResponse;
 }
 
+/*
+** Write the body string to a given fd.
+** @param body The request body.
+** @param fd The file descriptor where the body should be written.
+*/
 void CGIHandler::writeBodyString(int fd, std::string body)
 {
 	write(fd, body.c_str(), body.size());
 }
 
-void CGIHandler::writeBodyStringVector(int fd, std::vector<std::string> body)
-{
-	for (size_t i = 0; i < body.size(); i++)
-		write(fd, body[i].c_str(), body[i].size());
-}
-
+/*
+** As we're doing a read, we have to check if the output fd is ready for
+** reading through select().
+** @param fd The file descriptor where we will be reading the response from.
+*/
 void cgi_response_select(int fd)
 {
 	fd_set rfds;
@@ -302,6 +344,10 @@ void cgi_response_select(int fd)
 
 }
 
+/*
+** Read the CGI's response from the piped standard output.
+** @param fd The file descriptor where the CGI's stdout is piped to.
+*/
 void CGIHandler::readCgiResponse(int fd)
 {
 	char *respline;
@@ -313,11 +359,16 @@ void CGIHandler::readCgiResponse(int fd)
 	{
 		cgi_response_select(fd);
 		resplineString.assign(respline);
-		this->cgiResponse += resplineString + "\n";
+		_cgiResponse += resplineString + "\n";
 	}
-	// this->cgiResponse += resplineString + "\n";
 }
 
+/*
+** Parse the path of the request into the segments required by the CGI
+** standard (PATH_INFO, PATH_TRANSLATED, QUERY_STRING)
+** @param requestURI The full path of the request.
+** @param scriptName The matched path to the CGI script in our document root.
+*/
 pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 {
 	pathResult ret;
@@ -345,6 +396,12 @@ pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 
 }
 
+/*
+** Return the index of c in str, and -1 if c is not in str.
+** @param str The string to find c in.
+** @param c The character to be found in str.
+** @ret int The index of c in str, or -1 if c is not in str.
+*/
 int ft_find(const char *str, const char c)
 {
 	size_t i = 0;
@@ -357,6 +414,15 @@ int ft_find(const char *str, const char c)
 	return -1;
 }
 
+/*
+** Read the base base integer from str, and return it as an int.
+** Skip all whitespace in the beginning of the string.
+** Only one - or + is allowed in the beginning.
+** Then, an integer followed by a \0.
+** @param str The string containing the string in a specified base
+** @param base The base in which the integer is in string
+** @ret int The value of the said integer.
+*/
 int	ft_atoi_base(const char *str, const char *base)
 {
 	int		nbr;
@@ -385,6 +451,11 @@ int	ft_atoi_base(const char *str, const char *base)
 	return (nbr * sign);
 }
 
+/*
+** Convert a hexadecimal byte passed as parameter to a character in ASCII.
+** @param byte A byte in hexadecimal, either in capitals or not.
+** @ret char A corresponding character in ASCII.
+*/
 char convert(std::string byte)
 {
 	char res = 0;
@@ -397,6 +468,11 @@ char convert(std::string byte)
 
 }
 
+/*
+** Decode a percent-encoded string and return it.
+** @param encodedString The percent-encoded string.
+** @ret string The decoded string.
+*/
 std::string CGIHandler::urldecode(std::string encodedString)
 {
 	size_t pos;
