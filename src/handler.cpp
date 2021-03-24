@@ -3,23 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   handler.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
 /*   Updated: 2021/03/05 15:59:18 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/Server.class.hpp"
-#include "../inc/Config.class.hpp"
-#include "../inc/Location.class.hpp"
-#include "../inc/VirtualHost.class.hpp"
+#include "Server.class.hpp"
+#include "Config.class.hpp"
+#include "Location.class.hpp"
+#include "VirtualHost.class.hpp"
 #include <sys/time.h>
 #include <unistd.h>
-#include "../inc/Request.class.hpp"
-
-
-
+#include "Request.class.hpp"
 
 int check_listen(VirtualHost host, Header host_header)
 {
@@ -28,6 +25,7 @@ int check_listen(VirtualHost host, Header host_header)
 	size_t pos;
 	int request_server_port;
 	std::string request_server_name;
+
 
 	request_host = host_header.getValue()[0];
 	std::cout << host.getListenIp() << std::endl;
@@ -40,11 +38,16 @@ int check_listen(VirtualHost host, Header host_header)
 	{
 		request_server_name = host_header.getValue()[0];
 		//probably should set to default supported
-		request_server_port = 80;
+		request_server_port = host.getListenIp();
 	}
 	for (std::vector<std::string>::iterator it = server_names.begin(); it < server_names.end(); ++it)
+	{
+		std::cout << "Server name: " <<*it << std::endl;
+		if (*it == "" && host.getListenIp() == request_server_port)
+			return 1;
 		if (*it == request_server_name &&  host.getListenIp() == request_server_port)
 			return 1;
+	}
 	return 0;
 }
 
@@ -59,7 +62,6 @@ std::string path_to_pattern(std::string path)
 int count_match(std::string str1, std::string str2)
 {
 	int count = 0;
-
 	int i = 0;
 	while (str1[i] != '\0' && str2[i] != '\0')
 	{
@@ -95,6 +97,7 @@ std::string create_final_path(Location loc, std::string request_path)
 {
 	std::string root = loc.getRoot();
 	std::string final(root + request_path.substr(1));
+	std::cout << "Root "<< root << std::endl;
 	return final;
 }
 
@@ -107,7 +110,7 @@ bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_m
 }
 
 std::string handler(Request req, Config conf)
- {
+{
 	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
 	 std::string final("");
 	 Header host_header = *(req.getHeaderByName("Host"));
@@ -119,12 +122,16 @@ std::string handler(Request req, Config conf)
 			std::string request_path = req.getPath();
 			std::string request_pattern = path_to_pattern(request_path);
 			std::vector<Location> server_locations = (*it).getLocations();
-			// std::vector<Location>::iterator it_best = check_location(*it, request_path);
 			int count_max = 0;
 			int count_cur;
 			std::vector<Location>::iterator it_best;
 			for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 			{
+				if (it_loc->getPattern() == request_path)
+				{
+					it_best = it_loc;
+					break;
+				}
 				if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
 				{
 					it_best = it_loc;
@@ -140,12 +147,7 @@ std::string handler(Request req, Config conf)
 					req.setError(405);
 					return final;
 				}
-				if (req.getContentLength() == (*it_best).getClientMaxBodySize())
-				{
-					req.setError(413);
-					return "";
-				}
-			 	final = create_final_path(*it_best, request_path);
+				final = create_final_path(*it_best, request_path);
 				return final;
 			}
 			else
@@ -155,6 +157,33 @@ std::string handler(Request req, Config conf)
 				std::cout << "404" << std::endl;
 			}
 		 }
-	}
+	 }
 	return final;
- }
+}
+
+Location	handlerGetLocation(Request req, Config conf)
+{
+	Header host_header = *(req.getHeaderByName("Host"));
+	std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
+
+	std::string request_path = req.getPath();
+	std::string request_pattern = path_to_pattern(request_path);
+	int count_max = 0;
+	int count_cur;
+	std::vector<Location>::iterator it_best;
+	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
+	{
+		std::vector<Location> server_locations = it->getLocations();
+		for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
+		{
+			if (it_loc->getPattern() == request_path)
+				return (*it_loc);
+			if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
+			{
+				it_best = it_loc;
+				count_max = count_cur;
+			}
+		}
+	}
+	return (*it_best);
+}

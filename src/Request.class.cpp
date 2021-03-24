@@ -58,7 +58,7 @@ std::vector<std::string> ft_split(std::string s, char c);
 Request::Request(void) :
 	_read_bytes(0)
 {
-
+	_error = 0;
    	methods[0] = "GET";
    	methods[1] = "HEAD";
    	methods[2] = "POST";
@@ -67,7 +67,6 @@ Request::Request(void) :
    	methods[5] = "CONNECT";
    	methods[6] = "OPTIONS";
    	methods[7] = "TRACE";
-	std::cout << "Defualt constructor for Request called\n";
 }
 
 Request::Request(Request const &src) :
@@ -75,18 +74,13 @@ Request::Request(Request const &src) :
 	_content_length(src._content_length), _status_line(src._status_line), _method(src._method),
  _body(src._body), _query(src._query), _path(src._path), _fragment(src._fragment),
  _error(src._error), _state(src._state)
-{
-	std::cout << "Copy constructor for Request called\n";
-}
+{}
 
 Request::~Request(void)
-{
-	std::cout << "Default destructor for Request called\n";
-}
+{}
 
 Request		&Request::operator=(Request const &src)
 {
-	std::cout << "Assignation operator called\n";
 	_headers = src._headers;
 	_status_line = src._status_line;
 	_method = src._method;
@@ -265,6 +259,7 @@ std::string chunked_decode(std::string body)
 void Request::read_request(int sd)
 {
 	char input[BUFFER_SIZE];
+	bzero(input, BUFFER_SIZE);
 	int bytes;
 	size_t pos;
 	size_t last;
@@ -274,6 +269,7 @@ void Request::read_request(int sd)
 	if (bytes == 0)
 		_state = "chill";
 	std::string to_interpret(input);
+	// std::cout << "LOL SMOTRI: \n"  << to_interpret << std::endl;
 	if (bytes > 0)
 	{
 		_state = "read";

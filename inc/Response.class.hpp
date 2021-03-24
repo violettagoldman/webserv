@@ -13,23 +13,23 @@ class Response
 {
 	public:
 		Response(void);
-		Response(Request req);
-		// Response(CGI cgi);
+		Response(Request req, Location loc, std::string fp);
+		Response(std::string cgi_response);
 		Response(Response const &src);
 		~Response(void);
 
 
 		Response	&operator=(Response const &src);
 		void		setErrorPage();
-		void		setIndexPage();
+		void		setIndexPage(Location loc);
 		std::string	serialize();
 		std::string	getDate(time_t time);
-		void		handleMethod();
-		void		get();
+		void		handleMethod(Location loc);
+		void		get(Location loc);
 		void		post();
 		void		put();
 		void		deleteMethod();
-		void		options();
+		void		options(Location loc);
 		void		connect();
 		void		trace();
 		void		error(int status);
@@ -41,13 +41,14 @@ class Response
 
 		
 	private:
-		int										_statusCode;
-		std::string								_method;
-		std::map<std::string, std::string>		_headers;
-		std::string								_body;
-		std::map<int, std::string>				_statusCodeTranslation;
-		Request									_req;
-		// Config									&_config;
+		int									_statusCode;
+		std::string							_method;
+		std::map<std::string, std::string>	_headers;
+		std::string							_body;
+		std::map<int, std::string>			_statusCodeTranslation;
+		Request								_req;
+		std::string							_fp;
+		std::map<int, std::string>			_errorPages;
 };
 
 #endif

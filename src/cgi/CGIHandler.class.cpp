@@ -12,85 +12,6 @@
 
 #include "CGIHandler.class.hpp"
 
-size_t	ft_strlen(const char *str)
-{
-	char *start;
-
-	start = (char *)str;
-	while (*str)
-		str++;
-	return ((size_t)(str - start));
-}
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
-{
-	unsigned int i;
-	unsigned int limit;
-
-	i = 0;
-	limit = (unsigned int)(dstsize - 1);
-	if (!dst || !src)
-		return (0);
-	if (dstsize == 0)
-		return (ft_strlen(src));
-	while (src[i] != '\0' && i < limit)
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (ft_strlen(src));
-}
-
-char *cppalloc(size_t size)
-{
-	char *ret = new char[size];
-	return ret;
-}
-
-char	*ft_strdup(const char *s1)
-{
-	char	*p;
-	size_t	len;
-
-	len = ft_strlen(s1);
-	if ((p = cppalloc(sizeof(char) * (len + 1))) == NULL)
-		return (NULL);
-	ft_strlcpy(p, s1, len + 1);
-	p[len] = '\0';
-	return (p);
-}
-
-
-std::string		ft_itostr(int n)
-{
-	std::string		result;
-	long long int	nbr;
-
-	if (n < 0)
-		nbr = n == -2147483648 ? 2147483648 : -n;
-	else
-		nbr = n;
-	do
-	{
-		result.insert(0, std::string(1, nbr % 10 + '0'));
-		nbr /= 10;
-	}
-	while (nbr != 0);
-	if (n < 0)
-		result.insert(0, "-");
-	return (result);
-}
-
-// TODO redo without free
-// std::string ft_itostr(int n)
-// {
-// 	char *s = ft_itoa(n);
-// 	std::string str(s);
-// 	free(s);
-// 	return str;
-// }
-
 char **create_envp(std::vector<std::string> mvars)
 {
 	char **ret = new char*[mvars.size()+1];
@@ -147,14 +68,16 @@ void CGIHandler::prepareEnvp(void)
 		v.push_back("CONTENT_LENGTH=" + ft_itostr(bodySize));
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
-	v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
+	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost);
+
 	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
-	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
-	v.push_back("PATH_INFO=" + _cgiRequest.requestURI);
 
-	v.push_back("PATH_TRANSLATED=");
-	v.push_back("QUERY_STRING=");
+	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
+	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
+
+	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
+	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
 
 	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
@@ -178,19 +101,6 @@ void CGIHandler::prepareEnvp(void)
 
 	this->envp = create_envp(v);
 
-
-	// char **envp2 = envp;
-	// while (*envp2)
-	// {
-	// 	std::cout << *envp2 << std::endl;
-	// 	envp2++;
-	// }
-
-	// while (*envp)
-	// {
-	// 	// std::cout << "Envp: " << *envp << std::endl;
-	// 	// envp++;
-	// }
 }
 
 void CGIHandler::handleCgi(void)
@@ -207,19 +117,19 @@ void CGIHandler::handleCgi(void)
 	waitpid(pid, NULL, 0);
 }
 
-std::vector<std::string> getHeaderByKey(std::vector<Header *> hds, std::string key)
+std::vector<std::string> getHeaderByKey(std::vector<Header> hds, std::string key)
 {
-	for (size_t i = 0; i < hds.size(); ++i)
+	for (size_t i = 0; i < hds.size(); i++)
 	{
-		if (hds[i]->getName() == key)
+		if (hds[i].getName() == key)
 		{
-			return hds[i]->getValue();
+			return hds[i].getValue();
 		}
 	}
 	return std::vector<std::string>();
 }
 
-std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
+std::string getHeaderStringByKey(std::vector<Header> hds, std::string key)
 {
 	std::vector<std::string> result = getHeaderByKey(hds, key);
 
@@ -234,38 +144,97 @@ std::string getHeaderStringByKey(std::vector<Header *> hds, std::string key)
 	}
 }
 
+/*
+** Parse the Authorization header
+** @param authHeader the value of the Authorization header
+** @ret authResult the structure containing parsed auth type and credentials
+*/
+authResult CGIHandler::parseAuth(std::string authHeader)
+{
+	authResult ret;
+
+	std::vector<std::string> parts = ft_split(authHeader, ' ');
+
+	if (parts.size() != 2)
+		throw Exception("Wrong Authorization header format.");
+
+	if (parts[0] == "Basic")
+	{
+		ret.authType = "Basic";
+
+		std::string decodedCreds = Base64(parts[1]).decode();
+
+		std::vector<std::string> creds = ft_split(decodedCreds, ':');
+		if (creds.size() != 2)
+			throw Exception("Wrong Basic Auth credentials format.");
+		ret.user = creds[0];
+		ret.password = creds[1];
+	}
+	else
+	{
+		throw Exception("Wrong Authorization scheme.");
+	}
+
+	return ret;
+}
+
 // std::string parseAuth(std::string authValue)
 // {
 // 	std::vector<std::string> words = split(authValue, ' ');
 // }
 
-// CGIHandler::CGIHandler(ICGIRequest icr, std::string _requestedFile)
-// {
-// 	requestedFile = _requestedFile;
-// 	_cgiRequest.scriptFilename = requestedFile;
 
-// 	std::vector<Header *> hds = icr.getHeaders();
+CGIHandler::CGIHandler(Request icr, CGIRequires cr)
+{
 
-// 	// _cgiRequest.remoteAddr = ;
-// // 	_cgiRequest.remoteHost = ;
-// 	_cgiRequest.authType = getHeaderStringByKey(hds, "Authorization");
-// // 	_cgiRequest.remoteIdent = ;
-// // 	_cgiRequest.remoteUser = ;
-// // 	_cgiRequest.contentType = ;
-
-// // 	_cgiRequest.requestMethod = ;
-// // 	_cgiRequest.requestURI = ;
-// // 	_cgiRequest.serverPort = ;
-// // 	_cgiRequest.serverName = ;
-// // 	_cgiRequest.scriptFilename = ;
-// // 	_cgiRequest.pathToCGI = ;
+	std::vector<Header> hds = icr.getHeaders();
 
 
+	// From Request headers
+	
+	// Auth
+	std::string authValue;
+	if ((authValue = getHeaderStringByKey(hds, "Authorization")) != "")
+	{
+		authResult ar = parseAuth(authValue);
+		_cgiRequest.authType = ar.authType;
+		_cgiRequest.remoteUser = ar.user;
+		_cgiRequest.remoteIdent = ar.password;
+	}
 
-// // }
+	_cgiRequest.contentType = getHeaderStringByKey(hds, "Content-Type");
 
-CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
-	requestedFile(cr.scriptFilename), _cgiRequest(cr)
+	// TODO
+	pathResult pr = parsePath(cr.requestURI, cr.scriptName);
+	_cgiRequest.pathInfo = pr.pathInfo;
+	_cgiRequest.pathTranslated = pr.pathTranslated;
+	_cgiRequest.queryString = pr.queryString;
+
+	_cgiRequest.requestMethod = icr.getMethod();
+
+
+	// Passed as parameter from matching phase and request
+
+	// 	_cgiRequest.remoteHost = ; // not present in subject
+	_cgiRequest.remoteAddr = cr.remoteAddr;
+	_cgiRequest.requestURI = cr.requestURI;
+	_cgiRequest.serverPort = cr.serverPort;
+	_cgiRequest.serverName = cr.serverName;
+	_cgiRequest.scriptFilename = cr.scriptName;
+	_cgiRequest.pathToCGI = cr.pathToCGI;
+
+	pipeline(icr.getBody());
+}
+
+CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
+{
+	pipeline(body);
+}
+
+/*
+** Does all the internal work
+*/
+void CGIHandler::pipeline(std::string body)
 {
 	countBodySize(body);
 	openPipes();
@@ -275,7 +244,6 @@ CGIHandler::CGIHandler(std::string body, CGIRequest cr) :
 	close(pipe_out[1]);
 	readCgiResponse(pipe_out[0]);
 }
-
 
 
 void CGIHandler::countBodySize(std::string s)
@@ -348,4 +316,102 @@ void CGIHandler::readCgiResponse(int fd)
 		this->cgiResponse += resplineString + "\n";
 	}
 	// this->cgiResponse += resplineString + "\n";
+}
+
+pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
+{
+	pathResult ret;
+	size_t scriptNameStart = scriptName.rfind('/');
+	std::string scriptFilename = scriptName.substr(scriptNameStart);
+
+	size_t scriptPosition = requestURI.rfind(scriptFilename);
+
+
+	std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
+
+	ret.pathInfo = urldecode(afterScript);
+
+	size_t queryStringStart = afterScript.find("?");
+
+	if (queryStringStart != std::string::npos)
+		ret.queryString = afterScript.substr(queryStringStart+1);
+	else
+		ret.queryString = "";
+
+	std::string localPath = scriptName.substr(0, scriptNameStart);
+	ret.pathTranslated = localPath + ret.pathInfo;
+
+	return ret;
+
+}
+
+int ft_find(const char *str, const char c)
+{
+	size_t i = 0;
+	while (str[i])
+	{
+		if (str[i] == c)
+			return i;
+		i++;
+	}
+	return -1;
+}
+
+int	ft_atoi_base(const char *str, const char *base)
+{
+	int		nbr;
+	int		sign;
+	int		newval;
+
+	nbr = 0;
+	sign = 1;
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
+			|| (*str) == '\r' || (*str) == ' ')
+		str++;
+	if ((*str) == '-' || (*str) == '+')
+	{
+		sign *= ((*str) == '-' ? -1 : 1);
+		str++;
+	}
+	while ((*str) != '\0')
+	{
+		nbr *= ft_strlen(base);
+		newval = ft_find(base, *str);
+		if (newval == -1)
+			throw Exception("Invalid character in ft_atoi_base.");
+		nbr += newval;
+		str++;
+	}
+	return (nbr * sign);
+}
+
+char convert(std::string byte)
+{
+	char res = 0;
+	const std::string capitals = "ABCDEF";
+	if (capitals.find(byte[0]) != std::string::npos || capitals.find(byte[1]) != std::string::npos)
+		res = (char) ft_atoi_base(byte.c_str(), "0123456789ABCDEF");
+	else
+		res = (char) ft_atoi_base(byte.c_str(), "0123456789abcdef");
+	return res;
+
+}
+
+std::string CGIHandler::urldecode(std::string encodedString)
+{
+	size_t pos;
+	std::string encodedSection;
+	char replacement;
+	std::string replacementString;
+
+	while ((pos = encodedString.find("%")) != std::string::npos)
+	{
+		encodedSection = encodedString.substr(pos+1, 2);
+		replacement = convert(encodedSection);
+		replacementString.clear();
+		replacementString.push_back(replacement);
+		encodedString.replace(pos, 3, replacementString);
+
+	}
+	return encodedString;
 }

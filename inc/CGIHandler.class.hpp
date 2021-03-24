@@ -22,7 +22,9 @@
 # include "get_next_line.h"
 # include "ICGIRequest.class.hpp"
 # include "Exception.class.hpp"
-
+# include "Request.class.hpp"
+# include "Utility.hpp"
+# include "Base64.class.hpp"
 
 # ifndef PHPCGI_PATH
 #  ifdef __APPLE__
@@ -32,14 +34,14 @@
 
 typedef struct s_CGIRequest {
 	std::string remoteAddr;
-	std::string remoteHost;
+	// std::string remoteHost;
 	std::string authType;
 	std::string remoteIdent;
 	std::string remoteUser;
 	std::string contentType;
-	// std::string pathInfo;
-	// std::string pathTranslated;
-	// std::string queryString;
+	std::string pathInfo;
+	std::string pathTranslated;
+	std::string queryString;
 	std::string requestMethod;
 	std::string requestURI;
 	std::string serverPort;
@@ -48,13 +50,38 @@ typedef struct s_CGIRequest {
 	std::string pathToCGI;
 }	CGIRequest;
 
-std::string		ft_itostr(int n);
+typedef struct s_CGIRequires {
+	std::string scriptName;
+	std::string remoteAddr;
+	std::string requestURI; // ?????
+	std::string serverPort;
+	std::string serverName;
+	std::string pathToCGI;
+}	CGIRequires;
+
+typedef struct s_authResult {
+	std::string authType;
+	std::string user;
+	std::string password;
+}	authResult;
+
+typedef struct s_pathResult {
+	std::string pathInfo;
+	std::string pathTranslated;
+	std::string queryString;
+}	pathResult;
+
+// std::string		ft_itostr(int n);
+int	ft_atoi_base(const char *str, const char *base);
+
 
 class CGIHandler {
 
 public:
 	CGIHandler(std::string body, CGIRequest cr);
-	// CGIHandler(ICGIRequest icr, std::string requestedFile);
+
+	CGIHandler(ICGIRequest icr, CGIRequires cr);
+	CGIHandler(Request icr, CGIRequires cr);
 
 	// ~CGIHandler();
 	// CGIHandler(const CGIHandler &copy);
@@ -62,8 +89,12 @@ public:
 
 	std::string getCgiResponse(void) const;
 
+	static authResult parseAuth(std::string authHeader);
+	static pathResult parsePath(std::string requestURI, std::string scriptName);
+	static std::string urldecode(std::string encodedString);
+
 private:
-	std::string requestedFile;
+	// std::string requestedFile;
 	std::string cgiResponse;
 
 	CGIRequest _cgiRequest;
@@ -89,6 +120,11 @@ private:
 	void prepareEnvp(void);
 
 	void handleCgi(void);
+
+	void pipeline(std::string body);
+
+	// void parseRequest(ICGIRequest icr);
+	// void parseRequest(Request icr);
 };
 
 #endif

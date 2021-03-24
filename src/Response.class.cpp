@@ -1,32 +1,27 @@
 #include "Response.class.hpp"
 
-Response::Response(void)
+Response::Response(Request req, Location loc, std::string fp)
 {
-	
-	_method = "GET";
-	_statusCode = 200;
-	statusCodeTranslation();
-	_headers["Date"] = getDate(getTime());
-	_headers["Server"] = "Webserv/1.0 (Unix)";
-	std::cout << "Default constructor called\n";
-	handleMethod();
-}
-
-Response::Response(Request req)
-{
+	_fp = fp;
 	_req = req;
 	_method = _req.getMethod();
 	_statusCode = 200;
 	statusCodeTranslation();
 	_headers["Date"] = getDate(getTime());
 	_headers["Server"] = "Webserv/1.0 (Unix)";
-	handleMethod();
+	handleMethod(loc);
 }
 
-Response::Response(Response const &src)
+Response::Response(std::string cgi_response)
 {
-	*this = src;
+	(void)cgi_response;
+	// handleCGI(cgi_response);
 }
+
+// Response::Response(Response const &src)
+// {
+// 	*this = src;
+// }
 
 Response::~Response(void)
 {
@@ -37,7 +32,6 @@ Response		&Response::operator=(Response const &src)
 	if (this != &src)
 	{
 		this->_req = src._req;
-		// this->_config = src._config;
 		this->_body = src._body;
 		this->_headers = src._headers;
 		this->_method = src._method;
@@ -47,13 +41,21 @@ Response		&Response::operator=(Response const &src)
 	return (*this);
 }
 
-void			Response::handleMethod()
+void			Response::handleMethod(Location loc)
 {
 	std::string option;
+	(void)loc;
 
+	_errorPages = loc.getErrorPage();
 	option = _method;
+	if (_req.getError() != 0)
+	{
+		error(_req.getError());
+		return;
+
+	}
 	if (option == "GET")
-		get();
+		get(loc);
 	else if (option == "POST")
 		post();
 	else if (option == "PUT")
@@ -61,7 +63,7 @@ void			Response::handleMethod()
 	else if (option == "DELETE")
 		deleteMethod();
 	else if (option == "OPTIONS")
-		options();
+		options(loc);
 	else if (option == "CONNECT")
 		connect();
 	else if (option == "TRACE")
@@ -70,47 +72,52 @@ void			Response::handleMethod()
 		error(405);
 }
 
-void		Response::get()
+void		Response::get(Location loc)
 {
 	bool			autoindex;
 	std::string		path;
 	struct stat		fileStat;
 	int				fd;
 
-	path = _req.getPath();
-	autoindex = false;
-	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
+	path = _fp;
+	autoindex = loc.getAutoindex();
+	fd = open(path.c_str(), O_RDONLY);
+	if (fd < 0)
 	{
 		error(404);
 		setContentType(".html");
-		return ;
-	}
-	if (fstat(fd, &fileStat) < 0)
-	{
-		error(403);
 		close(fd);
 		return ;
 	}
-	if (!(fileStat.st_mode & S_IREAD))
-	{
-		error(403);
-		close(fd);
-		return ;
-	}
+	fstat(fd, &fileStat);
 	if (S_ISDIR(fileStat.st_mode))
 	{
-		if (autoindex)
-			setIndexPage();
-		else
-			error(403);
+		bool is_index = false;
+		close(fd);
+		for (size_t i = 0; i < loc.getIndex().size(); ++i)
+		{
+			std::string index = path + loc.getIndex()[i];
+			int fd_try = open(index.c_str(), O_RDONLY);
+			if (fd_try >= 0)
+			{
+				close(fd);
+				path = index;
+				is_index = true;
+			}
+		}
+		if (!is_index)
+		{
+			if (autoindex)
+				setIndexPage(loc);
+			else
+				error(403);
+			return ;
+		}
 	}
-	else
-	{
-		_body = readFile(path);
-		_headers["Last-Modified"] = getDate(fileStat.st_mtime);
-		setLastModified(fd);
-		setContentType(path);
-	}
+	_body = readFile(path);
+	_headers["Last-Modified"] = getDate(fileStat.st_mtime);
+	setLastModified(fd);
+	setContentType(path);
 	close(fd);
 }
 
@@ -210,13 +217,16 @@ void		Response::setErrorPage()
 	std::string		html;
 
 	// check for customised pages
-	html = readFile("./pages/error.html");
+	if (_errorPages.count(_statusCode) > 0)
+		html = readFile(_errorPages[_statusCode]);
+	else
+		html = readFile("./pages/error.html");
 	html = replacehtml(html, "$1", ft_itoa(_statusCode));
 	html = replacehtml(html, "$2", _statusCodeTranslation[_statusCode]);
 	_body = html;
 }
 
-void		Response::setIndexPage()
+void		Response::setIndexPage(Location loc)
 {
 	std::string		html;
 	std::string		li;
@@ -225,7 +235,7 @@ void		Response::setIndexPage()
 
 	html = readFile("./pages/index.html");
 	html = replacehtml(html, "$1", _req.getPath());
-	currentDirectory= opendir(".");
+	currentDirectory= opendir(loc.getRoot().c_str());
 	if (currentDirectory)
 	{
 		while ((dir = readdir(currentDirectory)) != NULL)
@@ -243,7 +253,7 @@ void		Response::post()
 	std::string path;
 
 	fd = -1;
-	path = _req.getPath();
+	path = _fp;
 	exist = checkPathExistance(path);
 	if (exist == 1)
 	{
@@ -274,7 +284,7 @@ void		Response::put()
 	int exist;
 
 	fd = -1;
-	std::string path = "/tmp/test_put1";
+	std::string path = _fp;
 	exist = checkPathExistance(path);
 	if (exist == 1)
 	{
@@ -297,7 +307,7 @@ void		Response::put()
 			else
 			{
 				_statusCode = 201;
-				_headers["Location"] = "get url from request"; // ask to add
+				_headers["Location"] = _req.getPath();
 			}
 		}
 		else
@@ -311,7 +321,7 @@ void		Response::deleteMethod()
 	std::string path;
 	int	fd;
 
-	path = _req.getPath();
+	path = _fp;
 	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
 	{
 		error(404);
@@ -325,12 +335,23 @@ void		Response::deleteMethod()
 	
 }
 
-void		Response::options()
+void		Response::options(Location loc)
 {
 	// connect to config
-	std::string		methods;
+	std::string		methods = "";
 
-	_headers["Allow"] = "GET, PUT, CONNECT";
+	if (loc.getLimitExcept().getMethods().size() == 0)
+		methods = "GET, POST, PUT, DELETE, CONNECT, TRACE, OPTIONS";
+	else
+	{
+		for (size_t i = 0; i < loc.getLimitExcept().getMethods().size(); ++i)
+		{
+			methods += loc.getLimitExcept().getMethods()[i];
+			if (i < loc.getLimitExcept().getMethods().size() - 1)
+				methods += ", ";
+		}
+	}
+	_headers["Allow"] = methods;
 	_statusCode = 200;
 }
 
@@ -341,6 +362,16 @@ void		Response::connect()
 
 void		Response::trace()
 {
+	std::string response = "";
+	for (size_t i = 0; i < _req.getHeaders().size(); ++i)
+	{
+		response += _req.getHeaders()[i].getName() + ": " + _req.getHeaders()[i].getValue()[0];
+		response += "\r\n";
+	}
+	response += "\r\n";
+	response += _req.getBody();
+	_body = response;
+	_statusCode = 200;
 }
 
 std::string		Response::getDate(time_t time)
@@ -383,10 +414,7 @@ std::string 	Response::serialize()
 	std::string res;
 
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
-	{
 		_headers["Content-Length"] = ft_itoa(_body.length());
-		std::cout << _body;
-	}
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
