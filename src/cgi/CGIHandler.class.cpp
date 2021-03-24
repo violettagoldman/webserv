@@ -13,22 +13,6 @@
 #include "CGIHandler.class.hpp"
 
 /*
-** Create an environment pointer
-** @param mvars The vector of key=value environment variable strings
-** @ret char ** Envp to pass to execve
-*/
-char **create_envp(std::vector<std::string> mvars)
-{
-	char **ret = new char*[mvars.size()+1];
-	for (size_t i = 0; i < mvars.size(); i++)
-	{
-		ret[i] = ft_strdup(mvars[i].c_str());
-	}
-	ret[mvars.size()] = NULL;
-	return ret;
-}
-
-/*
 ** Return true if the CGI called is php-cgi binary, and false otherwise.
 ** @param pathToCGI the path to the CGI executable called
 */
@@ -39,106 +23,6 @@ bool isCgiPhpCgi(std::string pathToCGI)
 	return false;
 }
 
-/*
-** Execute the CGI binary, passing the script name as argument
-*/
-void CGIHandler::execute_cgi()
-{
-	char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
-	char *cgiPath = const_cast<char *>(_cgiRequest.pathToCGI.c_str());
-
-	// Apparently, php-cgi doesn't like the script name as argument
-	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
-		reqfile = NULL;
-
-	char *const argv[] = {cgiPath, reqfile};
-
-	execve(cgiPath, argv, _envp);
-}
-
-/*
-** Prepare all the pipes (pipe to write in stdin, pipe to read from stdout)
-** and launch the CGI binary.
-*/
-void CGIHandler::launch_cgi()
-{
-	close(STDIN_FILENO);
-	dup(_pipeIn[0]);
-	close(STDOUT_FILENO);
-	dup(_pipeOut[1]);
-	execute_cgi();
-}
-
-/*
-** Create the pipes to write in stdin, and to read from stdout
-*/
-void CGIHandler::openPipes(void)
-{
-	pipe(_pipeIn);
-	pipe(_pipeOut);
-}
-
-/*
-** Create the environment variables that are required by the CGI standard,
-** and save them as a vector of strings
-*/
-void CGIHandler::prepareEnvp(void)
-{
-	std::vector<std::string> v;
-
-	v.push_back("AUTH_TYPE=" + _cgiRequest.authType); // basic / digest (request.Authorization)
-
-	if (_bodySize > 0)
-		v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
-
-	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
-	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost); // not present in the subject
-
-	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
-	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
-
-	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
-	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
-
-	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
-	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
-
-	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
-	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
-	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
-	
-	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
-	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
-
-	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
-	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
-
-	v.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	v.push_back("SERVER_SOFTWARE=Webserv/1.1");
-
-	v.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	v.push_back("REDIRECT_STATUS=200");
-
-	_envp = create_envp(v);
-
-}
-
-/*
-** Launch the CGI binary in a child process, and wait for it to finish
-*/
-void CGIHandler::handleCgi(void)
-{
-	pid_t pid;
-	extern int errno;
-	
-	pid = fork();
-	
-	if (pid == 0)
-	{
-		launch_cgi();
-	}
-	waitpid(pid, NULL, 0);
-}
 
 /*
 ** Find a header in a vector of headers by key, and return all its values
@@ -296,11 +180,72 @@ void CGIHandler::countBodySize(std::string s)
 }
 
 /*
-** The getter for cgiResponse
+** Create the pipes to write in stdin, and to read from stdout
 */
-std::string CGIHandler::getCgiResponse(void) const
+void CGIHandler::openPipes(void)
 {
-	return _cgiResponse;
+	pipe(_pipeIn);
+	pipe(_pipeOut);
+}
+
+/*
+** Create the environment variables that are required by the CGI standard,
+** and save them as a vector of strings
+*/
+void CGIHandler::prepareEnvp(void)
+{
+	std::vector<std::string> v;
+
+	v.push_back("AUTH_TYPE=" + _cgiRequest.authType); // basic / digest (request.Authorization)
+
+	if (_bodySize > 0)
+		v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
+
+	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
+	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost); // not present in the subject
+
+	v.push_back("REMOTE_IDENT=" + _cgiRequest.remoteIdent);
+	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
+
+	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
+	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
+
+	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
+	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
+
+	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
+	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
+	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
+	
+	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
+	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
+
+	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
+	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
+
+	v.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	v.push_back("SERVER_SOFTWARE=Webserv/1.1");
+
+	v.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	v.push_back("REDIRECT_STATUS=200");
+
+	_envp = create_envp(v);
+}
+
+/*
+** Create an environment pointer
+** @param mvars The vector of key=value environment variable strings
+** @ret char ** Envp to pass to execve
+*/
+char **create_envp(std::vector<std::string> mvars)
+{
+	char **ret = new char*[mvars.size()+1];
+	for (size_t i = 0; i < mvars.size(); i++)
+	{
+		ret[i] = ft_strdup(mvars[i].c_str());
+	}
+	ret[mvars.size()] = NULL;
+	return ret;
 }
 
 /*
@@ -311,6 +256,53 @@ std::string CGIHandler::getCgiResponse(void) const
 void CGIHandler::writeBodyString(int fd, std::string body)
 {
 	write(fd, body.c_str(), body.size());
+}
+
+/*
+** Launch the CGI binary in a child process, and wait for it to finish
+*/
+void CGIHandler::handleCgi(void)
+{
+	pid_t pid;
+	extern int errno;
+	
+	pid = fork();
+	
+	if (pid == 0)
+	{
+		launch_cgi();
+	}
+	waitpid(pid, NULL, 0);
+}
+
+/*
+** Prepare all the pipes (pipe to write in stdin, pipe to read from stdout)
+** and launch the CGI binary.
+*/
+void CGIHandler::launch_cgi()
+{
+	close(STDIN_FILENO);
+	dup(_pipeIn[0]);
+	close(STDOUT_FILENO);
+	dup(_pipeOut[1]);
+	execute_cgi();
+}
+
+/*
+** Execute the CGI binary, passing the script name as argument
+*/
+void CGIHandler::execute_cgi()
+{
+	char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
+	char *cgiPath = const_cast<char *>(_cgiRequest.pathToCGI.c_str());
+
+	// Apparently, php-cgi doesn't like the script name as argument
+	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
+		reqfile = NULL;
+
+	char *const argv[] = {cgiPath, reqfile};
+
+	execve(cgiPath, argv, _envp);
 }
 
 /*
@@ -341,7 +333,6 @@ void cgi_response_select(int fd)
 		return ;
 	else
 		throw Exception("Timeout while trying to read CGI response.");
-
 }
 
 /*
@@ -361,6 +352,14 @@ void CGIHandler::readCgiResponse(int fd)
 		resplineString.assign(respline);
 		_cgiResponse += resplineString + "\n";
 	}
+}
+
+/*
+** The getter for cgiResponse
+*/
+std::string CGIHandler::getCgiResponse(void) const
+{
+	return _cgiResponse;
 }
 
 /*
@@ -393,7 +392,6 @@ pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 	ret.pathTranslated = localPath + ret.pathInfo;
 
 	return ret;
-
 }
 
 /*

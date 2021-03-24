@@ -82,7 +82,7 @@ typedef struct s_pathResult {
 }	pathResult;
 
 int	ft_atoi_base(const char *str, const char *base);
-
+char **create_envp(std::vector<std::string> mvars);
 
 /*
 ** CGIHandler takes in a request and a path to a CGI script. It creates
