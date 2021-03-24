@@ -20,7 +20,6 @@
 # include <sys/errno.h>
 # include <sys/wait.h>
 # include "get_next_line.h"
-# include "ICGIRequest.class.hpp"
 # include "Exception.class.hpp"
 # include "Request.class.hpp"
 # include "Utility.hpp"
