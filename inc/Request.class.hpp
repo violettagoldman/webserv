@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/05 15:59:33 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/24 16:38:56 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ class Request
 		void read_request(int sd);
 		unsigned long contentLengthChecker(std::vector<Header> headers);
 		std::vector<Header>::iterator getHeaderByName(std::string name);
-		int getContentLength(void);
 	private:
 		int _read_bytes;
 		std::vector<Header> _headers;
@@ -61,6 +60,7 @@ class Request
 		int _error;
 		std::string _state;
 		std::string methods[8];
+		std::string _buffer;
 };
 std::vector<std::string> split(std::string input, std::string word);
 #endif
