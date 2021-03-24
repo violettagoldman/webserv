@@ -12,7 +12,11 @@
 
 #include "ABlock.class.hpp"
 
-
+/*
+** The go-to constructor of a block. Includes the nginx defaults for
+** the directives.
+** @param confFile a reference to an opened ConfigFile.
+*/
 ABlock::ABlock(ConfigFile &confFile) :
 	_confFile(confFile),
 	_clientMaxBodySize(1000000),
@@ -22,12 +26,21 @@ ABlock::ABlock(ConfigFile &confFile) :
 {
 }
 
-
+/*
+** Return the number of occurences of char c in string s
+** @param s The string to look in.
+** @param c The character to look for.
+** @ret int The number of ocurrences
+*/
 int ABlock::countOccurence(std::string s, char c)
 {
 	return std::count(s.begin(), s.end(), c);
 }
 
+/*
+** Check the lineString for all possible syntax errors and throw appropriate
+** Exceptions.
+*/
 void ABlock::checkLine(std::string lineString)
 {
 	if (countOccurence(lineString, '}') > 1)
@@ -38,14 +51,26 @@ void ABlock::checkLine(std::string lineString)
 		throw Exception("Please only put one directive per line.");
 }
 
+/*
+** This is the function that you can overload to do some checks on the state
+** of your block (like if all parameters have been set to reasonable values).
+** It will be called after the block has been read completely.
+*/
 void ABlock::check(void)
 {
 }
 
+/*
+** The destructor for ABlock.
+*/
 ABlock::~ABlock(void)
 {
 }
 
+/*
+** The function that reads the whole block line by line and returns only
+** when it's completely read.
+*/
 void ABlock::handle()
 {
 	bool blockClosed = false;
@@ -69,6 +94,11 @@ void ABlock::handle()
 		throw Exception("A block wasn't closed");
 }
 
+/*
+** Parse the error_pages directve.
+** @param directiveValue The value of that directive (whatever is between
+** its name and ;, without leading whitespace)
+*/
 void ABlock::parseErrorPage(std::string directiveValue)
 {
 	std::map<int, std::string> ret;
@@ -89,8 +119,10 @@ void ABlock::parseErrorPage(std::string directiveValue)
 }
 
 /*
+** Insert new error pages to the values that we may have inherited.
 ** std::map::insert doesn't overwrite existing elements. So in order to merge
 ** the two maps, we first insert old map into the new map, and then swap them.
+** @param newErrorPages The new parsed error page values.
 */
 void ABlock::insertErrorPages(std::map<int, std::string> &newErrorPages)
 {
@@ -98,6 +130,10 @@ void ABlock::insertErrorPages(std::map<int, std::string> &newErrorPages)
 	std::swap(_errorPage, newErrorPages);
 }
 
+/*
+** Handle all common directives (that is to say, those that exist on all levels
+** i.e. root and index).
+*/
 void ABlock::handleLineCommon(std::string lineString)
 {
 	if (isPresent(lineString, "root"))
@@ -119,16 +155,26 @@ void ABlock::handleLineCommon(std::string lineString)
 	else if (isPresent(lineString, "error_page"))
 	{
 		parseErrorPage(getStringDirective(lineString, "error_page"));
-		// this->_errorPage.insert(newErrorMap.begin(), newErrorMap.end());
-		// insertErrorPages(newErrorMap);
 	}
 }
 
+/*
+** Do specific manipulation on a line (you can override this function
+** to add new directives)
+** @param lineString The string we received from the config file, belonging
+** to this block.
+*/
 void ABlock::handleLine(std::string lineString)
 {
-	std::cout << "ABlock handled: " << lineString << std::endl;
+	(void)lineString;
 }
 
+/*
+** Return true if keyword exists in lineString, convenient to check if there's
+** a certain directive in the line.
+** @param lineString A line belonging to this block.
+** @param keyWord A string to look for.
+*/
 bool ABlock::isPresent(std::string lineString, std::string keyword)
 {
 	return (lineString.find(keyword) != std::string::npos);
@@ -160,6 +206,9 @@ std::string ABlock::getStringDirective(std::string lineString, std::string key)
 	return lineString.substr(valueStart, semicolon-valueStart);
 }
 
+/*
+** Getter for _confFile.
+*/
 ConfigFile &ABlock::getConfFile(void) const
 {
 	return this->_confFile;
@@ -193,6 +242,10 @@ void ABlock::trimWhitespaceStart(std::string &s)
 	}
 }
 
+/*
+** Parse the clientMaxBodySize directive.
+** @param lineString The line containing the directive.
+*/
 int ABlock::parseClientMaxBodySize(std::string lineString)
 {
 	std::string value = getStringDirective(lineString, "client_max_body_size");
@@ -213,6 +266,11 @@ int ABlock::parseClientMaxBodySize(std::string lineString)
 	return raw_value;
 }
 
+/*
+** Parse the fastcgi_param directive.
+** @param lineString The line containing the directive.
+** @param params The reference to the parameter map.
+*/
 void ABlock::parseFastCGIParam(std::string lineString,
 			std::map<std::string, std::string> &params)
 {
@@ -235,6 +293,11 @@ void ABlock::parseFastCGIParam(std::string lineString,
 	params[key] = value;
 }
 
+/*
+** Parse a on/off directive (ex. 'autoindex on' will return true).
+** @param lineString the line containing the directive.
+** @param key The name of the directive (ex. 'autoindex').
+*/
 bool ABlock::parseBoolDirective(std::string lineString, std::string key)
 {
 	std::string directive = getStringDirective(lineString, key);
@@ -246,6 +309,14 @@ bool ABlock::parseBoolDirective(std::string lineString, std::string key)
 	// TODO exception
 }
 
+/*
+** Parse a listen directive.
+** @param lineString The line belonging to this block
+** @param listenHost The reference to the listenHost variable that will be set
+** to the actual listen host.
+** @param listenIp The reference to the listenIp variable, that will be set to
+** the port.
+*/
 void ABlock::parseListen(std::string lineString, std::string &listenHost,
 							int &listenIp)
 {
@@ -267,27 +338,42 @@ void ABlock::parseListen(std::string lineString, std::string &listenHost,
 	}
 }
 
+/*
+** Getter for _clientMaxBodySize.
+*/
 int ABlock::getClientMaxBodySize(void) const
 {
 	return _clientMaxBodySize;
 }
 
+/*
+** Getter for _autoindex.
+*/
 bool ABlock::getAutoindex(void) const
 {
 	return _autoindex;
 }
 
+/*
+** Getter for _index.
+*/
 std::vector<std::string> ABlock::getIndex(void) const
 {
 	return _index;
 
 }
 
+/*
+** Getter for _root.
+*/
 std::string ABlock::getRoot(void) const
 {
 	return _root;
 }
 
+/*
+** Getter for _errorPage.
+*/
 std::map<int, std::string> ABlock::getErrorPage(void) const
 {
 	return _errorPage;
