@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/02/19 15:37:09 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/05 16:01:46 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,10 @@ int Request::isMethod(std::string check)
 	return -1;
 }
 
+int Request::getContentLength()
+{
+		return _content_length;
+}
 void Request::uri_handler(std::string str)
 {
 	std::string scheme;
@@ -233,6 +237,25 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 	return size;
 }
 
+std::string chunked_decode(std::string body)
+{
+	std::string result;
+	size_t n;
+	size_t pos;
+
+	pos = body.find(CRLF);
+	n = std::stoi(body.substr(0, pos), 0, 16);
+	while (n != 0)
+	{
+		result += body.substr(pos + 2, n);
+		body.erase(0, pos + n + 4);
+		pos = body.find(CRLF);
+		n = std::stoi(body.substr(0, pos), 0, 16);
+	}
+
+	return result;
+}
+
 void Request::read_request(int sd)
 {
 	char input[BUFFER_SIZE];
@@ -278,11 +301,15 @@ void Request::read_request(int sd)
 		if (isHeaderPresent("Transfer-Encoding", "chunked"))
 		{
 			//In chunked requests data length is in hex. transform hex to Int
-			while ((bytes = recv(sd, input, BUFFER_SIZE, 0)) > 0)
-			{
-				to_interpret.assign(input, bytes);
-				std::cout << to_interpret << std::endl;
-			}
+			std::string chunked;
+			chunked = chunked_decode(to_interpret.substr(last +1 ));
+			setBody(chunked);
+			_content_length = chunked.size();
+			// while ((bytes = recv(sd, input, BUFFER_SIZE, 0)) > 0)
+			// {
+			// 	to_interpret.assign(input, bytes);
+			// 	std::cout << to_interpret << std::endl;
+			// }
 		}
 	}
 	else if (bytes == -1)
