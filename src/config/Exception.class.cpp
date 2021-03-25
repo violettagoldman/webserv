@@ -12,20 +12,32 @@
 
 #include "Exception.class.hpp"
 
+/*
+** Constructor for Exception.
+*/
 Exception::Exception(std::string _message) :
 	message(_message)
 {
 }
 
+/*
+** Copy constructor for Exception.
+*/
 Exception::Exception(const Exception &copy) :
 	message(copy.message)
 {
 }
 
+/*
+** Destructor for Exception.
+*/
 Exception::~Exception()
 {
 }
 
+/*
+** Assignment ioperator overload for Exception.
+*/
 Exception &Exception::operator= (const Exception &operand)
 {
 	if (this != &operand)
@@ -35,6 +47,9 @@ Exception &Exception::operator= (const Exception &operand)
 	return (*this);
 }
 
+/*
+** What() function for reading an exception message.
+*/
 const char* Exception::what() const throw()
 {
 	return this->message.c_str();
