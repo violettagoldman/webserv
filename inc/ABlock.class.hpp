@@ -59,7 +59,7 @@ public:
 			std::map<std::string, std::string> &params);
 	static bool parseBoolDirective(std::string lineString, std::string key);
 	static void parseListen(std::string lineString, std::string &listenHost,
-							int &listenIp);
+							int &listenPort);
 
 	static int countOccurence(std::string s, char c);
 

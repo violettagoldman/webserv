@@ -12,10 +12,17 @@
 
 # include "ConfigFile.class.hpp"
 
+/*
+** Default constructor for ConfigFile.
+*/
 ConfigFile::ConfigFile() : _fd(-1)
 {
 }
 
+/*
+** Open the file of the config.
+** @param filename The name of the file.
+*/
 void ConfigFile::openFile(std::string filename)
 {
 	this->_fd = open(filename.c_str(), O_RDONLY);
@@ -23,6 +30,10 @@ void ConfigFile::openFile(std::string filename)
 		throw Exception("Couldn't open file");
 }
 
+/*
+** Constructor for ConfigFile that opens a file automatically.
+** @param filename The name of the file.
+*/
 ConfigFile::ConfigFile(std::string filename) :
 	_lastLineRead(false), _lastLineSent(false)
 {
@@ -31,6 +42,10 @@ ConfigFile::ConfigFile(std::string filename) :
 		throw Exception("Couldn't open file");
 }
 
+/*
+** Pass through select() before reading the config file.
+** @param fd The file description that you need to open.
+*/
 void pass_through_select(int fd)
 {
 	fd_set rfds;
@@ -56,6 +71,13 @@ void pass_through_select(int fd)
 		throw Exception("Timeout while trying to read from config file.");
 }
 
+/*
+** Read the next line of the config file.
+** Return 0 if the file has ended, so you can use this function in a while loop:
+**	while (c.getNext())
+**		...
+** @ret int Status code.
+*/
 int ConfigFile::getNext()
 {
 	if (this->_fd < 0)
@@ -83,6 +105,10 @@ int ConfigFile::getNext()
 	return this->_ret;
 }
 
+/*
+** Return the last read line in a string.
+** @ret string The last line.
+*/
 std::string ConfigFile::getLineString(void) const
 {
 	if (this->_fd < 0)
@@ -90,6 +116,11 @@ std::string ConfigFile::getLineString(void) const
 	return this->_lineString;
 }
 
+/*
+** Read the file to the end to prevent future calls to get_next_line from
+** bringing up garbage. Use if you raise an exception and plan on reading
+** other files.
+*/
 void ConfigFile::rewind(void)
 {
 	while (this->getNext())

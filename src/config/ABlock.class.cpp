@@ -314,11 +314,11 @@ bool ABlock::parseBoolDirective(std::string lineString, std::string key)
 ** @param lineString The line belonging to this block
 ** @param listenHost The reference to the listenHost variable that will be set
 ** to the actual listen host.
-** @param listenIp The reference to the listenIp variable, that will be set to
-** the port.
+** @param listenPort The reference to the listenPort variable, that will be set 
+** to the port.
 */
 void ABlock::parseListen(std::string lineString, std::string &listenHost,
-							int &listenIp)
+							int &listenPort)
 {
 	std::string directive = getStringDirective(lineString, "listen");
 	size_t valueStart = 0;
@@ -328,13 +328,13 @@ void ABlock::parseListen(std::string lineString, std::string &listenHost,
 		listenHost = directive.substr(valueStart, hostEnd - valueStart);
 		trimWhitespaceStart(listenHost);
 		size_t valueEnd = directive.find(";", hostEnd);
-		listenIp = ft_atoi(
+		listenPort = ft_atoi(
 			directive.substr(hostEnd+1, valueEnd - hostEnd).c_str());
 	}
 	else
 	{
 		listenHost = "";
-		listenIp = ft_atoi(directive.c_str());
+		listenPort = ft_atoi(directive.c_str());
 	}
 }
 

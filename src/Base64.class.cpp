@@ -14,11 +14,19 @@
 
 const std::string sequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+/*
+** Constructor for Base64.
+*/
 Base64::Base64(std::string input) :
 	_content(input)
 {
 }
 
+/*
+** Return the position of c in the Base64 sequence.
+** @param c the character to look up.
+** @ret unsigned char The position of c in the Base64 sequence.
+*/
 unsigned char lookup(char c)
 {
 	unsigned char i = 0;
@@ -31,6 +39,10 @@ unsigned char lookup(char c)
 	throw Exception("Wrong characters in Base64.");
 }
 
+/*
+** Decode the _content from Base64 and return it as a string.
+** @ret string The resulting string.
+*/
 std::string Base64::decode(void)
 {
 	std::string ret;
