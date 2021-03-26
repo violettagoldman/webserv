@@ -12,9 +12,6 @@
 
 #include "Config.class.hpp"
 
-/*
-** Config constructor.
-*/
 Config::Config(ConfigFile &confFile) : ABlock(confFile)
 {
 }
@@ -24,6 +21,7 @@ Config::Config(ConfigFile &confFile) : ABlock(confFile)
 ** in braces), so we don't need a break condition. We also don't need
 ** to check if the block was closed.
 */
+
 void Config::handle()
 {
 	do
@@ -38,16 +36,10 @@ void Config::handle()
 	Config::check();
 }
 
-/*
-** Return true, if two VirtualHosts have common serverNames.
-** @param vh1 First VH.
-** @param vh2 Second VH.
-** @ret bool Do the VH have at least one common serverName.
-*/
 bool duplicatesInServerName(VirtualHost vh1, VirtualHost vh2)
 {
-	const std::vector<std::string> v1 = vh1.getServerName();
-	const std::vector<std::string> v2 = vh2.getServerName();
+	std::vector<std::string> v1 = vh1.getServerName();
+	std::vector<std::string> v2 = vh2.getServerName();
 
 	for (size_t i = 0; i < v1.size(); ++i)
 	{
@@ -60,22 +52,12 @@ bool duplicatesInServerName(VirtualHost vh1, VirtualHost vh2)
 	return false;
 }
 
-/*
-** Return true, if two VirtualHosts have the same listen directive.
-** @param vh1 First VH.
-** @param vh2 Second VH.
-** @ret bool Do the VH have the same listen.
-*/
 bool virtualHostsHaveSameListen(VirtualHost vh1, VirtualHost vh2)
 {
 	return (vh1.getListenIp() == vh2.getListenIp() &&\
 			vh1.getListenHost() == vh2.getListenHost());
 }
 
-/*
-** Check if the Config object is completely formed, and raise necessary
-** exceptions.
-*/
 void Config::check()
 {
 	for (size_t i = 0; i < virtualHostVector.size() - 1; i++)
@@ -96,24 +78,65 @@ void Config::check()
 
 }
 
-/*
-** Handle a line that belongs to Config.
-*/
 void Config::handleLine(std::string lineString)
 {
+	// std::cout << "Config handled: " << lineString << std::endl;
+
 	if (lineString.find("server") != std::string::npos)
 	{
+		// std::cout << "Found server" << std::endl;
+		// VirtualHost sBlock(this->getConfFile());
 		VirtualHost sBlock(*this);
+
+		// sBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
+			// this->root, this->index);
 		sBlock.handle();
 
 		virtualHostVector.push_back(sBlock);
 	}
+	// else if (isPresent(lineString, "client_max_body_size"))
+	// {
+	// 	this->clientMaxBodySize = parseClientMaxBodySize(lineString);
+	// }
+	// else if (isPresent(lineString, "autoindex"))
+	// {
+	// 	this->autoindex = parseBoolDirective(lineString, "autoindex");
+	// }
+	// else if (isPresent(lineString, "index"))
+	// {
+	// 	this->index = ft_split(getStringDirective(lineString, "index"), ' ');
+	// }
+	// else if (isPresent(lineString, "root"))
+	// {
+	// 	this->root = getStringDirective(lineString, "root");
+	// }
 }
 
-/*
-** Getter for VirtualHost.
-*/
 std::vector<VirtualHost> Config::getVirtualHostVector(void) const
 {
 	return this->virtualHostVector;
 }
+
+// int Config::getClientMaxBodySize(void) const
+// {
+// 	return this->clientMaxBodySize;
+// }
+
+// bool Config::getAutoindex(void) const
+// {
+// 	return this->autoindex;
+// }
+
+// std::vector<std::string> Config::getIndex(void) const
+// {
+// 	return this->index;
+// }
+
+// std::string Config::getRoot(void) const
+// {
+// 	return this->root;
+// }
+
+
+
+

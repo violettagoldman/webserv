@@ -12,117 +12,90 @@
 
 #include "VirtualHost.class.hpp"
 
-/*
-** Constructor for VirtualHost.
-*/
 VirtualHost::VirtualHost(ConfigFile &confFile) : 
 	ABlock(confFile),
-	_listenPort(80),
-	_listenHost("*"),
-	_serverName(1, "")
+	listenIp(80),
+	listenHost("*"),
+	serverName(1, "")
 {
 }
 
-/*
-** Constructor for VirtualHost that inherits the directive values from whatever
-** block is passed as a parameter.
-*/
 VirtualHost::VirtualHost(ABlock &ab) :
 	ABlock(ab),
-	_listenPort(80),
-	_listenHost("*"),
-	_serverName(1, "")
+	listenIp(80),
+	listenHost("*"),
+	serverName(1, "")
 {
 }
 
-/*
-** Handle a line that belongs to the block.
-*/
 void VirtualHost::handleLine(std::string lineString)
 {
+	// std::cout << "VirtualHost handled: " << lineString << std::endl;
 	if (lineString.find("location") != std::string::npos)
 	{
 		Location locBlock(*this);
 
-		locBlock.setUploadStore(this->_uploadStore);
+		locBlock.setUploadStore(this->uploadStore);
+
+		// locBlock.inheritParams(this->clientMaxBodySize, this->autoindex,
+			// this->root, this->index, this->uploadStore);
+
 		locBlock.handle();
 
-		_locations.push_back(locBlock);
+		locations.push_back(locBlock);
 	}
 
 	if (isPresent(lineString, "listen"))
 	{
-		parseListen(lineString, this->_listenHost, this->_listenPort);
+		parseListen(lineString, this->listenHost, this->listenIp);
 	}
 	else if (isPresent(lineString, "server_name"))
 	{
-		this->_serverName = ft_split(getStringDirective(lineString,
+		this->serverName = ft_split(getStringDirective(lineString,
 										"server_name"), ' ');
 	}
 	else if (isPresent(lineString, "upload_store"))
 	{
-		this->_uploadStore = getStringDirective(lineString, "upload_store");
+		this->uploadStore = getStringDirective(lineString, "upload_store");
 	}
+	// else if (isPresent(lineString, "root"))
+	// {
+	// 	this->root = getStringDirective(lineString, "root");
+	// }
 }
 
-/*
-** Legacy Getter for _listenPort.
-*/
 int VirtualHost::getListenIp(void) const
 {
-	return this->_listenPort;
+	return this->listenIp;
 }
 
-/*
-** Getter for _listenPort.
-*/
-int VirtualHost::getListenPort(void) const
-{
-	return this->_listenPort;
-}
-
-/*
-** Getter for _listenHost.
-*/
 std::string VirtualHost::getListenHost(void) const
 {
-	return this->_listenHost;
+	return this->listenHost;
 }
 
-/*
-** Getter for _serverName.
-*/
 std::vector<std::string> VirtualHost::getServerName(void) const
 {
-	return this->_serverName;
+	return this->serverName;
 }
 
-/*
-** Getter for _locations.
-*/
 std::vector<Location> VirtualHost::getLocations(void) const
 {
-	return this->_locations;
+	return this->locations;
 }
 
-/*
-** Getter for uploadStore.
-*/
 std::string VirtualHost::getUploadStore(void) const
 {
-	return this->_uploadStore;
+	return this->uploadStore;
 }
 
-/*
-** Check if virtualHost is well formed.
-*/
 void VirtualHost::check(void)
 {
 	// specific checks
-	if (_locations.size() == 0 && this->getRoot() == "" && this->getUploadStore() == "")
+	if (locations.size() == 0 && this->getRoot() == "" && this->getUploadStore() == "")
 		throw Exception("VirtualHost has to either have a location, or specify root or upload.");
-	for (size_t i = 0; i < _locations.size(); i++)
+	for (size_t i = 0; i < locations.size(); i++)
 	{
-		_locations[i].check();
+		locations[i].check();
 	}
 }

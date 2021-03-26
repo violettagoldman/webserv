@@ -26,6 +26,7 @@ public:
 	TestCGIRequest(std::string method,
 	std::string body,
 	std::vector<Header> headers,
+	// std::string query,
 	std::string path);
 	// ~TestCGIRequest();
 
