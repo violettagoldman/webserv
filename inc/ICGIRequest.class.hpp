@@ -1,32 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Exception.hpp                                      :+:      :+:    :+:   */
+/*   ICGIRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/22 12:37:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 13:02:20 by ashishae         ###   ########.fr       */
+/*   Created: 2021/02/04 16:52:48 by ashishae          #+#    #+#             */
+/*   Updated: 2021/02/06 15:32:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EXCEPTION_CLASS_HPP
-# define EXCEPTION_CLASS_HPP
+#ifndef ICGIREQUEST_HPP
+# define ICGIREQUEST_HPP
 
 # include <string>
+# include "Header.class.hpp"
 
-class Exception {
+class ICGIRequest {
 
 public:
 
-	Exception(std::string message);
-	~Exception();
-	Exception(const Exception &copy);
-	Exception &operator= (const Exception &operand);
-	const char* what() const throw();
+	// ~ICGIRequest();
+	virtual std::string getMethod(void) = 0; //
+	virtual std::string getBody(void) = 0; //
+	virtual std::vector<Header *> getHeaders(void) = 0; //
+	virtual std::string getQuery(void) = 0;
+	virtual std::string getPath(void) = 0;
+	virtual std::string getFragment(void) = 0;
+
+	// virtual ~ICGIRequest() = 0;
 
 private:
-	std::string message;
 
 };
 
