@@ -24,6 +24,7 @@ int		main(int argc, char **argv)
 	size_t		i;
 	fd_set		fds;
 	fd_set		fds_read;
+	fd_set		fds_write;
 	int			new_socket;
 	int 		sd;
 	std::string	final_path;
@@ -53,7 +54,8 @@ int		main(int argc, char **argv)
 	while(1)
 	{
 		fds_read = fds;
-		select(FD_SETSIZE, &fds_read , NULL , NULL , NULL);
+		fds_write = fds;
+		select(FD_SETSIZE, &fds_read , &fds_write , NULL , NULL);
 
 		for (size_t s = 0; s < servers.size(); ++s)
 		{
@@ -101,7 +103,8 @@ int		main(int argc, char **argv)
 						else
 						{
 							Response response(request, loc, final_path);
-							servers[s].send(sd, response.serialize());
+							if (FD_ISSET(sd, &fds_write))
+								servers[s].send(sd, response.serialize());
 						}
 					}
 				}
