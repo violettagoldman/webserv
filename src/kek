@@ -1,0 +1,26 @@
+#include <iostream>
+std::string chunked_decode(std::string body)
+{
+	std::string result;
+	size_t n;
+	size_t pos;
+
+	pos = body.find("\r\n");
+	n = std::stoi(body.substr(0, pos), 0, 16);
+	while (n != 0)
+	{
+		result += body.substr(pos + 2, n);
+		body.erase(0, pos + n + 4);
+		pos = body.find("\r\n");
+		n = std::stoi(body.substr(0, pos), 0, 16);
+	}
+
+	return result;
+}
+
+int main()
+{
+	std::string kek("4\r\nWiki\r\n6\r\npedia \r\nE\r\nin \r\n\r\nchunks.\r\n0\r\n\r\n");
+	std::cout <<chunked_decode(kek) << std::endl;
+	return 0;
+}

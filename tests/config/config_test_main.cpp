@@ -22,6 +22,7 @@
 
 #include "VirtualHost.class.hpp"
 #include "ConfigReader.class.hpp"
+#include "PasswordFile.class.hpp"
 
 int main(void)
 {
@@ -232,8 +233,18 @@ int main(void)
 	check(res2[0] == "hello");
 
 
+	out("PasswordFile | Constructor");
 
-	test_results();
+	try
+	{
+		std::cout << "Ding" << std::endl;
+		PasswordFile("./config/test_password_files/testFile");
+	}
+	catch (Exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	
 
 
 	// TEST_EXCEPTION(ConfigReader r2("missing_listen.conf"), virtualHost::DirectiveNotFound,\

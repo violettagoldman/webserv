@@ -4,6 +4,7 @@
 #include "Server.class.hpp"
 #include "Response.class.hpp"
 #include "Handler.hpp"
+#include "CGIHandler.class.hpp"
 
 Request		*read_request(int sd, Request *req);
 
@@ -27,16 +28,16 @@ int		main(int argc, char **argv)
 	int 		sd;
 	std::string	final_path;
 	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
-	
+	std::map<int, Request> chunked_requests;
+	std::map<int, Request>::iterator chunked_pos;
+
 	if (argc == 2)
 	{
 		path_to_conf = argv[1];
 	}
 	std::cout << "Using config at " << path_to_conf << std::endl;
 	ConfigReader reader(path_to_conf);
-
 	Config conf = reader.getConfig();
-
 	for (size_t i = 0; i < conf.getVirtualHostVector().size(); ++i)
 	{
 		Server server;
@@ -71,7 +72,25 @@ int		main(int argc, char **argv)
 				if (FD_ISSET(sd , &fds_read))
 				{
 					Request request;
+					if ((chunked_pos = chunked_requests.find(sd)) != chunked_requests.end())
+					{
+						std::cout << "kek" << std::endl;
+						request = chunked_pos->second;
+						request.print_headers();
+						// request.setState("chunked");
+						std::cout << request.getState() << std::endl;
+					}
 					request.read_request(sd);
+
+					if (request.getState() == "chunked")
+						chunked_requests[sd] = request;
+					if (request.getState() == "read" && request.isHeaderPresent("Transfer-Encoding", "chunked"))
+					{
+							chunked_requests.erase(sd);
+							// servers[s].removeClient(sd);
+							// FD_CLR(sd, &fds);
+							// close(sd);
+						}
 					if (request.getState() == "end")
 					{
 						servers[s].removeClient(sd);
@@ -80,15 +99,36 @@ int		main(int argc, char **argv)
 					}
 					else if (request.getState() == "read" || request.getState() == "error")
 					{
+						std::cout << "Here is ok" << std::endl;
 						request.print_headers();
-						final_path = handler(request, conf, conf.getVirtualHostVector()[s]);
-						Location loc = handlerGetLocation(request, conf.getVirtualHostVector()[s]);
-						Response response(request, loc, final_path);
-						servers[s].send(sd, response.serialize());
+						final_path = handler(request, conf);
+						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
+						if (loc.getFcgiPass() != "")
+						{
+							CGIRequires cr =
+							{
+								final_path,
+								"127.0.0.1",
+								"localhost:8880/a.php",
+								servers[s].getPort(),
+								conf.getVirtualHostVector()[s].getServerName()[0],
+								loc.getFcgiPass()
+							};
+							CGIHandler handler(request, cr);
+							std::cout << "cgi rep:" << handler.getCgiResponse() << std::endl;
+							Response response(handler.getCgiResponse());
+							servers[s].send(sd, response.serialize());
+						}
+						else if (request.getState() != "chunked")
+						{
+							Response response(request, loc, final_path);
+							servers[s].send(sd, response.serialize());
+						}
 					}
 				}
 			}
 		}
 	}
+
 	return (0);
 }
