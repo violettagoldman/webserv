@@ -21,22 +21,32 @@
 # include "Utility.hpp"
 # include "LimitExcept.class.hpp"
 
-/*
-** The class that represents a location context in a NGINX config file.
-*/
 class Location : public ABlock
 {
 public:
 	Location(ConfigFile &confFile);
-	Location(ABlock &ab);
 
+	Location(ABlock &ab);
 	void handleLine(std::string lineString);
 
+	// void inheritParams(int clientMaxBodySize, bool autoindex, std::string root,
+	// 		std::vector<std::string> index, std::string uploadStore);
+
+	// void inheritParams(ABlock *parent);
+
 	std::string getPattern(void) const;
+	// std::string getRoot(void) const;
+	// int getClientMaxBodySize(void) const;
+	// bool getAutoindex(void) const;
+	// std::vector<std::string> getIndex(void) const;
+	// LimitExcept getLimitExcept(void) const;
+
+
 	std::string getFcgiPass(void) const;
 	std::map<std::string, std::string> getFcgiParams(void) const;
 	std::string getUploadStore(void) const;
 	LimitExcept getLimitExcept(void) const;
+
 	bool getFcgiSet(void) const;
 	bool getRootSet(void) const;
 	bool getUploadStoreSet(void) const;
@@ -46,8 +56,14 @@ public:
 	void check(void);
 
 private:
+
 	std::string parsePattern(std::string line);
+
 	std::string pattern;
+	
+	// std::vector<std::string> index;
+	// LimitExcept limitExcept;
+
 	LimitExcept limitExcept;
 	std::string fcgiPass;
 	std::map<std::string, std::string> fcgiParams;

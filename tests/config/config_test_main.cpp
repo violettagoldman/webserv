@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 14:01:33 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/03 12:35:49 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,14 @@ int main(void)
 	check(conf.getClientMaxBodySize() == 32);
 	check(conf.getIndex().size() == 1);
 	check(conf.getIndex()[0] == "index.html");
+
+	Config *_conf = r.createConfig();
+
+	check(_conf->getAutoindex() == true);
+	check(_conf->getClientMaxBodySize() == 32);
+	check(_conf->getIndex().size() == 1);
+	check(_conf->getIndex()[0] == "index.html");
+
 
 	std::vector<VirtualHost> virtualHostVector = conf.getVirtualHostVector();
 	check(virtualHostVector.size() == 4);
