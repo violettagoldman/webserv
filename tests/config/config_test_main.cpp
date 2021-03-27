@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/25 20:28:06 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 16:35:16 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,15 +235,20 @@ int main(void)
 
 	out("PasswordFile | Constructor");
 
-	try
-	{
-		std::cout << "Ding" << std::endl;
-		PasswordFile("./config/test_password_files/testFile");
-	}
-	catch (Exception &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+
+	PasswordFile p("./config/test_password_files/testFile");
+	std::vector<Credential> credentials = p.getCredentials();
+
+	check(credentials[0].username == "hello");
+	check(credentials[0].password == "world");
+	check(credentials[1].username == "sleeping");
+	check(credentials[1].password == "dragon");
+
+
+	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/nonexistent_passfile"), Exception, "Couldn't open file");
+	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/wrongFormat"), Exception, "Wrong PasswordFile format.");
+
+	
 	
 
 
