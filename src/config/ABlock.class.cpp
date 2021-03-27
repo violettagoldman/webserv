@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:10:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:05:56 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@ ABlock::ABlock(ConfigFile &confFile) :
 	_clientMaxBodySize(1000000),
 	_autoindex(false),
 	_index(std::vector<std::string>(1, "index.html")),
-	_root("html")
+	_root("html"),
+	_realm("off"),
+	_credentials(std::vector<Credential>()),
+	_userFilePath("")
 {
 }
 
@@ -50,6 +53,13 @@ void ABlock::checkLine(std::string lineString)
 			countOccurence(lineString, ';') > 1)
 		throw Exception("Please only put one directive per line.");
 }
+
+void ABlock::checkCommon(void)
+{
+	if (_userFilePath != "")
+		_credentials = PasswordFile(_userFilePath).getCredentials();
+}
+
 
 /*
 ** This is the function that you can overload to do some checks on the state
@@ -155,6 +165,14 @@ void ABlock::handleLineCommon(std::string lineString)
 	else if (isPresent(lineString, "error_page"))
 	{
 		parseErrorPage(getStringDirective(lineString, "error_page"));
+	}
+	else if (isPresent(lineString, "auth_basic "))
+	{
+		this->_realm = getStringDirective(lineString, "auth_basic");
+	}
+	else if (isPresent(lineString, "auth_basic_user_file"))
+	{
+		this->_userFilePath = getStringDirective(lineString, "auth_basic_user_file");
 	}
 }
 
@@ -377,4 +395,20 @@ std::string ABlock::getRoot(void) const
 std::map<int, std::string> ABlock::getErrorPage(void) const
 {
 	return _errorPage;
+}
+
+/*
+** Getter for _realm.
+*/
+std::string ABlock::getRealm(void) const
+{
+	return _realm;
+}
+
+/*
+** Getter for _credentials.
+*/
+std::vector<Credential> ABlock::getCredentials(void) const
+{
+	return _credentials;
 }

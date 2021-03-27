@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Location.class.cpp                              :+:      :+:    :+:   */
+/*   Location.class.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:10:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:06:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ std::string Location::parsePattern(std::string line)
 */
 void Location::check()
 {
+	ABlock::checkCommon();
 	if (rootSet == true && fcgiSet == true)
 		throw Exception("Root and fcgi_pass on the same location.");
 	if (fcgiSet == true && uploadStoreSet == true)

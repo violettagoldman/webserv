@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 13:46:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 16:34:36 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:08:04 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ PasswordFile::PasswordFile(std::string filename) :
 			continue;
 
 		std::vector<std::string> content = ft_split(ls, ':');
-
 		if (content.size() < 2 || content.size() > 3)
 			throw Exception("Wrong PasswordFile format.");
 
@@ -35,18 +34,6 @@ PasswordFile::PasswordFile(std::string filename) :
 		newCred.password = content[1];
 
 		_credentials.push_back(newCred);
-
-
-		// checkLine(ls);
-
-		// if (ls.find("}") != std::string::npos)
-		// {
-		// 	blockClosed = true;
-		// 	break;
-		// }
-
-		// handleLineCommon(ls);
-		// handleLine(ls);
 
 	}
 	while(_confFile.getNext());

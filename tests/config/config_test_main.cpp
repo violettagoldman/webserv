@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 16:35:16 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:09:56 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,13 @@ int main(void)
 	check(virtualHostVector[0].getLocations()[0].getErrorPage()[502] == "/50x.html");
 	check(virtualHostVector[0].getLocations()[0].getErrorPage()[503] == "/50x.html");
 	check(virtualHostVector[0].getLocations()[0].getErrorPage()[504] == "/50x.html");
+
+	out("Host 0 | location 0 | auth_basic");
+	check(virtualHostVector[0].getLocations()[0].getRealm() == "Admin area");
+	check(virtualHostVector[0].getLocations()[0].getCredentials()[0].username == "hello");
+	check(virtualHostVector[0].getLocations()[0].getCredentials()[0].password == "world");
+	check(virtualHostVector[0].getLocations()[0].getCredentials()[1].username == "sleeping");
+	check(virtualHostVector[0].getLocations()[0].getCredentials()[1].password == "dragon");
 	
 	check(virtualHostVector[0].getClientMaxBodySize() == 32);
 
@@ -121,6 +128,13 @@ int main(void)
 
 	out("Host 1 | Root on server level");
 	check(virtualHostVector[1].getRoot() == "/var/www2/");
+
+	out("Host 1 | auth on server level");
+	check(virtualHostVector[1].getRealm() == "Admin area");
+	check(virtualHostVector[1].getCredentials()[0].username == "hello");
+	check(virtualHostVector[1].getCredentials()[0].password == "world");
+	check(virtualHostVector[1].getCredentials()[1].username == "sleeping");
+	check(virtualHostVector[1].getCredentials()[1].password == "dragon");
 	// check(virtualHostVector[1].getLocations()[0].getLimitExcept()().getDeny()[0] == "all");
 
 	out("Host 1 | Location 0 | upload_store on Server, inherited to Location");
@@ -248,7 +262,7 @@ int main(void)
 	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/nonexistent_passfile"), Exception, "Couldn't open file");
 	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/wrongFormat"), Exception, "Wrong PasswordFile format.");
 
-	
+	test_results();
 	
 
 

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:10:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:06:37 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ std::string VirtualHost::getUploadStore(void) const
 */
 void VirtualHost::check(void)
 {
+	ABlock::checkCommon();
 	// specific checks
 	if (_locations.size() == 0 && this->getRoot() == "" && this->getUploadStore() == "")
 		throw Exception("VirtualHost has to either have a location, or specify root or upload.");
