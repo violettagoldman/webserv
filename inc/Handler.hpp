@@ -5,7 +5,7 @@
 # include "Config.class.hpp"
 
 
-std::string	handler(Request req, Config conf);
+std::string	handler(Request &req, Config conf);
 Location	handlerGetLocation(Request req, Config conf);
 
 #endif
