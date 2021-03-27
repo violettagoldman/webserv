@@ -15,12 +15,22 @@
 
 # include <string>
 # include <vector>
+# include <map>
+
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/uio.h>
+# include <unistd.h>
+# include <iostream>
+# include <algorithm>
+
 
 # include "get_next_line.h"
 # include "Exception.class.hpp"
 
 # include "ConfigFile.class.hpp"
 # include "Config.class.hpp"
+// # include "ABlock.class.hpp"
 # include "VirtualHost.class.hpp"
 
 class ConfigReader
@@ -28,13 +38,24 @@ class ConfigReader
 public:
 	ConfigReader(std::string filename);
 
+	Config *createConfig();
 	Config getConfig(void) const;
 
 private:
+	// int fd;
+	// int ret;
+	// char *line;
+
 	ConfigFile confFile;
+
+	Config *configBlock;
 	Config _config;
 	std::string lineString;
 
+	// virtualHostPrototype vhp;
+	// locationPrototype lp;
+	// configPrototype cp;
+	// limitExceptPrototype lep;
 	std::string lastLineParsed;
 
 	void parse();

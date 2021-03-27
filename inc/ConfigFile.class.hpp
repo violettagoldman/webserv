@@ -18,22 +18,15 @@
 # include <fcntl.h>
 # include "get_next_line.h"
 
-/*
-** An abstraction for reading config files in a while loop, raising file
-** exception errors, and closing the file.
-*/
 class ConfigFile
 {
 public:
-	// Default constructor for ConfigFile. Use openFile then to open a file.
 	ConfigFile();
-
-	// Use this constructor normally.
 	ConfigFile(std::string filename);
-
 
 	void openFile(std::string filename);
 
+	// void next();
 	int getNext();
 	std::string getLineString(void) const;
 	void rewind(void);
