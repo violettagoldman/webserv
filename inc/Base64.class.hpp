@@ -17,22 +17,18 @@
 # include <vector>
 # include <string>
 
-
 # include "Exception.class.hpp"
 
 # include "Utility.hpp"
 
-
+/*
+** The class that handles Base64 decoding.
+*/
 class Base64 {
 
 public:
 	Base64(std::string input);
-
-	// ~Base64();
-	// Base64(const Base64 &copy);
-	// Base64 &operator= (const Base64 &operand);
 	std::string decode(void);
-
 
 private:
 	std::string _content;

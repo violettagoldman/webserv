@@ -15,10 +15,13 @@
 
 # include <string>
 
+/*
+** The class that implements exception (42 subject doesn't allow to use
+** the exception header).
+*/
 class Exception {
 
 public:
-
 	Exception(std::string message);
 	~Exception();
 	Exception(const Exception &copy);
