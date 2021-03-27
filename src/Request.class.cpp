@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/27 13:41:21 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/27 17:46:39 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,13 +84,19 @@ Request::~Request(void)
 
 Request		&Request::operator=(Request const &src)
 {
+	_read_bytes = src._read_bytes;
 	_headers = src._headers;
+	_content_length = src._content_length;
 	_status_line = src._status_line;
 	_method = src._method;
-	_content_length = src._content_length;
 	_body = src._body;
+	_query = src._query;
+	_path = src._path;
+	_fragment = src._fragment;
+	_error = src._error;
 	_state = src._state;
 	_buffer = src._buffer;
+
 	return *this;
 }
 
@@ -265,6 +271,7 @@ void Request::read_request(int sd)
 		std::string body;
 		std::string start_line;
 		std::cout << "before reading" << std::endl;
+		usleep(1000);
 		bytes = recv(sd, input, BUFFER_SIZE, 0);
 		if (bytes <= 0)
 		{
@@ -272,7 +279,7 @@ void Request::read_request(int sd)
 			return ;
 		}
 		std::string to_interpret(input);
-		// std::cout << "LOL SMOTRI: \n"   << "\"" << to_interpret << "\"" << std::endl;
+		std::cout << "LOL SMOTRI: \n"   << "\"" << to_interpret << "\"" << std::endl;
 		if (to_interpret.find("Transfer-Encoding: chunked") != std::string::npos || _state == "chunked")
 		{
 			_state = "chunked";
@@ -297,7 +304,6 @@ void Request::read_request(int sd)
 			std::cout << to_interpret.size() << std::endl;
 			while (pos + 1!= last && last != std::string::npos && to_interpret.substr(pos + 1, last - pos) != CRLF)
 			{
-
 				one_header = to_interpret.substr(pos + 1, last - pos);
 				pos = last;
 				// std::cout << one_header << isHeaderPresent("Transfer-Encoding", "chunked") << std::endl;

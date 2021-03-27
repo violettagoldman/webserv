@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/24 17:19:30 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/27 17:53:00 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,10 @@ std::string path_to_pattern(std::string path)
 	size_t pos;
 
 	pos = path.find_last_of('/');
-	return path.substr(0, pos + 1);
+	if (pos == 0)
+		pos = std::string::npos;
+	std::cout << "Patter:" << path.substr(0, pos) << ";" << std::endl;
+	return path.substr(0, pos);
 }
 
 int count_match(std::string str1, std::string str2)
@@ -96,9 +99,10 @@ int count_match(std::string str1, std::string str2)
 std::string create_final_path(Location loc, std::string request_path)
 {
 	std::string root = loc.getRoot();
-	std::string final(root + request_path.substr(1));
+	// std::string final(root + request_path.substr(1));
+	(void)request_path;
 	std::cout << "Root "<< root << std::endl;
-	return final;
+	return root;
 }
 
 bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_method)
@@ -109,7 +113,7 @@ bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_m
 	return false;
 }
 
-std::string handler(Request req, Config conf)
+std::string handler(Request &req, Config conf)
 {
 	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
 	 std::string final("");
@@ -117,6 +121,7 @@ std::string handler(Request req, Config conf)
 
 	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	 {
+		 std::cout << "Hae:" << check_listen(*it, host_header) << ";" << std::endl;
 		 if (check_listen(*it, host_header))
 		 {
 			std::string request_path = req.getPath();
@@ -127,6 +132,7 @@ std::string handler(Request req, Config conf)
 			std::vector<Location>::iterator it_best;
 			for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 			{
+
 				if (it_loc->getPattern() == request_path)
 				{
 					it_best = it_loc;
@@ -144,6 +150,7 @@ std::string handler(Request req, Config conf)
 			{
 				if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
 				{
+					std::cout << "KEK" << std::endl;
 					req.setError(405);
 					return final;
 				}
