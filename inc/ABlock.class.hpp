@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 12:37:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 13:02:20 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:05:40 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <map>
 # include <algorithm>
 # include "Utility.hpp"
+# include "PasswordFile.class.hpp"
 
 /*
 ** This is the abstract base class for all other blocks. It handles the
@@ -43,6 +44,7 @@ public:
 	ConfigFile &getConfFile(void) const;
 
 	virtual void check(void);
+	void checkCommon(void);
 
 	void insertErrorPages(std::map<int, std::string> &newErrorPages);
 
@@ -72,6 +74,8 @@ public:
 	std::vector<std::string> getIndex(void) const;
 	std::string getRoot(void) const;
 	std::map<int, std::string> getErrorPage(void) const;
+	std::string getRealm(void) const;
+	std::vector<Credential> getCredentials(void) const;
 
 private:
 	ConfigFile &_confFile;
@@ -81,6 +85,10 @@ private:
 	std::vector<std::string> _index;
 	std::string _root;
 	std::map<int, std::string> _errorPage;
+	std::string _realm;
+	std::vector<Credential> _credentials;
+	std::string _userFilePath;
+
 
 };
 

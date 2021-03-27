@@ -1,16 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Exception.cpp                                      :+:      :+:    :+:   */
+/*   Exception.class.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 12:54:48 by ashishae          #+#    #+#             */
-/*   Updated: 2021/01/22 13:08:05 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:07:56 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Exception.class.hpp"
+
+#include <iostream>
 
 /*
 ** Constructor for Exception.
