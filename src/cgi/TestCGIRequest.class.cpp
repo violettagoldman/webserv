@@ -33,9 +33,11 @@ TestCGIRequest::TestCGIRequest(
 			longValue += valueVector[j];
 
 		Request::addHeader(headers[i].getName() + ": " + longValue + "\n");
+		/* code */
 	}
 	// std::cout << "Constructor got: " << headers.size() << std::endl;
 }
+
 
 std::string TestCGIRequest::getMethod(void)
 {
@@ -52,7 +54,17 @@ std::vector<Header> TestCGIRequest::getHeaders(void)
 	return _headers;
 }
 
+// std::string TestCGIRequest::getQuery(void)
+// {
+// 	return _query;
+// }
+
 std::string TestCGIRequest::getPath(void)
 {
 	return _path;
 }
+
+// std::string TestCGIRequest::getFragment(void)
+// {
+// 	return _fragment;
+// }

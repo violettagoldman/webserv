@@ -55,7 +55,7 @@ int						Server::setup(VirtualHost conf)
 		std::cerr << "Couldn't bind the port " << conf.getListenIp() << std::endl;
 		exit(1);
 	}
-	std::cout << "Listening on port " << conf.getListenIp() << std::endl; 
+	std::cout << "Listening on port " << conf.getListenIp() << std::endl;
 	return (0);
 }
 

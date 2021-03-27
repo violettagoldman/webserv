@@ -21,16 +21,17 @@
 # include <algorithm>
 # include "Utility.hpp"
 
-/*
-** This is the abstract base class for all other blocks. It handles the
-** common directives (such as index, root etc.) and allows you to inherit
-** their values in child-level blocks.
-*/
 class ABlock
 {
 
+
+
 public:
 	ABlock(ConfigFile &confFile);
+
+	// ABlock(ABlock &ab);
+
+	// ABlock(ABlock *ab);
 
 	virtual void handle();
 
@@ -59,11 +60,12 @@ public:
 			std::map<std::string, std::string> &params);
 	static bool parseBoolDirective(std::string lineString, std::string key);
 	static void parseListen(std::string lineString, std::string &listenHost,
-							int &listenPort);
+							int &listenIp);
 
 	static int countOccurence(std::string s, char c);
 
 	static void checkLine(std::string lineString);
+
 
 	virtual ~ABlock();
 
@@ -81,6 +83,8 @@ private:
 	std::vector<std::string> _index;
 	std::string _root;
 	std::map<int, std::string> _errorPage;
+
+
 
 };
 

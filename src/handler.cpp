@@ -1,12 +1,12 @@
-		/* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   handler.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/13 13:28:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/24 17:19:30 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ std::string path_to_pattern(std::string path)
 int count_match(std::string str1, std::string str2)
 {
 	int count = 0;
-
 	int i = 0;
 	while (str1[i] != '\0' && str2[i] != '\0')
 	{
@@ -110,71 +109,80 @@ bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_m
 	return false;
 }
 
-std::string handler(Request req, Config conf, VirtualHost vh)
+std::string handler(Request req, Config conf)
 {
 	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
 	 std::string final("");
 	 Header host_header = *(req.getHeaderByName("Host"));
 
-	std::string request_path = req.getPath();
-	std::cout << "Request path in handler: " << request_path << std::endl;
-	std::string request_pattern = path_to_pattern(request_path);
-	std::vector<Location> server_locations = vh.getLocations();
-	int count_max = 0;
-	int count_cur;
-	std::vector<Location>::iterator it_best;
-	for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
-	{
-		if (it_loc->getPattern() == request_pattern)
-		{
-			it_best = it_loc;
-			break;
-		}
-		if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
-		{
-			it_best = it_loc;
-			count_max = count_cur;
-		}
-	}
-	if (count_max == 0)
-		it_best = server_locations.end();
-	if (it_best != server_locations.end())
-	{
-		if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
-		{
-			req.setError(405);
-			return final;
-		}
-		final = create_final_path(*it_best, request_path);
-		return final;
-	}
-	else
-	{
-		std::cout << "Not found" << std::endl;
-		req.setError(404);
-		std::cout << "404" << std::endl;
-	}
+	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
+	 {
+		 if (check_listen(*it, host_header))
+		 {
+			std::string request_path = req.getPath();
+			std::string request_pattern = path_to_pattern(request_path);
+			std::vector<Location> server_locations = (*it).getLocations();
+			int count_max = 0;
+			int count_cur;
+			std::vector<Location>::iterator it_best;
+			for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
+			{
+				if (it_loc->getPattern() == request_path)
+				{
+					it_best = it_loc;
+					break;
+				}
+				if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
+				{
+					it_best = it_loc;
+					count_max = count_cur;
+				}
+			}
+			if (count_max == 0)
+				it_best = server_locations.end();
+			if (it_best != server_locations.end())
+			{
+				if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
+				{
+					req.setError(405);
+					return final;
+				}
+				final = create_final_path(*it_best, request_path);
+				return final;
+			}
+			else
+			{
+				std::cout << "Not found" << std::endl;
+				req.setError(404);
+				std::cout << "404" << std::endl;
+			}
+		 }
+	 }
 	return final;
 }
 
-Location	handlerGetLocation(Request req, VirtualHost conf)
+Location	handlerGetLocation(Request req, Config conf)
 {
 	Header host_header = *(req.getHeaderByName("Host"));
+	std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
 
 	std::string request_path = req.getPath();
 	std::string request_pattern = path_to_pattern(request_path);
-	std::vector<Location> server_locations = conf.getLocations();
 	int count_max = 0;
 	int count_cur;
 	std::vector<Location>::iterator it_best;
-	for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
+	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	{
-		if (it_loc->getPattern() == request_pattern)
-			return (*it_loc);
-		if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
+		std::vector<Location> server_locations = it->getLocations();
+		for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 		{
-			it_best = it_loc;
-			count_max = count_cur;
+			if (it_loc->getPattern() == request_path)
+				return (*it_loc);
+			if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
+			{
+				it_best = it_loc;
+				count_max = count_cur;
+			}
 		}
 	}
 	return (*it_best);

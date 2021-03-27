@@ -14,16 +14,14 @@
 # define LIMITEXCEPT_CLASS_HPP
 
 # include "ABlock.class.hpp"
+// # include "LocationBlock.class.hpp"
 # include "Utility.hpp"
 
-/*
-** The block that represents the limit_except directive.
-*/
 class LimitExcept : public ABlock
 {
 public:
 	LimitExcept(ConfigFile &confFile);
-	void handleLine(std::string lineString);
+	virtual void handleLine(std::string lineString);
 
 	static std::vector<std::string> parseMethods(std::string line);
 	
@@ -40,6 +38,7 @@ private:
 	std::vector<std::string> _methods;
 
 	bool _empty;
+
 };
 
 #endif

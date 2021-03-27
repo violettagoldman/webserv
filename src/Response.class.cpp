@@ -12,10 +12,16 @@ Response::Response(Request req, Location loc, std::string fp)
 	handleMethod(loc);
 }
 
-Response::Response(Response const &src)
+Response::Response(std::string cgi_response)
 {
-	*this = src;
+	(void)cgi_response;
+	// handleCGI(cgi_response);
 }
+
+// Response::Response(Response const &src)
+// {
+// 	*this = src;
+// }
 
 Response::~Response(void)
 {
@@ -46,6 +52,7 @@ void			Response::handleMethod(Location loc)
 	{
 		error(_req.getError());
 		return;
+
 	}
 	if (option == "GET")
 		get(loc);
