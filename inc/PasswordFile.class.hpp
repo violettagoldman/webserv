@@ -1,45 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ConfigReader.hpp                                   :+:      :+:    :+:   */
+/*   PasswordFile.class.hpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:07:39 by ashishae         ###   ########.fr       */
+/*   Created: 2021/03/27 13:23:55 by ashishae          #+#    #+#             */
+/*   Updated: 2021/03/27 13:54:03 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIGREADER_HPP
-# define CONFIGREADER_HPP
+#ifndef PASSWORDFILE_CLASS_HPP
+# define PASSWORDFILE_CLASS_HPP
 
+# include <iostream>
 # include <string>
 # include <vector>
-
-# include "get_next_line.h"
-# include "Exception.class.hpp"
-
 # include "ConfigFile.class.hpp"
-# include "Config.class.hpp"
-# include "VirtualHost.class.hpp"
 
-class ConfigReader
+typedef struct s_credential
+{
+	std::string username;
+	std::string password;
+}	Credential;
+
+class PasswordFile
 {
 public:
-	ConfigReader(std::string filename);
-
-	Config getConfig(void) const;
+	PasswordFile(std::string filename);
+	// PasswordFile(const PasswordFile &copy);
+	// PasswordFile &operator= (const PasswordFile &operand);
+	// ~PasswordFile();
+	std::vector<Credential> getCredentials(void) const;
 
 private:
-	ConfigFile confFile;
-	Config _config;
-	std::string lineString;
-
-	std::string lastLineParsed;
-
-	void parse();
-
-	std::vector<VirtualHost> serverBlockVector;
+	std::string _filename;
+	ConfigFile _confFile;
+	std::vector<Credential> _credentials;
 };
 
-#endif 
+#endif
