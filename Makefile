@@ -1,5 +1,5 @@
 NAME = webserv
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address -std=c++98 -g3 -Iinc/
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -Iinc/
 CC = clang++
 
 TOTAL = $(shell find src -iname  "*.cpp" | wc -l | bc)

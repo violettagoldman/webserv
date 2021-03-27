@@ -6,17 +6,20 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/24 17:47:18 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/27 13:41:21 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Request.class.hpp"
 #include "../inc/Utility.hpp"
 #include <sys/socket.h>
+// #include "../inc/CGIHandler.class.hpp"
+
 const std::string CRLF = "\r\n";
 const std::string WSP = "\r ";
 #define BUFFER_SIZE 1000000
 
+int	ft_atoi_base(const char *str, const char *base);
 
 std::vector<std::string> remove_spaces(std::vector<std::string> values)
 {
@@ -234,6 +237,24 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 	return size;
 }
 
+
+void Request::ChunkedInterpretation(std::string chunk)
+{
+	int size;
+	std::string info;
+
+	size_t pos;
+
+	pos = chunk.find(CRLF);
+	size = ft_atoi_base(chunk.substr(0, pos).c_str(), "0123456789ABCDEF");
+	std::cout << "Size of chunk: "<< size << std::endl;
+	pos = chunk.find(CRLF, pos + 1);
+	info = chunk.substr(pos + 2);
+	if ((int)info.size() != size)
+		_error = 400;
+	_body = info;
+}
+
 void Request::read_request(int sd)
 {
 		char input[BUFFER_SIZE + 1];
@@ -251,19 +272,20 @@ void Request::read_request(int sd)
 			return ;
 		}
 		std::string to_interpret(input);
-		std::cout << "LOL SMOTRI: \n"   <<bytes << "\"" << to_interpret << "\"" << std::endl;
+		// std::cout << "LOL SMOTRI: \n"   << "\"" << to_interpret << "\"" << std::endl;
 		if (to_interpret.find("Transfer-Encoding: chunked") != std::string::npos || _state == "chunked")
 		{
 			_state = "chunked";
 			_buffer += to_interpret;
 		}
-		std::cout << "buffer: " <<"\"" << _buffer << "\"" << std::endl;
+		// std::cout << "buffer: " <<"\"" << _buffer << "\"" << std::endl;
 		if (_buffer.find("0\r\n\r\n") != std::string::npos)
 		{
 			_state = "read";
 			to_interpret = _buffer;
+			std::cout << "Final request:\n" << to_interpret << std::endl;
 		}
-		std::cout << "LOL SMOTRI: \n"   <<bytes << "\"" << to_interpret << "\"" << std::endl;
+		// std::cout << "LOL SMOTRI: \n"   <<bytes << "\"" << to_interpret << "\"" << std::endl;
 		if (bytes > 0 && _state != "chunked")
 		{
 			_state = "read";
@@ -278,22 +300,16 @@ void Request::read_request(int sd)
 
 				one_header = to_interpret.substr(pos + 1, last - pos);
 				pos = last;
-				std::cout << one_header << isHeaderPresent("Transfer-Encoding", "chunked") << std::endl;
+				// std::cout << one_header << isHeaderPresent("Transfer-Encoding", "chunked") << std::endl;
 				last = to_interpret.find("\n", last + 1);
-				std::cout << "Pos: " << pos + 1 << std::endl;
-				std::cout << "Last: " << last << std::endl;
+				// std::cout << "Pos: " << pos + 1 << std::endl;
+				// std::cout << "Last: " << last << std::endl;
 				addHeader(one_header);
 			}
-			// if (isHeaderPresent("Transfer-Encoding", "chunked"))
-			// {
-			// 	std::cout << "HEere " << one_header << std::endl;
-			// 	setState("chunked");
-			// }
 			if (!isHeaderPresent("Host"))
 				setError(400);
 			if (isHeaderPresent("Content-Length"))
 			{
-				// std::cout << "Jerer" << std::endl;
 				unsigned long content_size = contentLengthChecker(getHeaders());
 				if (content_size != 0)
 				{
@@ -306,6 +322,14 @@ void Request::read_request(int sd)
 				setBody(body);
 				}
 			}
+			if (isHeaderPresent("Transfer-Encoding", "chunked"))
+			{
+
+				std::cout << "chunks: " << "\'" << to_interpret.substr(last + 1) << "\'" <<  std::endl;
+				ChunkedInterpretation(to_interpret.substr(last + 1));
+				std::cout << "\'" <<  _body <<  "\'" << std::endl;
+			}
+
 		}
 		// else if (_state == "chunked" && isHeaderPresent("Transfer-Encoding", "chunked"))
 		// {
