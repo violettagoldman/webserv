@@ -50,6 +50,8 @@ void			Response::handleMethod(Location loc)
 	option = _method;
 	if (_req.getError() != 0)
 	{
+		if (_req.getError() == 405)
+			options(loc);
 		error(_req.getError());
 		return;
 	}
@@ -70,7 +72,7 @@ void			Response::handleMethod(Location loc)
 	else
 	{
 		options(loc);
-		error(405); // redirect to option !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		error(405);
 	}
 }
 
