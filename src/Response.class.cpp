@@ -14,8 +14,15 @@ Response::Response(Request req, Location loc, std::string fp)
 
 Response::Response(std::string cgi_response)
 {
-	(void)cgi_response;
-	// handleCGI(cgi_response);
+	handleCGI(cgi_response);
+}
+
+void Response::handleCGI(std::string cgi_response)
+{
+	std::cout << "-- CGI --" << std::endl;
+	std::cout << cgi_response << std::endl;
+
+	std::string status = cgi_response;
 }
 
 // Response::Response(Response const &src)
@@ -267,7 +274,7 @@ void		Response::post()
 				error(500);
 			else
 			{
-				_headers["Content-Location"] = "get url from request";
+				_headers["Content-Location"] = _req.getPath();
 				_statusCode = 200;
 				_body = _req.getBody();
 			}

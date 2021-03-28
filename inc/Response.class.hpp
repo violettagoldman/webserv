@@ -37,6 +37,7 @@ class Response
 		void		statusCodeTranslation();
 		int			checkPathExistance(std::string path);
 		void		setLastModified(int fd);
+		void		handleCGI(std::string cgi_response);
 		
 
 		
