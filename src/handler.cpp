@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/28 15:18:20 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/28 16:37:34 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,10 +99,19 @@ int count_match(std::string str1, std::string str2)
 std::string create_final_path(Location loc, std::string request_path)
 {
 	std::string root = loc.getRoot();
-	// std::string final(root + request_path.substr(1));
-	(void)request_path;
-	std::cout << "Root "<< root << std::endl;
-	return root;
+	std::string location_pattern(loc.getPattern());
+	std::string request_path_f(request_path);
+	if (request_path!= "/")
+	{
+		if (location_pattern[location_pattern.size() - 1] == '/')
+			location_pattern.erase(location_pattern.size() - 1);
+		request_path_f.erase(request_path_f.find(location_pattern), location_pattern.length());
+	}
+	if (root[root.size() - 1] == '/' && request_path_f[0] == '/')
+		request_path_f.erase(0, 1);
+	std::string final(root + request_path_f);
+	std::cout << "Final: "<< final << std::endl;
+	return final;
 }
 
 bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_method)
@@ -199,7 +208,6 @@ Location	handlerGetLocation(Request req, Config conf)
 				count_max = count_cur;
 				std::cout << "Pattern best" << (*it_best).getPattern() <<  std::endl;
 				std::cout << "Index best" << (*it_best).getIndex()[0] << std::endl;
-				std::cout << "no zero best" << std::endl;
 			}
 		}
 	}
