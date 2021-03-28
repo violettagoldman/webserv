@@ -1,4 +1,4 @@
-		/* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   handler.cpp                                        :+:      :+:    :+:   */
@@ -171,6 +171,9 @@ Location	handlerGetLocation(Request req, Config conf)
 	int count_max = 0;
 	int count_cur;
 	std::vector<Location>::iterator it_best;
+	std::cout << "Error: " << req.getError() << std::endl;
+	if (req.getError() != 0)
+		return hosts.begin()->getLocations()[0];
 	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	{
 		std::vector<Location> server_locations = it->getLocations();

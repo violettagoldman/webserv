@@ -52,7 +52,6 @@ void			Response::handleMethod(Location loc)
 	{
 		error(_req.getError());
 		return;
-
 	}
 	if (option == "GET")
 		get(loc);
@@ -69,7 +68,10 @@ void			Response::handleMethod(Location loc)
 	else if (option == "TRACE")
 		trace();
 	else
-		error(405);
+	{
+		options(loc);
+		error(405); // redirect to option !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	}
 }
 
 void		Response::get(Location loc)
@@ -337,7 +339,6 @@ void		Response::deleteMethod()
 
 void		Response::options(Location loc)
 {
-	// connect to config
 	std::string		methods = "";
 
 	if (loc.getLimitExcept().getMethods().size() == 0)
