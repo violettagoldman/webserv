@@ -14,8 +14,15 @@ Response::Response(Request req, Location loc, std::string fp)
 
 Response::Response(std::string cgi_response)
 {
-	(void)cgi_response;
-	// handleCGI(cgi_response);
+	handleCGI(cgi_response);
+}
+
+void Response::handleCGI(std::string cgi_response)
+{
+	std::cout << "-- CGI --" << std::endl;
+	std::cout << cgi_response << std::endl;
+
+	// std::string status = cgi_response;
 }
 
 // Response::Response(Response const &src)
@@ -50,9 +57,10 @@ void			Response::handleMethod(Location loc)
 	option = _method;
 	if (_req.getError() != 0)
 	{
+		if (_req.getError() == 405)
+			options(loc);
 		error(_req.getError());
 		return;
-
 	}
 	if (option == "GET")
 		get(loc);
@@ -68,8 +76,13 @@ void			Response::handleMethod(Location loc)
 		connect();
 	else if (option == "TRACE")
 		trace();
+	else if (option == "HEAD")
+		head(loc);
 	else
+	{
+		options(loc);
 		error(405);
+	}
 }
 
 void		Response::get(Location loc)
@@ -119,6 +132,11 @@ void		Response::get(Location loc)
 	setLastModified(fd);
 	setContentType(path);
 	close(fd);
+}
+
+void		Response::head(Location loc)
+{
+	get(loc);
 }
 
 void		Response::setContentType(std::string path)
@@ -263,7 +281,7 @@ void		Response::post()
 				error(500);
 			else
 			{
-				_headers["Content-Location"] = "get url from request";
+				_headers["Content-Location"] = _req.getPath();
 				_statusCode = 200;
 				_body = _req.getBody();
 			}
@@ -337,7 +355,6 @@ void		Response::deleteMethod()
 
 void		Response::options(Location loc)
 {
-	// connect to config
 	std::string		methods = "";
 
 	if (loc.getLimitExcept().getMethods().size() == 0)
@@ -421,7 +438,8 @@ std::string 	Response::serialize()
 		res += it->first + ": " + it->second + "\r\n";
 	}
 	res += "\r\n";
-	res += _body;
+	if (_method != "HEAD")
+		res += _body;
 	return (res);
 }
 

@@ -108,7 +108,7 @@ Request		&Request::operator=(Request const &src)
 */
 int Request::isMethod(std::string check)
 {
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 8; i++)
 		if (check == methods[i])
 			return i;
 	return -1;
