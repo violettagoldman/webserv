@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/28 16:37:34 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/28 17:00:04 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "Request.class.hpp"
-
+# include <sys/stat.h>
 int check_listen(VirtualHost host, Header host_header)
 {
 	std::string request_host;
@@ -101,6 +101,9 @@ std::string create_final_path(Location loc, std::string request_path)
 	std::string root = loc.getRoot();
 	std::string location_pattern(loc.getPattern());
 	std::string request_path_f(request_path);
+	struct stat		fileStat;
+	int				fd;
+
 	if (request_path!= "/")
 	{
 		if (location_pattern[location_pattern.size() - 1] == '/')
@@ -110,6 +113,11 @@ std::string create_final_path(Location loc, std::string request_path)
 	if (root[root.size() - 1] == '/' && request_path_f[0] == '/')
 		request_path_f.erase(0, 1);
 	std::string final(root + request_path_f);
+	fd = open(final.c_str(), O_RDONLY);
+	fstat(fd, &fileStat);
+	if (S_ISDIR(fileStat.st_mode) && final[final.size() - 1] != '/')
+		final += "/";
+	close(fd);
 	std::cout << "Final: "<< final << std::endl;
 	return final;
 }
