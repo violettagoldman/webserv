@@ -26,6 +26,7 @@ class Response
 		std::string	getDate(time_t time);
 		void		handleMethod(Location loc);
 		void		get(Location loc);
+		void		head(Location loc);
 		void		post();
 		void		put();
 		void		deleteMethod();

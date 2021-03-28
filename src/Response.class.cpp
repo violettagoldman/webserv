@@ -22,7 +22,7 @@ void Response::handleCGI(std::string cgi_response)
 	std::cout << "-- CGI --" << std::endl;
 	std::cout << cgi_response << std::endl;
 
-	std::string status = cgi_response;
+	// std::string status = cgi_response;
 }
 
 // Response::Response(Response const &src)
@@ -76,6 +76,8 @@ void			Response::handleMethod(Location loc)
 		connect();
 	else if (option == "TRACE")
 		trace();
+	else if (option == "HEAD")
+		head(loc);
 	else
 	{
 		options(loc);
@@ -130,6 +132,11 @@ void		Response::get(Location loc)
 	setLastModified(fd);
 	setContentType(path);
 	close(fd);
+}
+
+void		Response::head(Location loc)
+{
+	get(loc);
 }
 
 void		Response::setContentType(std::string path)
@@ -431,7 +438,8 @@ std::string 	Response::serialize()
 		res += it->first + ": " + it->second + "\r\n";
 	}
 	res += "\r\n";
-	res += _body;
+	if (_method != "HEAD")
+		res += _body;
 	return (res);
 }
 
