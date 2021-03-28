@@ -29,7 +29,9 @@ int		main(int argc, char **argv)
 	int 		sd;
 	std::string	final_path;
 	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
-	
+	std::map<int, Request> chunked_requests;
+	std::map<int, Request>::iterator chunked_pos;
+
 	if (argc == 2)
 	{
 		path_to_conf = argv[1];
@@ -72,7 +74,14 @@ int		main(int argc, char **argv)
 				if (FD_ISSET(sd , &fds_read))
 				{
 					Request request;
+					if ((chunked_pos = chunked_requests.find(sd)) != chunked_requests.end())
+						request = chunked_pos->second;
 					request.read_request(sd);
+
+					if (request.getState() == "chunked")
+						chunked_requests[sd] = request;
+					if ((request.getState() == "read" || request.getState() == "end")&& request.isHeaderPresent("Transfer-Encoding", "chunked"))
+						chunked_requests.erase(sd);
 					if (request.getState() == "end")
 					{
 						servers[s].removeClient(sd);
@@ -83,6 +92,8 @@ int		main(int argc, char **argv)
 					{
 						request.print_headers();
 						final_path = handler(request, conf);
+						std::cout << "State of the error after handler" << request.getError() << std::endl;
+						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
 						if (loc.getFcgiPass() != "")
 						{
@@ -100,7 +111,7 @@ int		main(int argc, char **argv)
 							Response response(handler.getCgiResponse());
 							servers[s].send(sd, response.serialize());
 						}
-						else
+						else if (request.getState() != "chunked")
 						{
 							Response response(request, loc, final_path);
 							if (FD_ISSET(sd, &fds_write))

@@ -1,17 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Location.class.cpp                              :+:      :+:    :+:   */
+/*   Location.class.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:10:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 17:06:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.class.hpp"
 
+/*
+** Constructor for Location
+*/
 Location::Location(ConfigFile &confFile) :
 	ABlock(confFile),
 	limitExcept(confFile),
@@ -22,6 +25,9 @@ Location::Location(ConfigFile &confFile) :
 {
 }
 
+/*
+** Constructor for Location that inherits the parent block directives.
+*/
 Location::Location(ABlock &ab) :
 	ABlock(ab),
 	limitExcept(ab.getConfFile()),
@@ -57,17 +63,12 @@ std::string Location::parsePattern(std::string line)
 	return pattern;
 }
 
-// void Location::inheritParams(int _clientMaxBodySize, bool _autoindex,
-// 		std::string root, std::vector<std::string> _index, std::string _uploadStore)
-// {
-// 	this->clientMaxBodySize = _clientMaxBodySize;
-// 	this->autoindex = _autoindex;
-// 	this->index = _index;
-// 	this->uploadStore = _uploadStore;
-// }
-
+/*
+** Check if the Location block is well formed.
+*/
 void Location::check()
 {
+	ABlock::checkCommon();
 	if (rootSet == true && fcgiSet == true)
 		throw Exception("Root and fcgi_pass on the same location.");
 	if (fcgiSet == true && uploadStoreSet == true)
@@ -81,26 +82,18 @@ void Location::check()
 		throw Exception("location has to specify either root, fastcgi_pass or upload.");
 }
 
-// void Location::inheritParams(ABlock *parent)
-// {
-// 	this->clientMaxBodySize = parent->getClientMaxBodySize;
-// }
-
+/*
+** Handle a line that belongs to the location block.
+** @param lineString The line that belongs to the location block.
+*/
 void Location::handleLine(std::string lineString)
 {
-	// std::cout << "Location handled: " << lineString << std::endl;
-
 	if (lineString.find("limit_except") != std::string::npos)
 	{
-		// LimitExcept lExcept(this->getConfFile());
 		limitExcept.handle();
-
-		// limitExceptVector.push_back(lExcept);
 	}
-
 	if (isPresent(lineString, "root"))
 	{
-		// this->root = getStringDirective(lineString, "root");
 		this->rootSet = true;
 	}
 	if (isPresent(lineString, "location"))
@@ -123,66 +116,73 @@ void Location::handleLine(std::string lineString)
 	}
 }
 
+/*
+** Getter for pattern.
+*/
 std::string Location::getPattern(void) const
 {
 	return this->pattern;
 }
 
-// std::string Location::getRoot(void) const
-// {
-// 	return this->root;
-// }
-
-// int Location::getClientMaxBodySize(void) const 
-// {
-// 	return this->clientMaxBodySize;
-// }
-
-// bool Location::getAutoindex(void) const
-// {
-// 	return this->autoindex;
-// }
-
-// std::vector<std::string> Location::getIndex(void) const
-// {
-// 	return this->index;
-// }
-
+/*
+** Getter for limitExcept.
+*/
 LimitExcept Location::getLimitExcept(void) const
 {
 	return this->limitExcept;
 }
 
+/*
+** Getter for fcgiPass.
+*/
 std::string Location::getFcgiPass(void) const
 {
 	return this->fcgiPass;
 }
 
+/*
+** Getter for fcgiParams.
+*/
 std::map<std::string, std::string> Location::getFcgiParams(void) const
 {
 	return this->fcgiParams;
 }
 
+/*
+** Getter for uploadStore.
+*/
 std::string Location::getUploadStore(void) const
 {
 	return this->uploadStore;
 }
 
+/*
+** Getter for rootSet.
+*/
 bool Location::getRootSet(void) const
 {
 	return this->rootSet;
 }
 
+/*
+** Getter for fcgiSet.
+*/
 bool Location::getFcgiSet(void) const
 {
 	return this->fcgiSet;
 }
 
+/*
+** Getter for uploadStoreSet.
+*/
 bool Location::getUploadStoreSet(void) const
 {
 	return this->uploadStoreSet;
 }
 
+/*
+** Setter for uploadStore.
+*/
 void Location::setUploadStore(std::string _uploadStore)
 {
 	this->uploadStore = _uploadStore;
