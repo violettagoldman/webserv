@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/27 17:53:00 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/03/28 15:18:20 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,22 +178,32 @@ Location	handlerGetLocation(Request req, Config conf)
 	int count_max = 0;
 	int count_cur;
 	std::vector<Location>::iterator it_best;
-	std::cout << "Error: " << req.getError() << std::endl;
-	if (req.getError() != 0)
-		return hosts.begin()->getLocations()[0];
+	std::vector<Location> best_loc;
 	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
 	{
 		std::vector<Location> server_locations = it->getLocations();
 		for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 		{
+			if ((*it_loc).getIndex().size() != 0)
+			{
+				std::cout << "Pattern " << (*it_loc).getPattern() <<  std::endl;
+				std::cout << "Index " << (*it_loc).getIndex()[0] << std::endl;
+				std::cout << "no zero" << std::endl;
+			}
 			if (it_loc->getPattern() == request_path)
 				return (*it_loc);
 			if ((count_cur = count_match((*it_loc).getPattern(), request_pattern)) > count_max)
 			{
 				it_best = it_loc;
+				best_loc.push_back(*it_loc);
 				count_max = count_cur;
+				std::cout << "Pattern best" << (*it_best).getPattern() <<  std::endl;
+				std::cout << "Index best" << (*it_best).getIndex()[0] << std::endl;
+				std::cout << "no zero best" << std::endl;
 			}
 		}
 	}
-	return (*it_best);
+	// std::cout << "get root " << (best).getPattern() << std::endl;
+	// std::cout << "get index " << best_index.size() << std::endl;
+	return (best_loc[best_loc.size() - 1]);
 }
