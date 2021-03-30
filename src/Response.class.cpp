@@ -123,7 +123,7 @@ void		Response::get(Location loc)
 			if (autoindex)
 				setIndexPage(loc);
 			else
-				error(403);
+				error(404);
 			return ;
 		}
 	}
