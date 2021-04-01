@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 13:23:55 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 13:54:03 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/03/27 16:29:25 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include <string>
 # include <vector>
 # include "ConfigFile.class.hpp"
+# include "Utility.hpp"
+# include "Exception.class.hpp"
 
 typedef struct s_credential
 {
