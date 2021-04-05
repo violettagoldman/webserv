@@ -208,6 +208,7 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
 
 	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
+	// v.push_back("CONTENT_TYPE=text/html; charset=utf-8");
 	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
 
 	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
@@ -218,10 +219,8 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
 	
 	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
-	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
 
 	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
-	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
 
 	v.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	v.push_back("SERVER_SOFTWARE=Webserv/1.1");
@@ -242,6 +241,7 @@ char **create_envp(std::vector<std::string> mvars)
 	char **ret = new char*[mvars.size()+1];
 	for (size_t i = 0; i < mvars.size(); i++)
 	{
+		std::cout << mvars[i] << std::endl;
 		ret[i] = ft_strdup(mvars[i].c_str());
 	}
 	ret[mvars.size()] = NULL;
@@ -390,17 +390,24 @@ pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 	size_t scriptNameStart = scriptName.rfind('/');
 	std::string scriptFilename = scriptName.substr(scriptNameStart);
 
-	size_t scriptPosition = requestURI.rfind(scriptFilename);
+	std::string realURI = requestURI;
 
+	if (requestURI.find("http://") != std::string::npos)
+	{
+		size_t hostPartStart = requestURI.find("http://") + 7;
+		size_t URIPartStart = requestURI.find("/", hostPartStart);
+		realURI = requestURI.substr(URIPartStart);
+	}
+	//size_t scriptPosition = requestURI.rfind(scriptFilename);
 
-	std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
+	//std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
 
-	ret.pathInfo = urldecode(afterScript);
+	ret.pathInfo = urldecode(realURI);
 
-	size_t queryStringStart = afterScript.find("?");
+	size_t queryStringStart = realURI.find("?");
 
 	if (queryStringStart != std::string::npos)
-		ret.queryString = afterScript.substr(queryStringStart+1);
+		ret.queryString = realURI.substr(queryStringStart+1);
 	else
 		ret.queryString = "";
 

@@ -108,8 +108,8 @@ int		main(int argc, char **argv)
 							CGIRequires cr =
 							{
 								final_path,
-								"127.0.0.1",
-								"localhost:8880/a.php",
+								 (*(request.getHeaderByName("Host"))).getValue()[0],
+								request.getPath(),
 								servers[s].getPort(),
 								conf.getVirtualHostVector()[s].getServerName()[0],
 								loc.getFcgiPass()
