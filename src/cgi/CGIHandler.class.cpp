@@ -368,6 +368,9 @@ void CGIHandler::readCgiResponse(int fd)
 		resplineString.assign(respline);
 		_cgiResponse += resplineString + "\n";
 	}
+	std::cout << "Nasty stuff" << std::endl;
+	resplineString.assign(respline);
+	_cgiResponse += resplineString + "\n";
 }
 
 /*
