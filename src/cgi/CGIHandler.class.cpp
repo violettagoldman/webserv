@@ -293,14 +293,30 @@ void CGIHandler::launch_cgi()
 */
 void CGIHandler::execute_cgi()
 {
-	char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
+	// char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
 	char *cgiPath = const_cast<char *>(_cgiRequest.pathToCGI.c_str());
 
-	// Apparently, php-cgi doesn't like the script name as argument
-	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
-		reqfile = NULL;
+	
 
-	char *const argv[] = {cgiPath, reqfile};
+	char *const argv[] = {cgiPath, NULL, NULL};
+
+	// If cgi interpreter not specified, just launch the thing
+	
+	// Php-cgi scheme: only launch php-cgi
+	// Apparently, php-cgi doesn't like the script name as argument
+	//if (isCgiPhpCgi(_cgiRequest.pathToCGI))
+//		argv[0] = cgiPath;
+//	else if () // tester scheme, 
+
+
+
+//	if (_cgiRequest.pathToCGI == "")
+		// char *const argv[] = {reqfile, NULL};
+//	else
+		// char *const argv[] = {cgiPath, reqfile, NULL};
+
+
+	// Apparently this is not needed
 
 	execve(cgiPath, argv, _envp);
 }
