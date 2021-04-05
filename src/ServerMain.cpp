@@ -24,6 +24,7 @@ int		main(int argc, char **argv)
 	size_t		i;
 	fd_set		fds;
 	fd_set		fds_read;
+	fd_set		fds_write;
 	int			new_socket;
 	int 		sd;
 	std::string	final_path;
@@ -55,7 +56,8 @@ int		main(int argc, char **argv)
 	while(1)
 	{
 		fds_read = fds;
-		select(FD_SETSIZE, &fds_read , NULL , NULL , NULL);
+		fds_write = fds;
+		select(FD_SETSIZE, &fds_read , &fds_write , NULL , NULL);
 
 		for (size_t s = 0; s < servers.size(); ++s)
 		{
@@ -73,24 +75,13 @@ int		main(int argc, char **argv)
 				{
 					Request request;
 					if ((chunked_pos = chunked_requests.find(sd)) != chunked_requests.end())
-					{
-						std::cout << "kek" << std::endl;
 						request = chunked_pos->second;
-						request.print_headers();
-						// request.setState("chunked");
-						std::cout << request.getState() << std::endl;
-					}
 					request.read_request(sd);
 
 					if (request.getState() == "chunked")
 						chunked_requests[sd] = request;
-					if (request.getState() == "read" && request.isHeaderPresent("Transfer-Encoding", "chunked"))
-					{
-							chunked_requests.erase(sd);
-							// servers[s].removeClient(sd);
-							// FD_CLR(sd, &fds);
-							// close(sd);
-						}
+					if ((request.getState() == "read" || request.getState() == "end")&& request.isHeaderPresent("Transfer-Encoding", "chunked"))
+						chunked_requests.erase(sd);
 					if (request.getState() == "end")
 					{
 						servers[s].removeClient(sd);
@@ -99,17 +90,24 @@ int		main(int argc, char **argv)
 					}
 					else if (request.getState() == "read" || request.getState() == "error")
 					{
-						std::cout << "Here is ok" << std::endl;
 						request.print_headers();
 						final_path = handler(request, conf);
+						std::cout << "State of the error after handler" << request.getError() << std::endl;
+						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
-						if (loc.getFcgiPass() != "")
+						if (loc.getFcgiPass() != "" && request.getMethod() == "POST")
 						{
+							std::cout << final_path << std::endl;
+							std::cout << (*(request.getHeaderByName("Host"))).getValue()[0] << std::endl;
+							std::cout << request.getPath() << std::endl;
+							std::cout << servers[s].getPort() << std::endl;
+							std::cout <<conf.getVirtualHostVector()[s].getServerName()[0]  << std::endl;
+							std::cout << loc.getFcgiPass() << std::endl;
 							CGIRequires cr =
 							{
 								final_path,
 								 (*(request.getHeaderByName("Host"))).getValue()[0],
-								request.getPath(),
+								"http://" + (*(request.getHeaderByName("Host"))).getValue()[0] + request.getPath(),
 								servers[s].getPort(),
 								conf.getVirtualHostVector()[s].getServerName()[0],
 								loc.getFcgiPass()
@@ -122,7 +120,8 @@ int		main(int argc, char **argv)
 						else if (request.getState() != "chunked")
 						{
 							Response response(request, loc, final_path);
-							servers[s].send(sd, response.serialize());
+							if (FD_ISSET(sd, &fds_write))
+								servers[s].send(sd, response.serialize());
 						}
 					}
 				}
