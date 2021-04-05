@@ -95,13 +95,19 @@ int		main(int argc, char **argv)
 						std::cout << "State of the error after handler" << request.getError() << std::endl;
 						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
-						if (loc.getFcgiPass() != "")
+						if (loc.getFcgiPass() != "" && request.getMethod() == "POST")
 						{
+							std::cout << final_path << std::endl;
+							std::cout << (*(request.getHeaderByName("Host"))).getValue()[0] << std::endl;
+							std::cout << request.getPath() << std::endl;
+							std::cout << servers[s].getPort() << std::endl;
+							std::cout <<conf.getVirtualHostVector()[s].getServerName()[0]  << std::endl;
+							std::cout << loc.getFcgiPass() << std::endl;
 							CGIRequires cr =
 							{
 								final_path,
-								"127.0.0.1",
-								"localhost:8880/a.php",
+								 (*(request.getHeaderByName("Host"))).getValue()[0],
+								"http://" + (*(request.getHeaderByName("Host"))).getValue()[0] + request.getPath(),
 								servers[s].getPort(),
 								conf.getVirtualHostVector()[s].getServerName()[0],
 								loc.getFcgiPass()
