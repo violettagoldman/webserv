@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/01 16:21:08 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/06 15:21:47 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,17 +229,19 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 	for (std::vector<Header>::iterator it = headers.begin(); it < headers.end(); ++it)
 		if ((*it).getName() == "Content-Length")
 			values = (*it).getValue();
+	std::cout << "val " << values[0] << std::endl;
 	if (values.size() > 1)
 	{
 		setError(400);
 		return 0;
 	}
 	unsigned long size =  std::strtol(values[0].c_str(), NULL, 10);
-	if (errno)
-	{
-		setError(400);
-		return 0;
-	}
+
+	// if (errno)
+	// {
+	// 	setError(400);
+	// 	return 0;
+	// }
 	return size;
 }
 
@@ -324,19 +326,24 @@ void Request::read_request(int sd)
 				addHeader(one_header);
 			}
 			if (!isHeaderPresent("Host"))
+			{
+				std::cout << "Here" << std::endl;
 				setError(400);
+			}
 			if (isHeaderPresent("Content-Length"))
 			{
 				unsigned long content_size = contentLengthChecker(getHeaders());
+				std::cout << content_size << std::endl;
 				if (content_size != 0)
 				{
 					body = to_interpret.substr(last + 1);
 					if (content_size != body.length() || getError() == 400)
 					{
+						std::cout << "Here" << std::endl;
 						setState("error");
 						setError(400);
 					}
-				setBody(body);
+					setBody(body);
 				}
 			}
 			if (isHeaderPresent("Transfer-Encoding", "chunked"))
