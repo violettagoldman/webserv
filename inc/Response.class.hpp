@@ -38,13 +38,14 @@ class Response
 		void		statusCodeTranslation();
 		int			checkPathExistance(std::string path);
 		void		setLastModified(int fd);
-		void		handleCGI(std::string cgi_response);
+		void		handleCGI(void);
 		
 
 		
 	private:
 		int									_statusCode;
 		std::string							_method;
+		std::string							_cgi_response;
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		std::map<int, std::string>			_statusCodeTranslation;

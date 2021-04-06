@@ -12,17 +12,32 @@ Response::Response(Request req, Location loc, std::string fp)
 	handleMethod(loc);
 }
 
-Response::Response(std::string cgi_response)
+Response::Response(std::string cgi_response) : _cgi_response(cgi_response)
 {
-	handleCGI(cgi_response);
+	handleCGI();
 }
 
-void Response::handleCGI(std::string cgi_response)
+void Response::handleCGI()
 {
-	std::cout << "-- CGI --" << std::endl;
-	std::cout << cgi_response << std::endl;
+	std::string headers = _cgi_response.substr(0, _cgi_response.find("\r\n\r\n"));
+	std::string body = _cgi_response.substr(_cgi_response.find("\r\n\r\n") + 4, _cgi_response.size());
 
-	// std::string status = cgi_response;
+
+	size_t current = 0;
+	while (_cgi_response.substr(current, _cgi_response.size()).find("\r\n") != std::string::npos)
+	{
+		size_t end = _cgi_response.substr(current, _cgi_response.size()).find("\r\n");
+		std::string line = _cgi_response.substr(current, end);
+		size_t sep = line.find(": ");
+		if (sep == std::string::npos)
+			break;
+		std::string key = line.substr(0, sep);
+		std::string value = line.substr(sep + 2, end);
+		_headers[key] = value;
+		current = current + end + 2;
+	}
+	_statusCode = ft_atoi(_headers["Status"].c_str());
+	_body = body;
 }
 
 // Response::Response(Response const &src)
