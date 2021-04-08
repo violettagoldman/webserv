@@ -146,10 +146,7 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	_cgiRequest.scriptFilename = cr.scriptName;
 	_cgiRequest.pathToCGI = cr.pathToCGI;
 
-	if (icr.getBody().size() > 100)
-		pipeline(icr.getBody().substr(0, 5));
-	else
-		pipeline(icr.getBody());
+	pipeline(icr.getBody());
 }
 
 CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
