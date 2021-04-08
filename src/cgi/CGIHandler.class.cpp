@@ -146,7 +146,10 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	_cgiRequest.scriptFilename = cr.scriptName;
 	_cgiRequest.pathToCGI = cr.pathToCGI;
 
-	pipeline(icr.getBody());
+	if (icr.getBody().size() > 100)
+		pipeline(icr.getBody().substr(0, 5));
+	else
+		pipeline(icr.getBody());
 }
 
 CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
@@ -165,6 +168,7 @@ void CGIHandler::pipeline(std::string body)
 	openPipes();
 	prepareEnvp();
 	writeBodyString(_pipeIn[1], body);
+	close(_pipeIn[1]);
 	handleCgi();
 	close(_pipeOut[1]);
 	readCgiResponse(_pipeOut[0]);
@@ -198,8 +202,8 @@ void CGIHandler::prepareEnvp(void)
 
 	v.push_back("AUTH_TYPE=" + _cgiRequest.authType); // basic / digest (request.Authorization)
 
-	if (_bodySize > 0)
-		v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
+	// if (_bodySize > 0)
+	v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
 	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost); // not present in the subject
@@ -211,12 +215,12 @@ void CGIHandler::prepareEnvp(void)
 	// v.push_back("CONTENT_TYPE=text/html; charset=utf-8");
 	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
 
-	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
+	v.push_back("PATH_TRANSLATED=" + _cgiRequest.scriptFilename);
 	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
 
 	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
-	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
+	v.push_back("SCRIPT_NAME=" + _cgiRequest.pathInfo);
 	
 	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
 
