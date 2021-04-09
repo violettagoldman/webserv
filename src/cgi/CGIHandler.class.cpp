@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/09 15:40:06 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/09 16:01:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,7 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr) : _useTempFile(false)
 	_cgiRequest.scriptFilename = cr.scriptName;
 	_cgiRequest.pathToCGI = cr.pathToCGI;
 	std::cout << "Body is: " << icr.getBody() << std::endl;
+	std::cout << "Body size is: " << icr.getBody().size() << std::endl;
 	pipeline(icr.getBody());
 }
 
@@ -161,16 +162,17 @@ CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr), _useT
 */
 void CGIHandler::pipeline(std::string body)
 {
+	countBodySize(body);
 	if (body.size() > 6)
 	{
 		_useTempFile = true;
-		_tempFileWriteFd = open("/tmp/webservTmp", O_WRONLY|O_CREAT|O_TRUNC);
+		_tempFileWriteFd = open("webservTmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
 	}
 	openPipes();
 	prepareEnvp();
 
 	int writeTarget = _useTempFile ? _tempFileWriteFd : _pipeIn[1];
-
+	std::cout << "writeTarget: " << writeTarget << std::endl;
 	
 	writeBodyString(writeTarget, body);
 	close(writeTarget);
@@ -269,7 +271,10 @@ char **create_envp(std::vector<std::string> mvars)
 */
 void CGIHandler::writeBodyString(int fd, std::string body)
 {
-	std::cout << "Wrote " << write(fd, body.c_str(), body.size()) << "bytes" << std::endl;
+	extern int errno;
+	std::cout << "Wrote " << write(fd, body.c_str(), body.size()) << " bytes" << std::endl;
+	std::cout << "Errno: " << errno << std::endl;
+	std::cout << "Error message: " << strerror(errno) << std::endl;
 }
 
 /*
