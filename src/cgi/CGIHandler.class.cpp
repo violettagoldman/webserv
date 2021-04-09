@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGIHandler.cpp                                     :+:      :+:    :+:   */
+/*   CGIHandler.class.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:44:26 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/09 15:40:06 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ authResult CGIHandler::parseAuth(std::string authHeader)
 ** @param icr The request that was matched to be served by CGI
 ** @param cr All other necessary information in a structure
 */
-CGIHandler::CGIHandler(Request icr, CGIRequires cr)
+CGIHandler::CGIHandler(Request icr, CGIRequires cr) : _useTempFile(false)
 {
 
 	std::vector<Header> hds = icr.getHeaders();
@@ -145,11 +145,11 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	_cgiRequest.serverName = cr.serverName;
 	_cgiRequest.scriptFilename = cr.scriptName;
 	_cgiRequest.pathToCGI = cr.pathToCGI;
-
+	std::cout << "Body is: " << icr.getBody() << std::endl;
 	pipeline(icr.getBody());
 }
 
-CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
+CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr), _useTempFile(false)
 {
 	pipeline(body);
 }
@@ -161,11 +161,21 @@ CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
 */
 void CGIHandler::pipeline(std::string body)
 {
-	countBodySize(body);
+	if (body.size() > 6)
+	{
+		_useTempFile = true;
+		_tempFileWriteFd = open("/tmp/webservTmp", O_WRONLY|O_CREAT|O_TRUNC);
+	}
 	openPipes();
 	prepareEnvp();
-	writeBodyString(_pipeIn[1], body);
-	close(_pipeIn[1]);
+
+	int writeTarget = _useTempFile ? _tempFileWriteFd : _pipeIn[1];
+
+	
+	writeBodyString(writeTarget, body);
+	close(writeTarget);
+	
+	
 	handleCgi();
 	close(_pipeOut[1]);
 	readCgiResponse(_pipeOut[0]);
@@ -185,7 +195,10 @@ void CGIHandler::countBodySize(std::string s)
 */
 void CGIHandler::openPipes(void)
 {
-	pipe(_pipeIn);
+	if (!_useTempFile)
+	{
+		pipe(_pipeIn);
+	}
 	pipe(_pipeOut);
 }
 
@@ -256,7 +269,7 @@ char **create_envp(std::vector<std::string> mvars)
 */
 void CGIHandler::writeBodyString(int fd, std::string body)
 {
-	write(fd, body.c_str(), body.size());
+	std::cout << "Wrote " << write(fd, body.c_str(), body.size()) << "bytes" << std::endl;
 }
 
 /*
@@ -282,8 +295,20 @@ void CGIHandler::handleCgi(void)
 */
 void CGIHandler::launch_cgi()
 {
-	close(STDIN_FILENO);
-	dup(_pipeIn[0]);
+	// close(STDIN_FILENO);
+	if (_useTempFile)
+	{
+		int readFd = open("/tmp/webservTmp", O_RDONLY);
+		std::cout << "TEMP" << std::endl;
+		close(STDIN_FILENO);
+		dup(readFd);
+	}
+	else
+	{
+		close(STDIN_FILENO);
+		dup(_pipeIn[0]);
+	}
+	
 	close(STDOUT_FILENO);
 	dup(_pipeOut[1]);
 	execute_cgi();

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGIHandler.hpp                                     :+:      :+:    :+:   */
+/*   CGIHandler.class.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:10:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/09 13:56:16 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,8 @@ private:
 	int _pipeIn[2];
 	int _pipeOut[2];
 	char **_envp;
+	bool _useTempFile;
+	int _tempFileWriteFd;
 
 	void readCgiResponse(int fd);
 	void writeBodyString(int fd, std::string body);
