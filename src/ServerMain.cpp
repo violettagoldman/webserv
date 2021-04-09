@@ -95,7 +95,7 @@ int		main(int argc, char **argv)
 						std::cout << "State of the error after handler" << request.getError() << std::endl;
 						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
-						if (loc.getFcgiPass() != "" && request.getMethod() == "POST")
+						if (loc.getFcgiPass() != "")
 						{
 							std::cout << final_path << std::endl;
 							std::cout << (*(request.getHeaderByName("Host"))).getValue()[0] << std::endl;
@@ -115,6 +115,8 @@ int		main(int argc, char **argv)
 							CGIHandler handler(request, cr);
 							std::cout << "cgi rep:" << handler.getCgiResponse() << std::endl;
 							Response response(handler.getCgiResponse());
+							std::cout << "-- our response --" << std::endl;
+							std::cout << response.serialize() << std::endl;
 							servers[s].send(sd, response.serialize());
 						}
 						else if (request.getState() != "chunked")
