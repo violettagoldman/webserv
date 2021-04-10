@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/10 17:43:15 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/10 18:23:58 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr) : _useTempFile(false)
 
 	_cgiRequest.requestMethod = icr.getMethod();
 
-
+	_headers = icr.getHeaders();
 	// Passed as parameter from matching phase and request
 
 	// 	_cgiRequest.remoteHost = ; // not present in subject
@@ -221,7 +221,7 @@ void CGIHandler::openPipes(void)
 void CGIHandler::prepareEnvp(void)
 {
 	std::vector<std::string> v;
-
+	std::string buf;
 	v.push_back("AUTH_TYPE=" + _cgiRequest.authType); // basic / digest (request.Authorization)
 
 	// if (_bodySize > 0)
@@ -253,6 +253,21 @@ void CGIHandler::prepareEnvp(void)
 
 	v.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	v.push_back("REDIRECT_STATUS=200");
+	for (std::vector<Header>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+	{
+		buf = it->getName();
+		if (buf == "Authorization" || buf == "Content-Length" || buf == "Content-Type" || buf == "Host")
+			continue;
+		for (size_t i = 0; i < buf.length(); ++i)
+			buf[i] = std::toupper(buf[i]);
+		buf = "HTTP_" + buf;
+		std::replace(buf.begin(), buf.end(), '-', '_');
+		buf += "=";
+		buf += it->getValue()[0];
+		// for (std::vector<std::string>::iterator itv = it.getValue().begin(); itv < it.getValue().end(); ++itv)
+		// 	buf += *it;
+		v.push_back(buf);
+	}
 
 	_envp = create_envp(v);
 }
