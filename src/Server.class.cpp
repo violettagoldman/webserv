@@ -99,6 +99,7 @@ int						Server::accept(void)
 */
 int					Server::send(int fd, std::string message) const
 {
+	std::cout << message.size() << std::endl;
 	if (::send(fd, message.c_str(), message.size(), 0) == -1)
 		std::cerr << "Could not send response" << std::endl;
 	return (0);

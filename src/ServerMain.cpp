@@ -113,10 +113,10 @@ int		main(int argc, char **argv)
 								loc.getFcgiPass()
 							};
 							CGIHandler handler(request, cr);
-							std::cout << "cgi rep:" << handler.getCgiResponse() << std::endl;
+							// std::cout << "cgi rep:" << handler.getCgiResponse() << std::endl;
 							Response response(handler.getCgiResponse());
 							std::cout << "-- our response --" << std::endl;
-							std::cout << response.serialize() << std::endl;
+							// std::cout << response.serialize() << std::endl;
 							servers[s].send(sd, response.serialize());
 						}
 						else if (request.getState() != "chunked")
