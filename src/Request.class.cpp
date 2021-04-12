@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/06 15:21:47 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/12 15:25:27 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,6 +246,11 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 }
 
 
+long long Request::getBodyLength() const
+{
+	return _content_length;
+}
+
 void Request::ChunkedInterpretation(std::string chunk)
 {
 	int size;
@@ -344,6 +349,7 @@ void Request::read_request(int sd)
 						setError(400);
 					}
 					setBody(body);
+					_content_length = content_size;
 				}
 			}
 			if (isHeaderPresent("Transfer-Encoding", "chunked"))
@@ -351,6 +357,7 @@ void Request::read_request(int sd)
 
 				// std::cout << "chunks: " << "\'" << to_interpret.substr(last + 1) << "\'" <<  std::endl;
 				ChunkedInterpretation(to_interpret.substr(last + 1));
+				_content_length = _body.size();
 				// std::cout << "Body" << "\'" <<  _body <<  "\'" << std::endl;
 			}
 

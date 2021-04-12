@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/05 17:07:46 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/12 15:29:37 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,6 +236,13 @@ std::string handler(Request &req, Config conf)
 				{
 					std::cout << "KEK" << std::endl;
 					req.setError(405);
+					return final;
+				}
+				if ((*it_best).getClientMaxBodySize() > 0 && (*it_best).getClientMaxBodySize() < req.getBodyLength())
+				{
+					std::cout << (*it_best).getClientMaxBodySize()  << std::endl;
+					std::cout << req.getBodyLength() << std::endl;
+					req.setError(413);
 					return final;
 				}
 				std::cout << "good " << std::endl;
