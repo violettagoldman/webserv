@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/03/27 13:13:55 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/12 15:25:12 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,11 @@ class Request
 		unsigned long contentLengthChecker(std::vector<Header> headers);
 		std::vector<Header>::iterator getHeaderByName(std::string name);
 		void ChunkedInterpretation(std::string chunk);
+		long long getBodyLength() const;
 	private:
 		int _read_bytes;
 		std::vector<Header> _headers;
-		int _content_length;
+		long long _content_length;
 		std::string _status_line;
 		std::string _method;
 		std::string _body;
