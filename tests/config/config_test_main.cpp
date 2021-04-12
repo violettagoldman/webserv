@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:09:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/12 16:18:51 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,8 +159,7 @@ int main(void)
 	check(virtualHostVector[2].getLocations()[0].getUploadStore() == "/toto/lol2/");
 
 	out("Host 2 | Location 1 | fastcgi_pass");
-	check(virtualHostVector[2].getLocations()[1].getFcgiPass() == "127.0.0.1:9000");
-	check(virtualHostVector[2].getLocations()[1].getFcgiParams()["TEST_PARAM"] == "test_val");
+	check(virtualHostVector[2].getLocations()[1].getCgiPath() == "127.0.0.1:9000");
 
 	out("Host 2 | Location 1 | autoindex off");
 	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
@@ -204,11 +203,11 @@ int main(void)
 	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_servers_with_one_name.conf"), Exception, "Two servers with one server_name and listen");
 
 	
-	out("Exception | root and fcgi on same location");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
+	// out("Exception | root and fcgi on same location");
+	// TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
 
-	out("Exception | upload and fcgi on same location");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
+	// out("Exception | upload and fcgi on same location");
+	// TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
 
 	out("Exception | limit_except without method");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/fake_limit_except.conf"), Exception, "limit_except must specify at least one method.");
@@ -220,7 +219,7 @@ int main(void)
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_pattern.conf"), Exception, "location has to have a pattern.");
 
 	out("Exception | location has to specify either root, fastcgi_pass or upload");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, fastcgi_pass or upload.");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, cgi_path or upload.");
 
 	out("Exception | VirtualHost has to either have a location, or specify root or upload");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/empty_virtualhost.conf"), Exception, "VirtualHost has to either have a location, or specify root or upload.");
@@ -261,6 +260,9 @@ int main(void)
 
 	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/nonexistent_passfile"), Exception, "Couldn't open file");
 	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/wrongFormat"), Exception, "Wrong PasswordFile format.");
+
+	out("Config | cgi_extension");
+	check(virtualHostVector[0].getLocations()[0].getCgiExtension() == "php");
 
 	test_results();
 	

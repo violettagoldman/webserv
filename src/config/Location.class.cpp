@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:06:19 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/12 16:18:32 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ Location::Location(ConfigFile &confFile) :
 	limitExcept(confFile),
 	uploadStore(""),
 	rootSet(false),
-	fcgiSet(false),
+	cgiSet(false),
 	uploadStoreSet(false)
 {
 }
@@ -33,7 +33,7 @@ Location::Location(ABlock &ab) :
 	limitExcept(ab.getConfFile()),
 	uploadStore(""),
 	rootSet(false),
-	fcgiSet(false),
+	cgiSet(false),
 	uploadStoreSet(false)
 {
 }
@@ -69,17 +69,17 @@ std::string Location::parsePattern(std::string line)
 void Location::check()
 {
 	ABlock::checkCommon();
-	if (rootSet == true && fcgiSet == true)
-		throw Exception("Root and fcgi_pass on the same location.");
-	if (fcgiSet == true && uploadStoreSet == true)
-		throw Exception("Upload_store and fcgi_pass on the same location.");
+	// if (rootSet == true && cgiSet == true)
+	// 	throw Exception("Root and fcgi_pass on the same location.");
+	// if (cgiSet == true && uploadStoreSet == true)
+	// 	throw Exception("Upload_store and fcgi_pass on the same location.");
 
 	if (!this->limitExcept.isEmpty() &&
 			this->limitExcept.getMethods().size() == 0)
 		throw Exception("limit_except must specify at least one method.");
 
-	if (this->getRoot() == "" && this->fcgiPass == "" && this->uploadStore == "")
-		throw Exception("location has to specify either root, fastcgi_pass or upload.");
+	if (this->getRoot() == "" && this->cgiPath == "" && this->uploadStore == "")
+		throw Exception("location has to specify either root, cgi_path or upload.");
 }
 
 /*
@@ -100,14 +100,14 @@ void Location::handleLine(std::string lineString)
 	{
 		this->pattern = parsePattern(lineString);
 	}
-	if (isPresent(lineString, "fastcgi_pass"))
+	if (isPresent(lineString, "cgi_path"))
 	{
-		this->fcgiPass = getStringDirective(lineString, "fastcgi_pass");
-		this->fcgiSet = true;
+		this->cgiPath = getStringDirective(lineString, "cgi_path");
+		this->cgiSet = true;
 	}
-	if (isPresent(lineString, "fastcgi_param"))
+	if (isPresent(lineString, "cgi_extension"))
 	{
-		parseFastCGIParam(lineString, this->fcgiParams);
+		this->cgiExtension = getStringDirective(lineString, "cgi_extension");
 	}
 	else if (isPresent(lineString, "upload_store"))
 	{
@@ -133,19 +133,19 @@ LimitExcept Location::getLimitExcept(void) const
 }
 
 /*
-** Getter for fcgiPass.
+** Getter for cgiPath.
 */
-std::string Location::getFcgiPass(void) const
+std::string Location::getCgiPath(void) const
 {
-	return this->fcgiPass;
+	return this->cgiPath;
 }
 
 /*
-** Getter for fcgiParams.
+** Legacy getter for fcgiPass.
 */
-std::map<std::string, std::string> Location::getFcgiParams(void) const
+std::string Location::getFcgiPass(void) const
 {
-	return this->fcgiParams;
+	return this->cgiPath;
 }
 
 /*
@@ -165,11 +165,11 @@ bool Location::getRootSet(void) const
 }
 
 /*
-** Getter for fcgiSet.
+** Getter for cgiSet.
 */
-bool Location::getFcgiSet(void) const
+bool Location::getCgiSet(void) const
 {
-	return this->fcgiSet;
+	return this->cgiSet;
 }
 
 /*
@@ -178,6 +178,14 @@ bool Location::getFcgiSet(void) const
 bool Location::getUploadStoreSet(void) const
 {
 	return this->uploadStoreSet;
+}
+
+/*
+** Getter for cgiExtension
+*/
+std::string Location::getCgiExtension(void) const
+{
+	return this->cgiExtension;
 }
 
 /*
