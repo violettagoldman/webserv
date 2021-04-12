@@ -97,18 +97,26 @@ int		main(int argc, char **argv)
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
 						if (loc.getFcgiPass() != "")
 						{
+							std::cout << final_path << std::endl;
+							std::cout << (*(request.getHeaderByName("Host"))).getValue()[0] << std::endl;
+							std::cout << request.getPath() << std::endl;
+							std::cout << servers[s].getPort() << std::endl;
+							std::cout <<conf.getVirtualHostVector()[s].getServerName()[0]  << std::endl;
+							std::cout << loc.getFcgiPass() << std::endl;
 							CGIRequires cr =
 							{
 								final_path,
-								"127.0.0.1",
-								"localhost:8880/a.php",
+								 (*(request.getHeaderByName("Host"))).getValue()[0],
+								"http://" + (*(request.getHeaderByName("Host"))).getValue()[0] + request.getPath(),
 								servers[s].getPort(),
 								conf.getVirtualHostVector()[s].getServerName()[0],
 								loc.getFcgiPass()
 							};
 							CGIHandler handler(request, cr);
-							std::cout << "cgi rep:" << handler.getCgiResponse() << std::endl;
+							// std::cout << "cgi rep:" << handler.getCgiResponse() << std::endl;
 							Response response(handler.getCgiResponse());
+							std::cout << "-- our response --" << std::endl;
+							// std::cout << response.serialize() << std::endl;
 							servers[s].send(sd, response.serialize());
 						}
 						else if (request.getState() != "chunked")

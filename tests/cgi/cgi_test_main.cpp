@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/31 12:15:59 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/18 14:19:18 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/05 17:05:18 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -380,8 +380,28 @@ int main(void)
 	check(pr.queryString == queryString);
 	check(pr.pathTranslated == pathTranslated);
 
+	////////////////////////////////////////////////////////////////////////////
+	// Launching arbitrary cgi
+	////////////////////////////////////////////////////////////////////////////
 
-
+	CGIRequest cr4 = {
+		"127.0.0.1", // remoteAddr
+		// "testRemoteHost", // remoteHost
+		"", // authType
+		"", // remoteIdent
+		"", // remoteUser
+		"", // contentType
+		"/cgi/cgi_tester", // pathInfo,
+		"/cgi/cgi_tester", // pathTranslated,
+		"", // queryString
+		"POST", // requestMethod
+		"", // requestURI
+		"", // serverPort
+		"", // serverName
+		"", // scriptFilename
+		s_pwd + "/cgi/cgi_tester"
+	};
+	std::cout << CGIHandler("sdf", cr4).getCgiResponse() << std::endl;
 	test_results();
 
 }

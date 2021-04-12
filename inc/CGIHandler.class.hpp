@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGIHandler.hpp                                     :+:      :+:    :+:   */
+/*   CGIHandler.class.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:10:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/10 18:06:45 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ char **create_envp(std::vector<std::string> mvars);
 class CGIHandler {
 
 public:
-	// This constructor is mostly for testing. It allows you to set all the 
+	// This constructor is mostly for testing. It allows you to set all the
 	// variables in the structure and pass the body directly.
 	CGIHandler(std::string body, CGIRequest cr);
 
@@ -116,6 +116,9 @@ private:
 	int _pipeIn[2];
 	int _pipeOut[2];
 	char **_envp;
+	bool _useTempFile;
+	int _tempFileWriteFd;
+	std::vector<Header> _headers;
 
 	void readCgiResponse(int fd);
 	void writeBodyString(int fd, std::string body);

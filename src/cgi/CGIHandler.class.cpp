@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGIHandler.cpp                                     :+:      :+:    :+:   */
+/*   CGIHandler.class.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:44:26 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/10 18:23:58 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ std::vector<std::string> getHeaderByKey(std::vector<Header> hds, std::string key
 /*
 ** Find a header in a vector of headers by key, and return its only,
 ** or first value (and print a warning if there is many values).
-** This is useful because in Request headers are only splited by ; so 
+** This is useful because in Request headers are only splited by ; so
 ** most of headers will only have 1 value.
 ** @param key The key to look for.
 ** @param hds The vector of headers to look in.
 ** @ret string The value, or an empty string if no header found.
-** 
+**
 */
 std::string getHeaderStringByKey(std::vector<Header> hds, std::string key)
 {
@@ -108,14 +108,14 @@ authResult CGIHandler::parseAuth(std::string authHeader)
 ** @param icr The request that was matched to be served by CGI
 ** @param cr All other necessary information in a structure
 */
-CGIHandler::CGIHandler(Request icr, CGIRequires cr)
+CGIHandler::CGIHandler(Request icr, CGIRequires cr) : _useTempFile(false)
 {
 
 	std::vector<Header> hds = icr.getHeaders();
 
 
 	// From Request headers
-	
+
 	// Auth
 	std::string authValue;
 	if ((authValue = getHeaderStringByKey(hds, "Authorization")) != "")
@@ -135,7 +135,7 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 
 	_cgiRequest.requestMethod = icr.getMethod();
 
-
+	_headers = icr.getHeaders();
 	// Passed as parameter from matching phase and request
 
 	// 	_cgiRequest.remoteHost = ; // not present in subject
@@ -145,29 +145,51 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr)
 	_cgiRequest.serverName = cr.serverName;
 	_cgiRequest.scriptFilename = cr.scriptName;
 	_cgiRequest.pathToCGI = cr.pathToCGI;
-
+	// std::cout << "Body is: " << icr.getBody() << std::endl;
+	// std::cout << "Body size is: " << icr.getBody().size() << std::endl;
 	pipeline(icr.getBody());
 }
 
-CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr)
+CGIHandler::CGIHandler(std::string body, CGIRequest cr) : _cgiRequest(cr), _useTempFile(false)
 {
 	pipeline(body);
 }
 
 /*
-** This is the dispatch function that controls what CGI will do, 
+** This is the dispatch function that controls what CGI will do,
 ** and in what order, to prevent repetition in constructors.
 ** @param body The request body.
 */
 void CGIHandler::pipeline(std::string body)
 {
+	pid_t pid;
 	countBodySize(body);
+	// if (body.size() > 6)
+	// {
+	// 	_useTempFile = true;
+	// 	_tempFileWriteFd = open("webservTmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+	// }
 	openPipes();
 	prepareEnvp();
+	pid = fork();
+	if (pid == 0)
+	{
+		launch_cgi();
+	}
+	close(_pipeIn[0]);
+	// int writeTarget = _useTempFile ? _tempFileWriteFd : _pipeIn[1];
+	// std::cout << "writeTarget: " << writeTarget << std::endl;
+	fd_set wr;
+	FD_ZERO(&wr);
+	FD_SET(_pipeIn[1], &wr);
+	select(_pipeIn[1] + 1, 0, &wr, 0, 0);
 	writeBodyString(_pipeIn[1], body);
-	handleCgi();
-	close(_pipeOut[1]);
-	readCgiResponse(_pipeOut[0]);
+	close(_pipeIn[1]);
+	(void)_useTempFile;
+	waitpid(pid, NULL, 0);
+	// handleCgi();
+	// close(_pipeOut[1]);
+	readCgiResponse(_tempFileWriteFd);
 }
 
 /*
@@ -184,8 +206,12 @@ void CGIHandler::countBodySize(std::string s)
 */
 void CGIHandler::openPipes(void)
 {
+	// if (!_useTempFile)
+	// {
 	pipe(_pipeIn);
-	pipe(_pipeOut);
+	// }
+	(void)_pipeOut;
+	// pipe(_pipeOut);
 }
 
 /*
@@ -195,11 +221,11 @@ void CGIHandler::openPipes(void)
 void CGIHandler::prepareEnvp(void)
 {
 	std::vector<std::string> v;
-
+	std::string buf;
 	v.push_back("AUTH_TYPE=" + _cgiRequest.authType); // basic / digest (request.Authorization)
 
-	if (_bodySize > 0)
-		v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
+	// if (_bodySize > 0)
+	v.push_back("CONTENT_LENGTH=" + ft_itostr(_bodySize));
 
 	v.push_back("REMOTE_ADDR=" + _cgiRequest.remoteAddr);
 	// v.push_back("REMOTE_HOST=" + _cgiRequest.remoteHost); // not present in the subject
@@ -208,26 +234,40 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("REMOTE_USER=" + _cgiRequest.remoteUser);
 
 	v.push_back("CONTENT_TYPE=" + _cgiRequest.contentType);
+	// v.push_back("CONTENT_TYPE=text/html; charset=utf-8");
 	v.push_back("PATH_INFO=" + _cgiRequest.pathInfo);
 
-	v.push_back("PATH_TRANSLATED=" + _cgiRequest.pathTranslated);
+	v.push_back("PATH_TRANSLATED=" + _cgiRequest.scriptFilename);
 	v.push_back("QUERY_STRING=" + _cgiRequest.queryString);
 
 	v.push_back("REQUEST_METHOD=" + _cgiRequest.requestMethod);
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
-	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
-	
+	v.push_back("SCRIPT_NAME=" + _cgiRequest.pathInfo);
+
 	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
-	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
 
 	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
-	v.push_back("SCRIPT_NAME=" + _cgiRequest.scriptFilename);
 
 	v.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	v.push_back("SERVER_SOFTWARE=Webserv/1.1");
 
 	v.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	v.push_back("REDIRECT_STATUS=200");
+	for (std::vector<Header>::iterator it = _headers.begin(); it < _headers.end(); ++it)
+	{
+		buf = it->getName();
+		if (buf == "Authorization" || buf == "Content-Length" || buf == "Content-Type" || buf == "Host")
+			continue;
+		for (size_t i = 0; i < buf.length(); ++i)
+			buf[i] = std::toupper(buf[i]);
+		buf = "HTTP_" + buf;
+		std::replace(buf.begin(), buf.end(), '-', '_');
+		buf += "=";
+		buf += it->getValue()[0];
+		// for (std::vector<std::string>::iterator itv = it.getValue().begin(); itv < it.getValue().end(); ++itv)
+		// 	buf += *it;
+		v.push_back(buf);
+	}
 
 	_envp = create_envp(v);
 }
@@ -242,6 +282,7 @@ char **create_envp(std::vector<std::string> mvars)
 	char **ret = new char*[mvars.size()+1];
 	for (size_t i = 0; i < mvars.size(); i++)
 	{
+		std::cout << mvars[i] << std::endl;
 		ret[i] = ft_strdup(mvars[i].c_str());
 	}
 	ret[mvars.size()] = NULL;
@@ -255,7 +296,15 @@ char **create_envp(std::vector<std::string> mvars)
 */
 void CGIHandler::writeBodyString(int fd, std::string body)
 {
+	// extern int errno;
+	// fcntl(fd, F_SETFL, O_NONBLOCK);
+
+	// while (b != (long long) body.size())
+	// {
 	write(fd, body.c_str(), body.size());
+	// }
+	// std::cout << "Errno: " << errno << std::endl;
+	// std::cout << "Error message: " << strerror(errno) << std::endl;
 }
 
 /*
@@ -263,16 +312,13 @@ void CGIHandler::writeBodyString(int fd, std::string body)
 */
 void CGIHandler::handleCgi(void)
 {
-	pid_t pid;
+
 	extern int errno;
-	
-	pid = fork();
-	
-	if (pid == 0)
-	{
-		launch_cgi();
-	}
-	waitpid(pid, NULL, 0);
+
+
+
+
+	// waitpid(pid, NULL, 0);
 }
 
 /*
@@ -281,11 +327,29 @@ void CGIHandler::handleCgi(void)
 */
 void CGIHandler::launch_cgi()
 {
-	close(STDIN_FILENO);
-	dup(_pipeIn[0]);
-	close(STDOUT_FILENO);
-	dup(_pipeOut[1]);
+	// close(STDIN_FILENO);
+	// if (_useTempFile)
+	// {
+	// 	int readFd = open("/tmp/webservTmp", O_RDONLY);
+	// 	std::cout << "TEMP" << std::endl;
+	// 	close(STDIN_FILENO);
+	// 	dup(readFd);
+	// }
+	// else
+	// {
+		// close(STDIN_FILENO);
+	_tempFileWriteFd = open("webservTmp",O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+	close(_pipeIn[1]);
+	dup2(_pipeIn[0], 0);
+	dup2(_tempFileWriteFd, 1);
+	close(_tempFileWriteFd);
+	// }
+	close(_pipeIn[0]);
+	// close(STDOUT_FILENO);
+	// dup2(_pipeOut[1]);
 	execute_cgi();
+	close(0);
+
 }
 
 /*
@@ -293,14 +357,30 @@ void CGIHandler::launch_cgi()
 */
 void CGIHandler::execute_cgi()
 {
-	char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
+	// char *reqfile = const_cast<char *>(_cgiRequest.scriptFilename.c_str());
 	char *cgiPath = const_cast<char *>(_cgiRequest.pathToCGI.c_str());
 
-	// Apparently, php-cgi doesn't like the script name as argument
-	if (isCgiPhpCgi(_cgiRequest.pathToCGI))
-		reqfile = NULL;
+	// fcntl(_tempFileWriteFd, F_SETFL, O_NONBLOCK);
 
-	char *const argv[] = {cgiPath, reqfile};
+	char *const argv[] = {cgiPath, NULL, NULL};
+
+	// If cgi interpreter not specified, just launch the thing
+
+	// Php-cgi scheme: only launch php-cgi
+	// Apparently, php-cgi doesn't like the script name as argument
+	//if (isCgiPhpCgi(_cgiRequest.pathToCGI))
+//		argv[0] = cgiPath;
+//	else if () // tester scheme,
+
+
+
+//	if (_cgiRequest.pathToCGI == "")
+		// char *const argv[] = {reqfile, NULL};
+//	else
+		// char *const argv[] = {cgiPath, reqfile, NULL};
+
+
+	// Apparently this is not needed
 
 	execve(cgiPath, argv, _envp);
 }
@@ -341,17 +421,34 @@ void cgi_response_select(int fd)
 */
 void CGIHandler::readCgiResponse(int fd)
 {
-	char *respline;
+	// char *respline;
 	std::string resplineString;
 	int ret;
+	char buf[BUFFER_SIZE + 1];
 
-	cgi_response_select(fd);
-	while ((ret = fd_get_next_line(fd, &respline)))
+	bzero(buf, BUFFER_SIZE + 1);
+	// cgi_response_select(fd);
+	fd = open("webservTmp", O_RDONLY, 0666);
+	_cgiResponse = "";
+	while ((ret = read(fd, buf, BUFFER_SIZE)))
+	// while ((ret = fd_get_next_line(fd, &respline)))
 	{
-		cgi_response_select(fd);
-		resplineString.assign(respline);
-		_cgiResponse += resplineString + "\n";
+		// cgi_response_select(fd);
+		// std::cout << resplineString << std::endl;
+		// resplineString.assign(respline);
+		// _cgiResponse += resplineString + "\n";
+		_cgiResponse.append(buf);
+		bzero(buf, BUFFER_SIZE + 1);
 	}
+	// if (_cgiResponse.size() > 1000)
+	// 	std::cout << _cgiResponse.substr(100, 100) << std::endl;
+	close(fd);
+	std::cout <<  _cgiResponse.size() << std::endl;
+	std::cout << "Nasty stuff" << std::endl;
+
+	// resplineString.assign(respline);
+	// _cgiResponse += resplineString + "\n";
+	// _cgiResponse.append(buf)
 }
 
 /*
@@ -359,6 +456,7 @@ void CGIHandler::readCgiResponse(int fd)
 */
 std::string CGIHandler::getCgiResponse(void) const
 {
+
 	return _cgiResponse;
 }
 
@@ -374,17 +472,24 @@ pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 	size_t scriptNameStart = scriptName.rfind('/');
 	std::string scriptFilename = scriptName.substr(scriptNameStart);
 
-	size_t scriptPosition = requestURI.rfind(scriptFilename);
+	std::string realURI = requestURI;
 
+	if (requestURI.find("http://") != std::string::npos)
+	{
+		size_t hostPartStart = requestURI.find("http://") + 7;
+		size_t URIPartStart = requestURI.find("/", hostPartStart);
+		realURI = requestURI.substr(URIPartStart);
+	}
+	//size_t scriptPosition = requestURI.rfind(scriptFilename);
 
-	std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
+	//std::string afterScript = requestURI.substr(scriptPosition+scriptFilename.size());
 
-	ret.pathInfo = urldecode(afterScript);
+	ret.pathInfo = urldecode(realURI);
 
-	size_t queryStringStart = afterScript.find("?");
+	size_t queryStringStart = realURI.find("?");
 
 	if (queryStringStart != std::string::npos)
-		ret.queryString = afterScript.substr(queryStringStart+1);
+		ret.queryString = realURI.substr(queryStringStart+1);
 	else
 		ret.queryString = "";
 
