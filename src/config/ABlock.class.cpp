@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:05:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/12 15:36:42 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 */
 ABlock::ABlock(ConfigFile &confFile) :
 	_confFile(confFile),
-	_clientMaxBodySize(1000000),
+	_clientMaxBodySize(0),
 	_autoindex(false),
 	_index(std::vector<std::string>(1, "index.html")),
 	_root("html"),
@@ -332,7 +332,7 @@ bool ABlock::parseBoolDirective(std::string lineString, std::string key)
 ** @param lineString The line belonging to this block
 ** @param listenHost The reference to the listenHost variable that will be set
 ** to the actual listen host.
-** @param listenPort The reference to the listenPort variable, that will be set 
+** @param listenPort The reference to the listenPort variable, that will be set
 ** to the port.
 */
 void ABlock::parseListen(std::string lineString, std::string &listenHost,
