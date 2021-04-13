@@ -44,6 +44,7 @@ std::string		readFile(std::string file)
 		for (size_t i = 0; i < 257; i++)
 			buffer[i] = 0;
 	}
+	close(fd);
 	return (html);
 }
 
