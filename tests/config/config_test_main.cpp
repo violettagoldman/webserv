@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/13 17:00:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/13 17:24:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,6 +302,9 @@ int main(void)
 
 	TestCGIRequest tr5("GET", "lalabody", hds4, "lala");
 	check(virtualHostVector[0].getLocations()[0].authenticate(tr5) == false);
+
+	// Auth realm without credentials :)
+	TEST_EXCEPTION(ConfigReader p("./config/test_configs/auth_without_file.conf"), Exception, "You have to provide a credential file for Basic auth.");
 
 	test_results();
 	
