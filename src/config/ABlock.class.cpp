@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:05:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/13 17:10:43 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -411,4 +411,13 @@ std::string ABlock::getRealm(void) const
 std::vector<Credential> ABlock::getCredentials(void) const
 {
 	return _credentials;
+}
+
+/*
+** Return true if you need to authenticate requests through this block, and
+** false otherwise.
+*/
+bool ABlock::needsAuth(void) const
+{
+	return _realm != "off";
 }
