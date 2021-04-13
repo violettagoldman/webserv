@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/12 16:18:32 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/13 17:03:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,62 @@ void Location::handleLine(std::string lineString)
 		this->uploadStore = getStringDirective(lineString, "upload_store");
 		this->uploadStoreSet = true;
 	}
+}
+
+/*
+** Return true if request has the right authorization header, and false otherwise.
+** @param r Request
+** @ret bool If the request is authorized for this location.
+*/
+bool Location::authenticate(Request &r)
+{
+	std::vector<Header> headers = r.getHeaders();
+
+	std::string authValue;
+	for (size_t i = 0; i < headers.size(); i++)
+	{
+		if (headers[i].getName() == "Authorization")
+		{
+			if (headers[i].getValue().size() != 1)
+				return false;
+			authValue = headers[i].getValue()[0];
+		}
+	}
+	
+	std::vector<std::string> parts = ft_split(authValue, ' ');
+
+	if (parts.size() != 2)
+	{
+		return false;
+	}
+
+	std::string user;
+	std::string password;
+
+	if (parts[0] == "Basic")
+	{
+		std::string decodedCreds = Base64(parts[1]).decode();
+
+		std::vector<std::string> creds = ft_split(decodedCreds, ':');
+		if (creds.size() != 2)
+		{
+			return false;
+		}
+		user = creds[0];
+		password = creds[1];
+	}
+	else
+	{
+		return false;
+	}
+	
+	for (size_t i = 0; i < this->getCredentials().size(); i++)
+	{
+		if (this->getCredentials()[i].username == user &&
+			this->getCredentials()[i].password == password )
+			return true;
+	}
+	return false;
 }
 
 /*
