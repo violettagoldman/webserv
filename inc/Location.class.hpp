@@ -20,6 +20,8 @@
 # include "Exception.class.hpp"
 # include "Utility.hpp"
 # include "LimitExcept.class.hpp"
+# include "Request.class.hpp"
+# include "Base64.class.hpp"
 
 /*
 ** The class that represents a location context in a NGINX config file.
@@ -34,14 +36,18 @@ public:
 
 	std::string getPattern(void) const;
 	std::string getFcgiPass(void) const;
-	std::map<std::string, std::string> getFcgiParams(void) const;
+	std::string getCgiPath(void) const;
 	std::string getUploadStore(void) const;
 	LimitExcept getLimitExcept(void) const;
-	bool getFcgiSet(void) const;
+	bool getCgiSet(void) const;
 	bool getRootSet(void) const;
 	bool getUploadStoreSet(void) const;
 
+	std::string getCgiExtension(void) const;
+
 	void setUploadStore(std::string uploadStore);
+
+	bool authenticate(Request &r);
 
 	void check(void);
 
@@ -49,12 +55,12 @@ private:
 	std::string parsePattern(std::string line);
 	std::string pattern;
 	LimitExcept limitExcept;
-	std::string fcgiPass;
-	std::map<std::string, std::string> fcgiParams;
+	std::string cgiPath;
 	std::string uploadStore;
 	bool rootSet;
-	bool fcgiSet;
+	bool cgiSet;
 	bool uploadStoreSet;
+	std::string cgiExtension;
 };
 
 #endif

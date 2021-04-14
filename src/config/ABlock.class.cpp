@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/12 15:36:42 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/13 17:24:29 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ void ABlock::checkLine(std::string lineString)
 
 void ABlock::checkCommon(void)
 {
+	if (_realm != "off" && _userFilePath == "")
+		throw Exception("You have to provide a credential file for Basic auth.");
 	if (_userFilePath != "")
 		_credentials = PasswordFile(_userFilePath).getCredentials();
 }
@@ -411,4 +413,13 @@ std::string ABlock::getRealm(void) const
 std::vector<Credential> ABlock::getCredentials(void) const
 {
 	return _credentials;
+}
+
+/*
+** Return true if you need to authenticate requests through this block, and
+** false otherwise.
+*/
+bool ABlock::needsAuth(void) const
+{
+	return _realm != "off";
 }

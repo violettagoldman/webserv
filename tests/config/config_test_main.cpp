@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:09:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/13 17:24:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include "VirtualHost.class.hpp"
 #include "ConfigReader.class.hpp"
 #include "PasswordFile.class.hpp"
+#include "TestCGIRequest.class.hpp"
 
 int main(void)
 {
@@ -159,8 +160,7 @@ int main(void)
 	check(virtualHostVector[2].getLocations()[0].getUploadStore() == "/toto/lol2/");
 
 	out("Host 2 | Location 1 | fastcgi_pass");
-	check(virtualHostVector[2].getLocations()[1].getFcgiPass() == "127.0.0.1:9000");
-	check(virtualHostVector[2].getLocations()[1].getFcgiParams()["TEST_PARAM"] == "test_val");
+	check(virtualHostVector[2].getLocations()[1].getCgiPath() == "127.0.0.1:9000");
 
 	out("Host 2 | Location 1 | autoindex off");
 	check(virtualHostVector[2].getLocations()[1].getAutoindex() == false);
@@ -204,11 +204,11 @@ int main(void)
 	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_servers_with_one_name.conf"), Exception, "Two servers with one server_name and listen");
 
 	
-	out("Exception | root and fcgi on same location");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
+	// out("Exception | root and fcgi on same location");
+	// TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_with_multiple_actions.conf"), Exception, "Root and fcgi_pass on the same location.");
 
-	out("Exception | upload and fcgi on same location");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
+	// out("Exception | upload and fcgi on same location");
+	// TEST_EXCEPTION(ConfigReader r3("./config/test_configs/upload_and_fcgi.conf"), Exception, "Upload_store and fcgi_pass on the same location.");
 
 	out("Exception | limit_except without method");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/fake_limit_except.conf"), Exception, "limit_except must specify at least one method.");
@@ -220,7 +220,7 @@ int main(void)
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_pattern.conf"), Exception, "location has to have a pattern.");
 
 	out("Exception | location has to specify either root, fastcgi_pass or upload");
-	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, fastcgi_pass or upload.");
+	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/location_without_action.conf"), Exception, "location has to specify either root, cgi_path or upload.");
 
 	out("Exception | VirtualHost has to either have a location, or specify root or upload");
 	TEST_EXCEPTION(ConfigReader r3("./config/test_configs/empty_virtualhost.conf"), Exception, "VirtualHost has to either have a location, or specify root or upload.");
@@ -261,6 +261,50 @@ int main(void)
 
 	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/nonexistent_passfile"), Exception, "Couldn't open file");
 	TEST_EXCEPTION(PasswordFile p("./config/test_password_files/wrongFormat"), Exception, "Wrong PasswordFile format.");
+
+	out("Config | cgi_extension");
+	check(virtualHostVector[0].getLocations()[0].getCgiExtension() == "php");
+
+	out("Config | authenticate request");
+
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[0].username << std::endl;
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[0].password << std::endl;
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[1].username << std::endl;
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[1].password << std::endl;
+
+
+	std::vector<Header> hds;
+	hds.push_back(Header("Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l\n")); //aladdin:sesame;
+
+	std::vector<Header> hds2;
+	hds2.push_back(Header("Authorization: Basic c2xlZXBpbmc6ZHJhZ29u\n")); //sleeping:dragon;
+
+	TestCGIRequest tr1("GET", "lalabody", hds, "whateverpath");
+	TestCGIRequest tr2("GET", "lalabody", hds2, "whateverpath");
+
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr1) == false);
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr2) == true);
+
+	// no header
+	TestCGIRequest tr3("GET", "lalabody", std::vector<Header>(), "whateverpath");
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr3) == false);
+
+	// Wrong authorization type
+	std::vector<Header> hds3;
+	hds3.push_back(Header("Authorization: Advanced lalala\n"));
+
+	TestCGIRequest tr4("GET", "lalabody", hds3, "lala");
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr4) == false);
+
+	// Wrong authorization format
+	std::vector<Header> hds4;
+	hds3.push_back(Header("Authorization: Basic I have no idea what I'm doing\n"));
+
+	TestCGIRequest tr5("GET", "lalabody", hds4, "lala");
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr5) == false);
+
+	// Auth realm without credentials :)
+	TEST_EXCEPTION(ConfigReader p("./config/test_configs/auth_without_file.conf"), Exception, "You have to provide a credential file for Basic auth.");
 
 	test_results();
 	

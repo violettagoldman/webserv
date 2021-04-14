@@ -42,6 +42,8 @@ void Response::handleCGI()
 	}
 	_statusCode = ft_atoi(_headers["Status"].c_str());
 	_body = body;
+	std::cout << "-- CGI RESPONSE --\n";
+	std::cout << _body;
 }
 
 // Response::Response(Response const &src)
@@ -136,6 +138,7 @@ void		Response::get(Location loc)
 				path = index;
 				is_index = true;
 			}
+			close(fd_try);
 		}
 		if (!is_index)
 		{

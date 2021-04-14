@@ -288,7 +288,7 @@ void Request::read_request(int sd)
 		size_t last;
 		std::string body;
 		std::string start_line;
-		std::cout << "before reading" << std::endl;
+		// std::cout << "before reading" << std::endl;
 		usleep(1000);
 		bytes = recv(sd, input, BUFFER_SIZE, 0);
 		if (bytes <= 0)

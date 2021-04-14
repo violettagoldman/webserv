@@ -55,11 +55,11 @@ std::string path_to_pattern(std::string path)
 {
 	size_t pos;
 
-	std::cout << "here" << std::endl;
+	// std::cout << "here" << std::endl;
 	pos = path.find_last_of('/');
 	if (pos == 0)
 		pos = std::string::npos;
-	std::cout << "Patter:" << path.substr(0, pos) << ";" << std::endl;
+	// std::cout << "Patter:" << path.substr(0, pos) << ";" << std::endl;
 	return path.substr(0, pos);
 }
 
