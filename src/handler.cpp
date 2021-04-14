@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/12 15:29:37 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/14 17:26:26 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,12 @@ std::string handler(Request &req, Config conf)
 					std::cout << (*it_best).getClientMaxBodySize()  << std::endl;
 					std::cout << req.getBodyLength() << std::endl;
 					req.setError(413);
+					return final;
+				}
+				if ((*it_best).needsAuth() && !(*it_best).authenticate(req))
+				{
+					req.setError(401);
+					std::cout << "Auth" << std::endl;
 					return final;
 				}
 				std::cout << "good " << std::endl;
