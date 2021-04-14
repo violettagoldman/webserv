@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/12 16:18:51 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/13 17:24:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include "VirtualHost.class.hpp"
 #include "ConfigReader.class.hpp"
 #include "PasswordFile.class.hpp"
+#include "TestCGIRequest.class.hpp"
 
 int main(void)
 {
@@ -263,6 +264,47 @@ int main(void)
 
 	out("Config | cgi_extension");
 	check(virtualHostVector[0].getLocations()[0].getCgiExtension() == "php");
+
+	out("Config | authenticate request");
+
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[0].username << std::endl;
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[0].password << std::endl;
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[1].username << std::endl;
+	std::cout << "Looking for creds:" << virtualHostVector[0].getLocations()[0].getCredentials()[1].password << std::endl;
+
+
+	std::vector<Header> hds;
+	hds.push_back(Header("Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l\n")); //aladdin:sesame;
+
+	std::vector<Header> hds2;
+	hds2.push_back(Header("Authorization: Basic c2xlZXBpbmc6ZHJhZ29u\n")); //sleeping:dragon;
+
+	TestCGIRequest tr1("GET", "lalabody", hds, "whateverpath");
+	TestCGIRequest tr2("GET", "lalabody", hds2, "whateverpath");
+
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr1) == false);
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr2) == true);
+
+	// no header
+	TestCGIRequest tr3("GET", "lalabody", std::vector<Header>(), "whateverpath");
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr3) == false);
+
+	// Wrong authorization type
+	std::vector<Header> hds3;
+	hds3.push_back(Header("Authorization: Advanced lalala\n"));
+
+	TestCGIRequest tr4("GET", "lalabody", hds3, "lala");
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr4) == false);
+
+	// Wrong authorization format
+	std::vector<Header> hds4;
+	hds3.push_back(Header("Authorization: Basic I have no idea what I'm doing\n"));
+
+	TestCGIRequest tr5("GET", "lalabody", hds4, "lala");
+	check(virtualHostVector[0].getLocations()[0].authenticate(tr5) == false);
+
+	// Auth realm without credentials :)
+	TEST_EXCEPTION(ConfigReader p("./config/test_configs/auth_without_file.conf"), Exception, "You have to provide a credential file for Basic auth.");
 
 	test_results();
 	

@@ -20,6 +20,8 @@
 # include "Exception.class.hpp"
 # include "Utility.hpp"
 # include "LimitExcept.class.hpp"
+# include "Request.class.hpp"
+# include "Base64.class.hpp"
 
 /*
 ** The class that represents a location context in a NGINX config file.
@@ -44,6 +46,8 @@ public:
 	std::string getCgiExtension(void) const;
 
 	void setUploadStore(std::string uploadStore);
+
+	bool authenticate(Request &r);
 
 	void check(void);
 

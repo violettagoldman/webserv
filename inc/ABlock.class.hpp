@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 12:37:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:05:40 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/13 17:09:56 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ public:
 	std::string getRoot(void) const;
 	std::map<int, std::string> getErrorPage(void) const;
 	std::string getRealm(void) const;
+	bool needsAuth(void) const;
 	std::vector<Credential> getCredentials(void) const;
 
 private:
@@ -88,8 +89,6 @@ private:
 	std::string _realm;
 	std::vector<Credential> _credentials;
 	std::string _userFilePath;
-
-
 };
 
 #endif
