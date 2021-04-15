@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/10 18:23:58 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/12 16:42:22 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ std::vector<std::string> getHeaderByKey(std::vector<Header> hds, std::string key
 	}
 	return std::vector<std::string>();
 }
-
 
 /*
 ** Find a header in a vector of headers by key, and return its only,
@@ -244,6 +243,7 @@ void CGIHandler::prepareEnvp(void)
 	v.push_back("REQUEST_URI=" + _cgiRequest.requestURI);
 	v.push_back("SCRIPT_NAME=" + _cgiRequest.pathInfo);
 
+	v.push_back("SERVER_NAME=" + _cgiRequest.serverName);
 	v.push_back("SERVER_PORT=" + _cgiRequest.serverPort);
 
 	v.push_back("SCRIPT_FILENAME=" + _cgiRequest.scriptFilename);
@@ -443,8 +443,6 @@ void CGIHandler::readCgiResponse(int fd)
 	// if (_cgiResponse.size() > 1000)
 	// 	std::cout << _cgiResponse.substr(100, 100) << std::endl;
 	close(fd);
-	std::cout <<  _cgiResponse.size() << std::endl;
-	std::cout << "Nasty stuff" << std::endl;
 
 	// resplineString.assign(respline);
 	// _cgiResponse += resplineString + "\n";

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 13:51:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/15 17:28:18 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 class VirtualHost : public ABlock
 {
 public:
-	VirtualHost(ConfigFile &confFile);
+	VirtualHost(ConfigFile *confFile);
 
 	VirtualHost(ABlock &ab);
 	void handleLine(std::string lineString);

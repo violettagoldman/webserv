@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/15 16:43:13 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/15 17:28:53 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*
 ** Constructor for Location
 */
-Location::Location(ConfigFile &confFile) :
+Location::Location(ConfigFile *confFile) :
 	ABlock(confFile),
 	limitExcept(confFile),
 	uploadStore(""),
@@ -57,7 +57,7 @@ std::string Location::parsePattern(std::string line)
 	trimWhitespace(pattern);
 	if (pattern.size() == 0)
 	{
-		this->getConfFile().rewind();
+		this->getConfFile()->rewind();
 		throw Exception("location has to have a pattern.");
 	}
 	return pattern;

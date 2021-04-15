@@ -6,18 +6,30 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/13 17:24:29 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/15 17:24:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ABlock.class.hpp"
+
+ABlock::ABlock() :
+	_confFile(NULL),
+	_clientMaxBodySize(0),
+	_autoindex(false),
+	_index(std::vector<std::string>(1, "index.html")),
+	_root("html"),
+	_realm("off"),
+	_credentials(std::vector<Credential>()),
+	_userFilePath("")
+{
+}
 
 /*
 ** The go-to constructor of a block. Includes the nginx defaults for
 ** the directives.
 ** @param confFile a reference to an opened ConfigFile.
 */
-ABlock::ABlock(ConfigFile &confFile) :
+ABlock::ABlock(ConfigFile *confFile) :
 	_confFile(confFile),
 	_clientMaxBodySize(0),
 	_autoindex(false),
@@ -88,7 +100,7 @@ void ABlock::handle()
 	bool blockClosed = false;
 	do
 	{
-		std::string ls = _confFile.getLineString();
+		std::string ls = _confFile->getLineString();
 		checkLine(ls);
 
 		if (ls.find("}") != std::string::npos)
@@ -101,7 +113,7 @@ void ABlock::handle()
 		handleLine(ls);
 
 	}
-	while(_confFile.getNext());
+	while(_confFile->getNext());
 	if (!blockClosed)
 		throw Exception("A block wasn't closed");
 }
@@ -119,7 +131,7 @@ void ABlock::parseErrorPage(std::string directiveValue)
 
 	if (directiveParts.size() < 2)
 	{
-		_confFile.rewind();
+		_confFile->rewind();
 		throw Exception("error_page has to specify error code and page.");
 	}
 
@@ -229,7 +241,7 @@ std::string ABlock::getStringDirective(std::string lineString, std::string key)
 /*
 ** Getter for _confFile.
 */
-ConfigFile &ABlock::getConfFile(void) const
+ConfigFile *ABlock::getConfFile(void) const
 {
 	return this->_confFile;
 }
