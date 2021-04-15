@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/13 17:03:19 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/15 16:43:13 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,16 @@ bool Location::authenticate(Request &r)
 
 	if (parts[0] == "Basic")
 	{
-		std::string decodedCreds = Base64(parts[1]).decode();
+		std::string decodedCreds;
+
+		try 
+		{
+			decodedCreds = Base64(parts[1]).decode();
+		}
+		catch (Exception &e) {
+			return false;
+		}
+		
 
 		std::vector<std::string> creds = ft_split(decodedCreds, ':');
 		if (creds.size() != 2)
