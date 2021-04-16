@@ -14,7 +14,7 @@ class Response
 	public:
 		Response(void);
 		Response(Request req, Location loc, std::string fp);
-		Response(std::string cgi_response);
+		Response(std::string cgi_response, Location loc);
 		Response(Response const &src);
 		~Response(void);
 
@@ -38,7 +38,7 @@ class Response
 		void		statusCodeTranslation();
 		int			checkPathExistance(std::string path);
 		void		setLastModified(int fd);
-		void		handleCGI(void);
+		void		handleCGI(Location loc);
 		
 
 		
