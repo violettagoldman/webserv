@@ -21,11 +21,13 @@ void Response::handleCGI(Location loc)
 {
 	std::string headers = _cgi_response.substr(0, _cgi_response.find("\r\n\r\n"));
 	std::string body = _cgi_response.substr(_cgi_response.find("\r\n\r\n") + 4);
-	if (body.size() > static_cast<size_t>(loc.getClientMaxBodySize()))
-	{
-		error(413);
-		return ;
-	}
+	std::cout << "Body_size in handlecgi" << body.size() << std::endl;
+	(void)loc;
+	// if (body.size() > static_cast<size_t>(loc.getClientMaxBodySize()))
+	// {
+	// 	error(413);
+	// 	return ;
+	// }
 	size_t current = 0;
 	while (_cgi_response.substr(current, _cgi_response.size()).find("\r\n") != std::string::npos)
 	{
@@ -448,7 +450,7 @@ void		Response::setLastModified(int fd)
 std::string 	Response::serialize()
 {
 	std::string res;
-	std::cout << std::to_string(_body.length()) << std::endl;
+	std::cout << "serialize" << std::to_string(_body.length()) << std::endl;
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
 		_headers["Content-Length"] = std::to_string(_body.length());
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
