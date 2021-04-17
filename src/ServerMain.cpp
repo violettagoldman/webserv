@@ -37,8 +37,19 @@ int		main(int argc, char **argv)
 		path_to_conf = argv[1];
 	}
 	std::cout << "Using config at " << path_to_conf << std::endl;
-	ConfigReader reader(path_to_conf);
-	Config conf = reader.getConfig();
+	
+	Config conf;
+	try
+	{
+		ConfigReader reader(path_to_conf);
+		conf = reader.getConfig();
+	}
+	catch (Exception &e)
+	{
+		std::cout << "Got a Config exception: " << e.what() << std::endl;
+		exit(1);
+	}
+
 	for (size_t i = 0; i < conf.getVirtualHostVector().size(); ++i)
 	{
 		Server server;

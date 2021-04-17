@@ -23,7 +23,8 @@
 class Config : public ABlock
 {
 public:
-	Config(ConfigFile &confFile);
+	Config();
+	Config(ConfigFile *confFile);
 	virtual void handleLine(std::string lineString);
 	void handle();
 	std::vector<VirtualHost> getVirtualHostVector(void) const;

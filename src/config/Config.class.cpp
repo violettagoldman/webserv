@@ -12,10 +12,14 @@
 
 #include "Config.class.hpp"
 
+Config::Config()
+{
+}
+
 /*
 ** Config constructor.
 */
-Config::Config(ConfigFile &confFile) : ABlock(confFile)
+Config::Config(ConfigFile *confFile) : ABlock(confFile)
 {
 }
 
@@ -28,13 +32,13 @@ void Config::handle()
 {
 	do
 	{
-		std::string ls = getConfFile().getLineString();
+		std::string ls = getConfFile()->getLineString();
 		checkLine(ls);
 		handleLineCommon(ls);
 		handleLine(ls);
 
 	}
-	while(getConfFile().getNext());
+	while(getConfFile()->getNext());
 	Config::check();
 }
 

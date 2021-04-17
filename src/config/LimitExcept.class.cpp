@@ -15,7 +15,7 @@
 /*
 ** Constructor for LimitExcept.
 */
-LimitExcept::LimitExcept(ConfigFile &confFile) : ABlock(confFile), _empty(true)
+LimitExcept::LimitExcept(ConfigFile *confFile) : ABlock(confFile), _empty(true)
 {
 }
 
