@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 12:37:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/13 17:09:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/15 17:24:28 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,9 @@ class ABlock
 {
 
 public:
-	ABlock(ConfigFile &confFile);
+	ABlock();
+	// ABlock(ConfigFile &confFile);
+	ABlock(ConfigFile *confFile);
 
 	virtual void handle();
 
@@ -41,7 +43,7 @@ public:
 
 	virtual void handleLine(std::string lineString);
 
-	ConfigFile &getConfFile(void) const;
+	ConfigFile *getConfFile(void) const;
 
 	virtual void check(void);
 	void checkCommon(void);
@@ -79,7 +81,7 @@ public:
 	std::vector<Credential> getCredentials(void) const;
 
 private:
-	ConfigFile &_confFile;
+	ConfigFile *_confFile;
 
 	int _clientMaxBodySize;
 	bool _autoindex;

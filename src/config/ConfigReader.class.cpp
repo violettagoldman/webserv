@@ -22,7 +22,7 @@ void ConfigReader::parse()
 }
 
 ConfigReader::ConfigReader(std::string filename) :
-	confFile(filename), _config(confFile)
+	confFile(filename), _config(&confFile)
 {
 	while (confFile.getNext())
 	{

@@ -29,7 +29,7 @@
 class Location : public ABlock
 {
 public:
-	Location(ConfigFile &confFile);
+	Location(ConfigFile *confFile);
 	Location(ABlock &ab);
 
 	void handleLine(std::string lineString);

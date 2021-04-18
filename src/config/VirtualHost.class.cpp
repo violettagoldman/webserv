@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:06:37 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/15 17:28:25 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*
 ** Constructor for VirtualHost.
 */
-VirtualHost::VirtualHost(ConfigFile &confFile) : 
+VirtualHost::VirtualHost(ConfigFile *confFile) : 
 	ABlock(confFile),
 	_listenPort(80),
 	_listenHost("*"),
