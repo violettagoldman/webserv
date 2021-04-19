@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/19 16:56:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:53:27 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ int ConfigFile::getNext()
 
 	this->_ret = fd_get_next_line(this->_fd, &(this->_line));
 	this->_lineString.assign(this->_line);
+	free(this->_line);
 	if (_ret == 0)
 	{
 		_lastLineRead = true;

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/19 17:02:04 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:55:44 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,10 +169,11 @@ void CGIHandler::pipeline(std::string body)
 	// 	_tempFileWriteFd = open("webservTmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
 	// }
 	openPipes();
-	prepareEnvp();
+	
 	pid = fork();
 	if (pid == 0)
 	{
+		prepareEnvp();
 		launch_cgi();
 	}
 	close(_pipeIn[0]);
