@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/15 17:24:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:31:00 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,36 @@ ABlock::ABlock() :
 	_credentials(std::vector<Credential>()),
 	_userFilePath("")
 {
+}
+
+ABlock::ABlock(const ABlock &copy) :
+	_confFile(copy._confFile),
+	_clientMaxBodySize(copy._clientMaxBodySize),
+	_autoindex(copy._autoindex),
+	_index(copy._index),
+	_root(copy._root),
+	_errorPage(copy._errorPage),
+	_realm(copy._realm),
+	_credentials(copy._credentials),
+	_userFilePath(copy._userFilePath)
+{
+}
+
+ABlock::~ABlock()
+{
+}
+
+ABlock &ABlock::operator=(const ABlock &operand)
+{
+	_confFile = operand._confFile;
+	_clientMaxBodySize = operand._clientMaxBodySize;
+	_autoindex = operand._autoindex;
+	_index = operand._index;
+	_root = operand._root;
+	_errorPage = operand._errorPage;
+	_realm = operand._realm;
+	_credentials = operand._credentials;
+	_userFilePath = operand._userFilePath;
 }
 
 /*
