@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/19 17:31:00 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:45:18 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,6 @@ ABlock::ABlock(const ABlock &copy) :
 {
 }
 
-ABlock::~ABlock()
-{
-}
-
 ABlock &ABlock::operator=(const ABlock &operand)
 {
 	_confFile = operand._confFile;
@@ -52,6 +48,7 @@ ABlock &ABlock::operator=(const ABlock &operand)
 	_realm = operand._realm;
 	_credentials = operand._credentials;
 	_userFilePath = operand._userFilePath;
+	return *this;
 }
 
 /*

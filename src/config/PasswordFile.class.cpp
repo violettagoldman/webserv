@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 13:46:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/19 17:25:41 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:45:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ PasswordFile &PasswordFile::operator= (const PasswordFile &operand)
 	// _filename = copy._filename; 
 	// _confFile = copy._confFile; 
 	_credentials = operand._credentials;
+	return *this;
 }
 
 PasswordFile::~PasswordFile()
