@@ -44,6 +44,8 @@ int						Server::setup(VirtualHost conf)
 		std::cerr << "Couldn't initialize the socket" << std::endl;
 		return (-1);
 	}
+	// if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
+	// 	return (-1);
 	_address.sin_family = AF_INET;
 	if (conf.getListenHost().size())
 		_address.sin_addr.s_addr = inet_addr(conf.getListenHost().c_str());
@@ -66,7 +68,7 @@ int						Server::setup(VirtualHost conf)
 */
 int						Server::listen(void)
 {
-	if (::listen(_fd, 10) == -1)
+	if (::listen(_fd, 100000) == -1)
 	{
 		std::cerr << "Couldn't listen to connections" << std::endl;
 		return (-1);

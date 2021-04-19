@@ -12,21 +12,22 @@ Response::Response(Request req, Location loc, std::string fp)
 	handleMethod(loc);
 }
 
-Response::Response(std::string cgi_response) : _cgi_response(cgi_response)
+Response::Response(std::string cgi_response, Location loc) : _cgi_response(cgi_response)
 {
-	handleCGI();
+	handleCGI(loc);
 }
 
-void Response::handleCGI()
+void Response::handleCGI(Location loc)
 {
 	std::string headers = _cgi_response.substr(0, _cgi_response.find("\r\n\r\n"));
 	std::string body = _cgi_response.substr(_cgi_response.find("\r\n\r\n") + 4);
-
-
-	std::cout << "Headers response:" << headers << std::endl;
-	if (body.size() > 100)
-		std::cout << "body: " << body.substr(0, 200) << std::endl;
-	std::cout << "size in handle:" << body.size() << std::endl;
+	std::cout << "Body_size in handlecgi" << body.size() << std::endl;
+	(void)loc;
+	// if (body.size() > static_cast<size_t>(loc.getClientMaxBodySize()))
+	// {
+	// 	error(413);
+	// 	return ;
+	// }
 	size_t current = 0;
 	while (_cgi_response.substr(current, _cgi_response.size()).find("\r\n") != std::string::npos)
 	{
@@ -42,14 +43,7 @@ void Response::handleCGI()
 	}
 	_statusCode = ft_atoi(_headers["Status"].c_str());
 	_body = body;
-	std::cout << "-- CGI RESPONSE --\n";
-	std::cout << _body;
 }
-
-// Response::Response(Response const &src)
-// {
-// 	*this = src;
-// }
 
 Response::~Response(void)
 {
@@ -72,7 +66,12 @@ Response		&Response::operator=(Response const &src)
 void			Response::handleMethod(Location loc)
 {
 	std::string option;
-	(void)loc;
+
+	if (_body.size() > static_cast<size_t>(loc.getClientMaxBodySize()))
+	{
+		error(413);
+		return ;
+	}
 
 	_errorPages = loc.getErrorPage();
 	option = _method;
@@ -451,7 +450,7 @@ void		Response::setLastModified(int fd)
 std::string 	Response::serialize()
 {
 	std::string res;
-	std::cout << std::to_string(_body.length()) << std::endl;
+	std::cout << "serialize" << std::to_string(_body.length()) << std::endl;
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
 		_headers["Content-Length"] = std::to_string(_body.length());
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
