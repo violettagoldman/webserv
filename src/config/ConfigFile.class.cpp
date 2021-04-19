@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:10:43 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 16:56:38 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,35 +43,6 @@ ConfigFile::ConfigFile(std::string filename) :
 }
 
 /*
-** Pass through select() before reading the config file.
-** @param fd The file description that you need to open.
-*/
-void pass_through_select(int fd)
-{
-	fd_set rfds;
-
-	FD_ZERO(&rfds);
-
-	FD_SET(fd, &rfds);
-
-	struct timeval tv;
-
-	/* Wait up to five seconds. */
-
-	tv.tv_sec = 5;
-	tv.tv_usec = 0;
-
-	int retval = select(fd + 1, &rfds, NULL, NULL, &tv);
-
-	if (retval == -1)
-		throw Exception("Error while trying to select().");
-	else if (retval)
-		return ;
-	else
-		throw Exception("Timeout while trying to read from config file.");
-}
-
-/*
 ** Read the next line of the config file.
 ** Return 0 if the file has ended, so you can use this function in a while loop:
 **	while (c.getNext())
@@ -91,8 +62,6 @@ int ConfigFile::getNext()
 		_lastLineSent = true;
 		return 0;
 	}
-
-	pass_through_select(this->_fd);
 
 	this->_ret = fd_get_next_line(this->_fd, &(this->_line));
 	this->_lineString.assign(this->_line);
