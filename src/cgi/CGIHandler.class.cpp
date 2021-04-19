@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/12 16:42:22 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:02:04 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,11 +178,11 @@ void CGIHandler::pipeline(std::string body)
 	close(_pipeIn[0]);
 	// int writeTarget = _useTempFile ? _tempFileWriteFd : _pipeIn[1];
 	// std::cout << "writeTarget: " << writeTarget << std::endl;
-	fd_set wr;
-	FD_ZERO(&wr);
-	FD_SET(_pipeIn[1], &wr);
-	select(_pipeIn[1] + 1, 0, &wr, 0, 0);
-	writeBodyString(_pipeIn[1], body);
+
+	ssize_t write_status = write(_pipeIn[1], body.c_str(), body.size());
+	if (write_status < 0)
+		throw Exception("Error while trying to write response body to CGI");
+
 	close(_pipeIn[1]);
 	(void)_useTempFile;
 	waitpid(pid, NULL, 0);
@@ -290,38 +290,6 @@ char **create_envp(std::vector<std::string> mvars)
 }
 
 /*
-** Write the body string to a given fd.
-** @param body The request body.
-** @param fd The file descriptor where the body should be written.
-*/
-void CGIHandler::writeBodyString(int fd, std::string body)
-{
-	// extern int errno;
-	// fcntl(fd, F_SETFL, O_NONBLOCK);
-
-	// while (b != (long long) body.size())
-	// {
-	write(fd, body.c_str(), body.size());
-	// }
-	// std::cout << "Errno: " << errno << std::endl;
-	// std::cout << "Error message: " << strerror(errno) << std::endl;
-}
-
-/*
-** Launch the CGI binary in a child process, and wait for it to finish
-*/
-void CGIHandler::handleCgi(void)
-{
-
-	extern int errno;
-
-
-
-
-	// waitpid(pid, NULL, 0);
-}
-
-/*
 ** Prepare all the pipes (pipe to write in stdin, pipe to read from stdout)
 ** and launch the CGI binary.
 */
@@ -386,36 +354,6 @@ void CGIHandler::execute_cgi()
 }
 
 /*
-** As we're doing a read, we have to check if the output fd is ready for
-** reading through select().
-** @param fd The file descriptor where we will be reading the response from.
-*/
-void cgi_response_select(int fd)
-{
-	fd_set rfds;
-
-	FD_ZERO(&rfds);
-
-	FD_SET(fd, &rfds);
-
-	struct timeval tv;
-
-	/* Wait up to five seconds. */
-
-	tv.tv_sec = 5;
-	tv.tv_usec = 0;
-
-	int retval = select(fd + 1, &rfds, NULL, NULL, &tv);
-
-	if (retval == -1)
-		throw Exception("Error while trying to select() CGI response.");
-	else if (retval)
-		return ;
-	else
-		throw Exception("Timeout while trying to read CGI response.");
-}
-
-/*
 ** Read the CGI's response from the piped standard output.
 ** @param fd The file descriptor where the CGI's stdout is piped to.
 */
@@ -427,26 +365,14 @@ void CGIHandler::readCgiResponse(int fd)
 	char buf[BUFFER_SIZE + 1];
 
 	bzero(buf, BUFFER_SIZE + 1);
-	// cgi_response_select(fd);
 	fd = open("webservTmp", O_RDONLY, 0666);
 	_cgiResponse = "";
 	while ((ret = read(fd, buf, BUFFER_SIZE)))
-	// while ((ret = fd_get_next_line(fd, &respline)))
 	{
-		// cgi_response_select(fd);
-		// std::cout << resplineString << std::endl;
-		// resplineString.assign(respline);
-		// _cgiResponse += resplineString + "\n";
 		_cgiResponse.append(buf);
 		bzero(buf, BUFFER_SIZE + 1);
 	}
-	// if (_cgiResponse.size() > 1000)
-	// 	std::cout << _cgiResponse.substr(100, 100) << std::endl;
 	close(fd);
-
-	// resplineString.assign(respline);
-	// _cgiResponse += resplineString + "\n";
-	// _cgiResponse.append(buf)
 }
 
 /*
