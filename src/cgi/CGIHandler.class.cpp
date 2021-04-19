@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/12 16:42:22 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 16:54:24 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,10 +178,6 @@ void CGIHandler::pipeline(std::string body)
 	close(_pipeIn[0]);
 	// int writeTarget = _useTempFile ? _tempFileWriteFd : _pipeIn[1];
 	// std::cout << "writeTarget: " << writeTarget << std::endl;
-	fd_set wr;
-	FD_ZERO(&wr);
-	FD_SET(_pipeIn[1], &wr);
-	select(_pipeIn[1] + 1, 0, &wr, 0, 0);
 	writeBodyString(_pipeIn[1], body);
 	close(_pipeIn[1]);
 	(void)_useTempFile;
@@ -386,36 +382,6 @@ void CGIHandler::execute_cgi()
 }
 
 /*
-** As we're doing a read, we have to check if the output fd is ready for
-** reading through select().
-** @param fd The file descriptor where we will be reading the response from.
-*/
-void cgi_response_select(int fd)
-{
-	fd_set rfds;
-
-	FD_ZERO(&rfds);
-
-	FD_SET(fd, &rfds);
-
-	struct timeval tv;
-
-	/* Wait up to five seconds. */
-
-	tv.tv_sec = 5;
-	tv.tv_usec = 0;
-
-	int retval = select(fd + 1, &rfds, NULL, NULL, &tv);
-
-	if (retval == -1)
-		throw Exception("Error while trying to select() CGI response.");
-	else if (retval)
-		return ;
-	else
-		throw Exception("Timeout while trying to read CGI response.");
-}
-
-/*
 ** Read the CGI's response from the piped standard output.
 ** @param fd The file descriptor where the CGI's stdout is piped to.
 */
@@ -427,13 +393,11 @@ void CGIHandler::readCgiResponse(int fd)
 	char buf[BUFFER_SIZE + 1];
 
 	bzero(buf, BUFFER_SIZE + 1);
-	// cgi_response_select(fd);
 	fd = open("webservTmp", O_RDONLY, 0666);
 	_cgiResponse = "";
 	while ((ret = read(fd, buf, BUFFER_SIZE)))
 	// while ((ret = fd_get_next_line(fd, &respline)))
 	{
-		// cgi_response_select(fd);
 		// std::cout << resplineString << std::endl;
 		// resplineString.assign(respline);
 		// _cgiResponse += resplineString + "\n";
