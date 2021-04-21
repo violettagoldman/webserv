@@ -450,9 +450,9 @@ void		Response::setLastModified(int fd)
 std::string 	Response::serialize()
 {
 	std::string res;
-	std::cout << "serialize" << std::to_string(_body.length()) << std::endl;
+	std::cout << "serialize" << ft_itoa(_body.length()) << std::endl;
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
-		_headers["Content-Length"] = std::to_string(_body.length());
+		_headers["Content-Length"] = ft_itoa(_body.length());
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
