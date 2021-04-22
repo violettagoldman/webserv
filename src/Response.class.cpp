@@ -450,6 +450,8 @@ void		Response::setLastModified(int fd)
 std::string 	Response::serialize()
 {
 	std::string res;
+	if (_req.isHeaderPresent("Accept-Language"))
+		_headers["Content-Language"] = _req.getHeaderByName("Accept-Language")->getValue()[0];
 	std::cout << "serialize" << ft_itoa(_body.length()) << std::endl;
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
 		_headers["Content-Length"] = ft_itoa(_body.length());
