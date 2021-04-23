@@ -8,6 +8,7 @@
 # include "Utility.hpp"
 # include "Config.class.hpp"
 # include "Request.class.hpp"
+# include "Utility.hpp"
 
 class Response
 {
