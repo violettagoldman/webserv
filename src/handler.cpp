@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 15:18:22 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/14 17:26:26 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/20 16:27:11 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ bool extensionCheck(std::string loc, std::string req)
 	// std::cout << "EXTENSION : " << extension << std::endl;
 	if (extension == "")
 		return 0;
-	std::cout << loc << std::endl;
+	// std::cout << loc << std::endl;
 	if (loc.substr(loc.find("*") + 1) == extension)
 	{
 		std::cout << "ok " << std::endl;
@@ -106,35 +106,99 @@ bool extensionCheck(std::string loc, std::string req)
 	return 0;
 }
 
-int count_match(std::string str1, std::string str2)
+std::string preprocess(std::string request_path)
 {
-	int count = 0;
-	size_t i = 0;
-	size_t pos;
-	std::string extension;
-	std::string filename;
-	if (extensionCheck(str1, str2))
-	{
-		pos = str2.find_last_of('/');
-		if (pos != std::string::npos && str2.substr(pos).find_last_of('.') != std::string::npos)
-		{
-			filename = str2.substr(pos + 1);
-			extension = filename.substr(0, filename.find_last_of('.'));
-			// std::cout << "FILENAME IN COUNTMATCH " << extension << std::endl;
-		}
-		str1.replace(str1.find("*"), filename.size(), filename);
-		// std::cout << "STR1" << str1 <<std::endl;
-	}
+	std::string to_compare;
+	size_t sl_pos;
+	size_t dot_pos;
+
+
+	sl_pos = request_path.find_last_of('/');
+	to_compare = request_path.substr(0, sl_pos);
+	dot_pos = request_path.find_last_of('.');
+	sl_pos = request_path.find_last_of('/');
+	if (dot_pos != std::string::npos && dot_pos > sl_pos)
+		to_compare  = request_path.substr(0, sl_pos + 1);
+	else if (sl_pos == request_path.size() - 1 && request_path.size() != 1)
+		to_compare = request_path.substr(0, sl_pos + 1);
+	else if (request_path.size() != 1)
+		to_compare = request_path + '/';
 	else
-		str2  = path_to_pattern(str2);
-	while (i < str1.size() && i < str2.size())
+		to_compare = request_path;
+	return to_compare;
+}
+
+//
+int count_match(std::string request, std::string location)
+{
+	size_t i = 0;
+	size_t count = 0;
+
+	request = preprocess(request);
+	// std::cout << "Request :"<< request <<std::endl;
+	// std::cout <<"Location :"<< location <<std::endl;
+
+	if (location.size() != 1 && location[location.size() - 1] != '/')
+		location = location + '/';
+
+	while (i < request.size() && i < location.size())
 	{
-		if (str1[i] == str2[i])
+		if (request[i] == location[i])
 			count++;
+		else
+			break;
 		i++;
+	}
+
+	if (location.size() != 1)
+	{
+		size_t sl_one = std::string::npos;
+		size_t sl_two;
+
+		while ((sl_one = location.find_last_of('/', sl_one - 1)) != std::string::npos && sl_one != 1)
+		{
+			sl_two = location.find_last_of('/', sl_one - 1);
+			if (count == sl_one + 1)
+				return count;
+			else if (count < sl_one + 1 && count > sl_two)
+				return sl_two;
+		}
+		return 0;
 	}
 	return count;
 }
+
+
+//
+// int count_match(std::string str1, std::string str2)
+// {
+// 	int count = 0;
+// 	size_t i = 0;
+// 	size_t pos;
+// 	std::string extension;
+// 	std::string filename;
+// 	if (extensionCheck(str1, str2))
+// 	{
+// 		pos = str2.find_last_of('/');
+// 		if (pos != std::string::npos && str2.substr(pos).find_last_of('.') != std::string::npos)
+// 		{
+// 			filename = str2.substr(pos + 1);
+// 			extension = filename.substr(0, filename.find_last_of('.'));
+// 			// std::cout << "FILENAME IN COUNTMATCH " << extension << std::endl;
+// 		}
+// 		str1.replace(str1.find("*"), filename.size(), filename);
+// 		// std::cout << "STR1" << str1 <<std::endl;
+// 	}
+// 	else
+// 		str2  = path_to_pattern(str2);
+// 	while (i < str1.size() && i < str2.size())
+// 	{
+// 		if (str1[i] == str2[i])
+// 			count++;
+// 		i++;
+// 	}
+// 	return count;
+// }
 
 // std::vector<Location>::iterator check_location(VirtualHost host, std::string request_path)
 // {
@@ -164,7 +228,7 @@ std::string create_final_path(Location loc, std::string request_path)
 	std::string request_path_f(request_path);
 	struct stat		fileStat;
 	int				fd;
-
+	// std::cout << request_path << std::endl;
 	// std::cout << request_path << std::endl;
 	// std::cout << root << std::endl;
 	// std::cout << location_pattern << std::endl;
@@ -216,13 +280,14 @@ std::string handler(Request &req, Config conf)
 			std::vector<Location>::iterator it_best;
 			for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
 			{
-
+				// std::cout <<"pat:" <<  it_loc->getPattern()  << std::endl;
 				if (it_loc->getPattern() == request_path)
 				{
 					it_best = it_loc;
+					count_max = 1;
 					break;
 				}
-				if ((count_cur = count_match((*it_loc).getPattern(), request_path)) > count_max)
+				if ((count_cur = count_match(request_path, (*it_loc).getPattern())) > count_max)
 				{
 					it_best = it_loc;
 					count_max = count_cur;
@@ -256,11 +321,7 @@ std::string handler(Request &req, Config conf)
 				return final;
 			}
 			else
-			{
-				std::cout << "Not found" << std::endl;
 				req.setError(404);
-				std::cout << "404" << std::endl;
-			}
 		 }
 	 }
 	return final;
@@ -290,7 +351,7 @@ Location	handlerGetLocation(Request req, Config conf)
 			// }
 			if (it_loc->getPattern() == request_path)
 				return (*it_loc);
-			if ((count_cur = count_match((*it_loc).getPattern(), request_path)) > count_max)
+			if ((count_cur = count_match(request_path, (*it_loc).getPattern())) > count_max)
 			{
 				it_best = it_loc;
 				best_loc.push_back(*it_loc);
