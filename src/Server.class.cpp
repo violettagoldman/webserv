@@ -13,7 +13,7 @@ Server::~Server(void)
 {
 }
 
-Server					&Server::operator=(Server const &src)
+Server &Server::operator=(Server const &src)
 {
 	if (this != &src)
 	{
@@ -24,7 +24,7 @@ Server					&Server::operator=(Server const &src)
 	return (*this);
 }
 
-unsigned short	ft_htons(unsigned short x)
+unsigned short ft_htons(unsigned short x)
 {
 	x = x >> 8 | x << 8;
 	return (x);
@@ -37,7 +37,7 @@ unsigned short	ft_htons(unsigned short x)
 * 3. binding the address to set the port
 * @return int Error code
 */
-int						Server::setup(VirtualHost conf)
+int Server::setup(VirtualHost conf)
 {
 	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -66,7 +66,7 @@ int						Server::setup(VirtualHost conf)
 * and wait for a connection to be established
 * @return int Error code
 */
-int						Server::listen(void)
+int Server::listen(void)
 {
 	if (::listen(_fd, 100000) == -1)
 	{
@@ -80,14 +80,14 @@ int						Server::listen(void)
 * This method is used to accept connection from a client
 * @return int Error code
 */
-int						Server::accept(void)
+int Server::accept(void)
 {
-	int	addrlen;
+	int addrlen;
 	int newSocket;
 
 	addrlen = sizeof(_address);
 	if ((newSocket = ::accept(_fd, (struct sockaddr *)&_address,
-		(socklen_t *)&addrlen)) == -1)
+														(socklen_t *)&addrlen)) == -1)
 	{
 		std::cerr << "Couldn't accept the connection" << std::endl;
 		return (-1);
@@ -99,10 +99,10 @@ int						Server::accept(void)
 * This method is used to write in the socket
 * @return int Error code
 */
-int					Server::send(int fd, std::string message) const
+int Server::send(int fd, std::string message) const
 {
 	std::cout << message.size() << std::endl;
-	if (::send(fd, message.c_str(), message.size(), 0) == -1)
+	if (::send(fd, message.c_str(), message.size(), 0) <= 0)
 		std::cerr << "Could not send response" << std::endl;
 	return (0);
 }
@@ -111,7 +111,7 @@ int					Server::send(int fd, std::string message) const
 * This method is used to release all data
 * @return int Error code
 */
-int					Server::close(void)
+int Server::close(void)
 {
 	for (size_t i = 0; i < _clients.size(); i++)
 		::close(_clients[i]);
@@ -119,47 +119,47 @@ int					Server::close(void)
 	return (0);
 }
 
-std::vector<int>	Server::getClients(void) const
+std::vector<int> Server::getClients(void) const
 {
 	return (_clients);
 }
 
-std::string			Server::getHost(void) const
+std::string Server::getHost(void) const
 {
 	return (_host);
 }
 
-std::string			Server::getPort(void) const
+std::string Server::getPort(void) const
 {
 	return (_port);
 }
 
-int					Server::getFd(void) const
+int Server::getFd(void) const
 {
 	return (_fd);
 }
 
-void				Server::addClient(int fd)
+void Server::addClient(int fd)
 {
 	_clients.push_back(fd);
 }
 
-void				Server::removeClient(int fd)
+void Server::removeClient(int fd)
 {
 	_clients.erase(std::find(_clients.begin(), _clients.end(), fd));
 }
 
-void				Server::setHost(std::string host)
+void Server::setHost(std::string host)
 {
 	this->_host = host;
 }
 
-void				Server::setPort(std::string port)
+void Server::setPort(std::string port)
 {
 	this->_port = port;
 }
 
-void				Server::setFd(int fd)
+void Server::setFd(int fd)
 {
 	this->_fd = fd;
 }
