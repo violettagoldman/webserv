@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.class.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/21 15:49:48 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/23 15:50:12 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Request
 		std::vector<Header>::iterator getHeaderByName(std::string name);
 		void ChunkedInterpretation(std::string chunk);
 		long long getBodyLength() const;
+		std::string getExtension(void);
 	private:
 		int _read_bytes;
 		std::vector<Header> _headers;
