@@ -6,11 +6,36 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 13:46:22 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:08:04 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:45:26 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PasswordFile.class.hpp"
+
+PasswordFile::PasswordFile()
+{
+}
+
+PasswordFile::PasswordFile(const PasswordFile &copy)
+{
+	// Copying file entities would create a mess
+	// _filename = copy._filename; 
+	// _confFile = copy._confFile; 
+	_credentials = copy._credentials;
+}
+
+PasswordFile &PasswordFile::operator= (const PasswordFile &operand)
+{
+	// Copying file entities would create a mess
+	// _filename = copy._filename; 
+	// _confFile = copy._confFile; 
+	_credentials = operand._credentials;
+	return *this;
+}
+
+PasswordFile::~PasswordFile()
+{
+}
 
 PasswordFile::PasswordFile(std::string filename) :
 	_filename(filename),

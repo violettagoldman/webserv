@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.class.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/12 15:25:27 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/21 15:50:03 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,7 +282,7 @@ void Request::ChunkedInterpretation(std::string chunk)
 void Request::read_request(int sd)
 {
 		char input[BUFFER_SIZE + 1];
-		bzero(input, BUFFER_SIZE + 1);
+		ft_bzero(input, BUFFER_SIZE + 1);
 		int bytes;
 		size_t pos;
 		size_t last;

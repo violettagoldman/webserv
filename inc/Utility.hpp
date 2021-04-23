@@ -20,5 +20,6 @@ size_t						ft_strlcpy(char *dst, const char *src, size_t dstsize);
 char						*cppalloc(size_t size);
 char						*ft_strdup(const char *s1);
 std::string					ft_itostr(int n);
+void						ft_bzero(void *s, size_t n);
 
 #endif

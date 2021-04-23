@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.class.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/12 15:25:12 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/21 15:49:48 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "Utility.hpp"
 #include "./Header.class.hpp"
 
 //501 if method is not recognized

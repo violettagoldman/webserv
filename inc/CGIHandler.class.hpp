@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/10 18:06:45 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/19 16:59:48 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,13 +121,11 @@ private:
 	std::vector<Header> _headers;
 
 	void readCgiResponse(int fd);
-	void writeBodyString(int fd, std::string body);
 	void countBodySize(std::string s);
 	void launch_cgi(void);
 	void execute_cgi(void);
 	void openPipes(void);
 	void prepareEnvp(void);
-	void handleCgi(void);
 	void pipeline(std::string body);
 };
 

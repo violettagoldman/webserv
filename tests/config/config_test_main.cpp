@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/17 17:45:02 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/13 17:24:38 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/19 17:44:39 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,9 @@ int main(void)
 
 	out("Exception | two servers with one name");
 	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_servers_with_one_name.conf"), Exception, "Two servers with one server_name and listen");
+
+	out("Exception | two servers with one port");
+	TEST_EXCEPTION(ConfigReader r2("./config/test_configs/two_servers_with_one_port.conf"), Exception, "Two servers with one server_name and listen");
 
 	
 	// out("Exception | root and fcgi on same location");
