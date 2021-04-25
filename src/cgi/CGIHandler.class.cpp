@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/19 17:55:44 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/21 15:48:35 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -365,13 +365,13 @@ void CGIHandler::readCgiResponse(int fd)
 	int ret;
 	char buf[BUFFER_SIZE + 1];
 
-	bzero(buf, BUFFER_SIZE + 1);
+	ft_bzero(buf, BUFFER_SIZE + 1);
 	fd = open("webservTmp", O_RDONLY, 0666);
 	_cgiResponse = "";
 	while ((ret = read(fd, buf, BUFFER_SIZE)))
 	{
 		_cgiResponse.append(buf);
-		bzero(buf, BUFFER_SIZE + 1);
+		ft_bzero(buf, BUFFER_SIZE + 1);
 	}
 	close(fd);
 }

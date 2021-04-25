@@ -37,7 +37,7 @@ int		main(int argc, char **argv)
 		path_to_conf = argv[1];
 	}
 	std::cout << "Using config at " << path_to_conf << std::endl;
-	
+
 	Config conf;
 	try
 	{
@@ -106,7 +106,7 @@ int		main(int argc, char **argv)
 						std::cout << "State of the error after handler" << request.getError() << std::endl;
 						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
-						if (loc.getFcgiPass() != "")
+						if (loc.getFcgiPass() != "" && loc.getCgiExtension() == request.getExtension())
 						{
 							CGIRequires cr =
 							{

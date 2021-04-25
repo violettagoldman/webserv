@@ -49,7 +49,7 @@ Response::~Response(void)
 {
 }
 
-Response		&Response::operator=(Response const &src)
+Response &Response::operator=(Response const &src)
 {
 	if (this != &src)
 	{
@@ -63,14 +63,14 @@ Response		&Response::operator=(Response const &src)
 	return (*this);
 }
 
-void			Response::handleMethod(Location loc)
+void Response::handleMethod(Location loc)
 {
 	std::string option;
 
 	if (_body.size() > static_cast<size_t>(loc.getClientMaxBodySize()))
 	{
 		error(413);
-		return ;
+		return;
 	}
 
 	_errorPages = loc.getErrorPage();
@@ -105,12 +105,12 @@ void			Response::handleMethod(Location loc)
 	}
 }
 
-void		Response::get(Location loc)
+void Response::get(Location loc)
 {
-	bool			autoindex;
-	std::string		path;
-	struct stat		fileStat;
-	int				fd;
+	bool autoindex;
+	std::string path;
+	struct stat fileStat;
+	int fd;
 
 	path = _fp;
 	autoindex = loc.getAutoindex();
@@ -120,7 +120,7 @@ void		Response::get(Location loc)
 		error(404);
 		setContentType(".html");
 		close(fd);
-		return ;
+		return;
 	}
 	fstat(fd, &fileStat);
 	if (S_ISDIR(fileStat.st_mode))
@@ -145,7 +145,7 @@ void		Response::get(Location loc)
 				setIndexPage(loc);
 			else
 				error(404);
-			return ;
+			return;
 		}
 	}
 	_body = readFile(path);
@@ -155,21 +155,21 @@ void		Response::get(Location loc)
 	close(fd);
 }
 
-void		Response::head(Location loc)
+void Response::head(Location loc)
 {
 	get(loc);
 }
 
-void		Response::setContentType(std::string path)
+void Response::setContentType(std::string path)
 {
-	std::string							extension;
-	size_t								n;
-	std::map<std::string, std::string>	m;
+	std::string extension;
+	size_t n;
+	std::map<std::string, std::string> m;
 
 	if ((n = path.find_last_of(".")) == std::string::npos)
 	{
 		_headers["Content-Type"] = "text/html";
-		return ;
+		return;
 	}
 	extension = std::string(path, n + 1, path.size() - n);
 	m["aac"] = "audio/aac";
@@ -245,15 +245,15 @@ void		Response::setContentType(std::string path)
 		_headers["Content-Type"] = "text/html";
 }
 
-void		Response::error(int status)
+void Response::error(int status)
 {
 	_statusCode = status;
 	setErrorPage();
 }
 
-void		Response::setErrorPage()
+void Response::setErrorPage()
 {
-	std::string		html;
+	std::string html;
 
 	// check for customised pages
 	if (_errorPages.count(_statusCode) > 0)
@@ -265,16 +265,16 @@ void		Response::setErrorPage()
 	_body = html;
 }
 
-void		Response::setIndexPage(Location loc)
+void Response::setIndexPage(Location loc)
 {
-	std::string		html;
-	std::string		li;
-	DIR				*currentDirectory;
-	struct dirent 	*dir;
+	std::string html;
+	std::string li;
+	DIR *currentDirectory;
+	struct dirent *dir;
 
 	html = readFile("./pages/index.html");
 	html = replacehtml(html, "$1", _req.getPath());
-	currentDirectory= opendir(loc.getRoot().c_str());
+	currentDirectory = opendir(loc.getRoot().c_str());
 	if (currentDirectory)
 	{
 		while ((dir = readdir(currentDirectory)) != NULL)
@@ -285,7 +285,7 @@ void		Response::setIndexPage(Location loc)
 	_body = html;
 }
 
-void		Response::post()
+void Response::post()
 {
 	int fd;
 	int exist;
@@ -314,10 +314,10 @@ void		Response::post()
 	{
 		error(404);
 	}
-	close (fd);
+	close(fd);
 }
 
-void		Response::put()
+void Response::put()
 {
 	int fd;
 	int exist;
@@ -352,31 +352,30 @@ void		Response::put()
 		else
 			error(500);
 	}
-	close (fd);
+	close(fd);
 }
 
-void		Response::deleteMethod()
+void Response::deleteMethod()
 {
 	std::string path;
-	int	fd;
+	int fd;
 
 	path = _fp;
 	if ((fd = open(path.c_str(), O_RDONLY)) < 0)
 	{
 		error(404);
-		return ;
+		return;
 	}
 	if (unlink(path.c_str()) == 0)
 		_statusCode = 204;
 	else
 		error(403);
 	close(fd);
-
 }
 
-void		Response::options(Location loc)
+void Response::options(Location loc)
 {
-	std::string		methods = "";
+	std::string methods = "";
 
 	if (loc.getLimitExcept().getMethods().size() == 0)
 		methods = "GET, POST, PUT, DELETE, CONNECT, TRACE, OPTIONS";
@@ -393,12 +392,12 @@ void		Response::options(Location loc)
 	_statusCode = 200;
 }
 
-void		Response::connect()
+void Response::connect()
 {
 	_statusCode = 200;
 }
 
-void		Response::trace()
+void Response::trace()
 {
 	std::string response = "";
 	for (size_t i = 0; i < _req.getHeaders().size(); ++i)
@@ -412,17 +411,17 @@ void		Response::trace()
 	_statusCode = 200;
 }
 
-std::string		Response::getDate(time_t time)
+std::string Response::getDate(time_t time)
 {
-	char 		buffer[33];
-	size_t		last;
+	char buffer[33];
+	size_t last;
 
 	last = strftime(buffer, 32, "%a, %d %b %Y %T GMT", localtime(&time));
 	buffer[last] = '\0';
 	return (std::string(buffer));
 }
 
-int			Response::checkPathExistance(std::string path)
+int Response::checkPathExistance(std::string path)
 {
 	struct stat fileStat;
 	int exist;
@@ -439,7 +438,7 @@ int			Response::checkPathExistance(std::string path)
 		return (0);
 }
 
-void		Response::setLastModified(int fd)
+void Response::setLastModified(int fd)
 {
 	struct stat fileStat;
 
@@ -447,12 +446,16 @@ void		Response::setLastModified(int fd)
 	_headers["Last-Modified"] = getDate(fileStat.st_mtime);
 }
 
-std::string 	Response::serialize()
+std::string Response::serialize()
 {
 	std::string res;
-	std::cout << "serialize" << std::to_string(_body.length()) << std::endl;
+	if (_req.isHeaderPresent("Accept-Language"))
+		_headers["Content-Language"] = _req.getHeaderByName("Accept-Language")->getValue()[0];
+	std::cout << "serialize" << ft_itoa(_body.length()) << std::endl;
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
-		_headers["Content-Length"] = std::to_string(_body.length());
+		_headers["Content-Length"] = ft_itoa(_body.length());
+	if (_statusCode == 201 || _statusCode == 204)
+		_headers["Content-Length"] = "0";
 	res = "HTTP/1.1 " + ft_itoa(_statusCode) + " " + _statusCodeTranslation[_statusCode] + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
@@ -464,7 +467,7 @@ std::string 	Response::serialize()
 	return (res);
 }
 
-void		Response::statusCodeTranslation()
+void Response::statusCodeTranslation()
 {
 	_statusCodeTranslation[100] = "Continue";
 	_statusCodeTranslation[101] = "Switching Protocols";

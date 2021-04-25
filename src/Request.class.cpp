@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/12 15:25:27 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/23 17:22:50 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,10 +279,20 @@ void Request::ChunkedInterpretation(std::string chunk)
 	}
 }
 
+std::string Request::getExtension(void)
+{
+	size_t pos;
+	pos = _path.find_last_of(".");
+	if (pos == std::string::npos)
+		return ("");
+	std::cout << _path.substr(pos + 1) << std::endl;
+	return (_path.substr(pos + 1));
+
+}
 void Request::read_request(int sd)
 {
 		char input[BUFFER_SIZE + 1];
-		bzero(input, BUFFER_SIZE + 1);
+		ft_bzero(input, BUFFER_SIZE + 1);
 		int bytes;
 		size_t pos;
 		size_t last;
@@ -386,6 +396,9 @@ void Request::read_request(int sd)
 		else if (bytes == -1)
 			_state = "end";
 }
+
+
+
 // void Request::read_request(int sd)
 // {
 // 	char input[BUFFER_SIZE + 1];
