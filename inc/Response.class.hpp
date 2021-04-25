@@ -40,9 +40,9 @@ class Response
 		int			checkPathExistance(std::string path);
 		void		setLastModified(int fd);
 		void		handleCGI(Location loc);
-		
 
-		
+
+
 	private:
 		int									_statusCode;
 		std::string							_method;

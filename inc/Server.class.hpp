@@ -22,7 +22,7 @@ class Server
 		int					setup(VirtualHost conf);
 		int					accept(void);
 		int					listen(void);
-		int					send(int fd, std::string message) const;
+		int					send(int fd, std::string message, fd_set fds_write) const;
 		int					close(void);
 		std::string			getHost(void) const;
 		std::string			getPort(void) const;

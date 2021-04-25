@@ -31,13 +31,13 @@ int		main(int argc, char **argv)
 	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
 	std::map<int, Request> chunked_requests;
 	std::map<int, Request>::iterator chunked_pos;
-
+	std::vector<Response> kekw;
 	if (argc == 2)
 	{
 		path_to_conf = argv[1];
 	}
 	std::cout << "Using config at " << path_to_conf << std::endl;
-	
+
 	Config conf;
 	try
 	{
@@ -68,8 +68,11 @@ int		main(int argc, char **argv)
 	{
 		fds_read = fds;
 		fds_write = fds;
-		select(FD_SETSIZE, &fds_read , &fds_write , NULL , NULL);
-
+		if (select(FD_SETSIZE, &fds_read , &fds_write , NULL , NULL) == -1)
+		{
+			std::cout << "Error in select" << std::endl;
+			continue ;
+		}
 		for (size_t s = 0; s < servers.size(); ++s)
 		{
 			int server_socket = servers[s].getFd();
@@ -106,7 +109,7 @@ int		main(int argc, char **argv)
 						std::cout << "State of the error after handler" << request.getError() << std::endl;
 						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
-						if (loc.getFcgiPass() != "")
+						if (loc.getFcgiPass() != "" && loc.getCgiExtension() == request.getExtension())
 						{
 							CGIRequires cr =
 							{
@@ -119,14 +122,25 @@ int		main(int argc, char **argv)
 							};
 							CGIHandler handler(request, cr);
 							Response response(handler.getCgiResponse(), loc);
-							servers[s].send(sd, response.serialize());
+							kekw.push_back(response);
+							// if (FD_ISSET(sd, &fds_write))
+							// 	servers[s].send(sd, response.serialize(), fds_write);
 						}
 						else if (request.getState() != "chunked")
 						{
 							Response response(request, loc, final_path);
-							if (FD_ISSET(sd, &fds_write))
-								servers[s].send(sd, response.serialize());
+							kekw.push_back(response);
+							// if (FD_ISSET(sd, &fds_write))
+							// 	servers[s].send(sd, response.serialize(), fds_write);
 						}
+					}
+				}
+				if (FD_ISSET(sd , &fds_write))
+				{
+					if (kekw.size() != 0)
+					{
+						servers[s].send(sd, kekw[0].serialize(), fds_write);
+						kekw.pop_back();
 					}
 				}
 			}
