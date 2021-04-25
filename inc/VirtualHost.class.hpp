@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/15 17:28:18 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:45:50 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,11 @@
 class VirtualHost : public ABlock
 {
 public:
+	VirtualHost();
+	VirtualHost(const VirtualHost &copy);
+	VirtualHost &operator=(const VirtualHost &operand);
+	~VirtualHost();
+
 	VirtualHost(ConfigFile *confFile);
 
 	VirtualHost(ABlock &ab);

@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/11 12:07:39 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:27:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ class ConfigFile
 public:
 	// Default constructor for ConfigFile. Use openFile then to open a file.
 	ConfigFile();
+
+	ConfigFile(const ConfigFile &copy);
+	ConfigFile &operator=(const ConfigFile &operand);
+	~ConfigFile();
 
 	// Use this constructor normally.
 	ConfigFile(std::string filename);

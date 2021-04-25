@@ -23,6 +23,22 @@ Config::Config(ConfigFile *confFile) : ABlock(confFile)
 {
 }
 
+Config::Config(const Config &copy) :
+	ABlock(copy),
+	virtualHostVector(copy.virtualHostVector)
+{
+}
+
+Config &Config::operator=(const Config &operand)
+{
+	virtualHostVector = operand.virtualHostVector;
+	return (*this);
+}
+
+Config::~Config()
+{
+}
+
 /*
 ** In our implementation Config is the whole file (it's not wrapped
 ** in braces), so we don't need a break condition. We also don't need

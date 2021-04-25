@@ -32,6 +32,11 @@ public:
 	Location(ConfigFile *confFile);
 	Location(ABlock &ab);
 
+	Location();
+	Location(const Location &copy);
+	Location &operator=(const Location &operand);
+	~Location();
+
 	void handleLine(std::string lineString);
 
 	std::string getPattern(void) const;
@@ -53,6 +58,7 @@ public:
 
 private:
 	std::string parsePattern(std::string line);
+	
 	std::string pattern;
 	LimitExcept limitExcept;
 	std::string cgiPath;

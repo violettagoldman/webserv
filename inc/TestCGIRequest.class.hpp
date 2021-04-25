@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TestCGIRequest.hpp                                 :+:      :+:    :+:   */
+/*   TestCGIRequest.class.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 17:28:31 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:46:06 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:50:54 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,11 @@
 class TestCGIRequest : public Request {
 
 public:
+
+	TestCGIRequest();
+	TestCGIRequest(const TestCGIRequest &copy);
+	TestCGIRequest &operator=(const TestCGIRequest &operand);
+	~TestCGIRequest();
 
 	TestCGIRequest(std::string method,
 	std::string body,
@@ -43,9 +48,8 @@ private:
 	std::string _method;
 	std::string _body;
 	std::vector<Header> _headers;
-	// std::string _query;
 	std::string _path;
-	// std::string _fragment;
+
 
 
 

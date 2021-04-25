@@ -23,6 +23,13 @@ class LimitExcept : public ABlock
 {
 public:
 	LimitExcept(ConfigFile *confFile);
+
+	LimitExcept();
+	LimitExcept(const LimitExcept &copy);
+	LimitExcept &operator=(const LimitExcept &operand);
+	~LimitExcept();
+
+
 	void handleLine(std::string lineString);
 
 	static std::vector<std::string> parseMethods(std::string line);

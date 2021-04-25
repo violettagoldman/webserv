@@ -6,11 +6,51 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/21 15:48:35 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:22:41 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGIHandler.class.hpp"
+
+CGIHandler::CGIHandler()
+{
+}
+
+CGIHandler::CGIHandler(const CGIHandler &copy) :
+	_cgiResponse(copy._cgiResponse),
+	_cgiRequest(copy._cgiRequest),
+	_bodySize(copy._bodySize),
+	_envp(copy._envp),
+	_useTempFile(copy._useTempFile),
+	_tempFileWriteFd(copy._tempFileWriteFd),
+	_headers(copy._headers)
+{
+	_pipeIn[0] = copy._pipeIn[0];
+	_pipeIn[1] = copy._pipeIn[1];
+	_pipeOut[0] = copy._pipeOut[0];
+	_pipeOut[1] = copy._pipeIn[1];
+}
+
+CGIHandler &CGIHandler::operator=(const CGIHandler &operand)
+{
+	_cgiResponse = operand._cgiResponse;
+	_cgiRequest = operand._cgiRequest;
+	_bodySize = operand._bodySize;
+	_envp = operand._envp;
+	_useTempFile = operand._useTempFile;
+	_tempFileWriteFd = operand._tempFileWriteFd;
+	_headers = operand._headers;
+	_pipeIn[0] = operand._pipeIn[0];
+	_pipeIn[1] = operand._pipeIn[1];
+	_pipeOut[0] = operand._pipeOut[0];
+	_pipeOut[1] = operand._pipeIn[1];
+
+	return (*this);
+}
+
+CGIHandler::~CGIHandler()
+{
+}
 
 /*
 ** Return true if the CGI called is php-cgi binary, and false otherwise.
