@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:10:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:10:10 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@
 class Base64 {
 
 public:
+	Base64();
+
+	Base64(const Base64 &copy);
+	Base64 &operator=(const Base64 &operand);
+	~Base64();
+
 	Base64(std::string input);
 	std::string decode(void);
 

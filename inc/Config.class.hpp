@@ -24,6 +24,12 @@ class Config : public ABlock
 {
 public:
 	Config();
+
+	Config(const Config &copy);
+	Config &operator=(const Config &operand);
+
+	~Config();
+
 	Config(ConfigFile *confFile);
 	virtual void handleLine(std::string lineString);
 	void handle();

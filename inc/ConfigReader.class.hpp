@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:07:37 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/15 17:31:48 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:32:24 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ class ConfigReader
 {
 public:
 	ConfigReader(std::string filename);
+
+	ConfigReader(const ConfigReader &copy);
+	ConfigReader &operator=(const ConfigReader &operand);
+	~ConfigReader();
 
 	Config getConfig(void) const;
 

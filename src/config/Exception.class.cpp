@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 12:54:48 by ashishae          #+#    #+#             */
-/*   Updated: 2021/03/27 17:07:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:35:02 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,11 @@
 */
 Exception::Exception(std::string _message) :
 	message(_message)
+{
+}
+
+Exception::Exception() :
+	message("")
 {
 }
 

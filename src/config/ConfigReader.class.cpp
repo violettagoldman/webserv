@@ -21,6 +21,29 @@ void ConfigReader::parse()
 	_config.handle();
 }
 
+ConfigReader::ConfigReader(const ConfigReader &copy) :
+	confFile(copy.confFile),
+	_config(copy._config),
+	lineString(copy.lineString),
+	lastLineParsed(copy.lastLineParsed),
+	serverBlockVector(copy.serverBlockVector)
+{
+}
+
+ConfigReader &ConfigReader::operator=(const ConfigReader &operand)
+{
+	confFile = operand.confFile;
+	_config = operand._config;
+	lineString = operand.lineString;
+	lastLineParsed = operand.lastLineParsed;
+	serverBlockVector = operand.serverBlockVector;
+	return (*this);
+}
+
+ConfigReader::~ConfigReader()
+{
+}
+
 ConfigReader::ConfigReader(std::string filename) :
 	confFile(filename), _config(&confFile)
 {

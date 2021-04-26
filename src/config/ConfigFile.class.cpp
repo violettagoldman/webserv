@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/19 17:53:27 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:30:45 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,31 @@
 ** Default constructor for ConfigFile.
 */
 ConfigFile::ConfigFile() : _fd(-1)
+{
+}
+
+ConfigFile::ConfigFile(const ConfigFile &copy) :
+	_fd(copy._fd),
+	_ret(copy._ret),
+	_line(copy._line),
+	_lastLineRead(copy._lastLineRead),
+	_lastLineSent(copy._lastLineSent),
+	_lineString(copy._lineString)
+{
+}
+
+ConfigFile &ConfigFile::operator=(const ConfigFile &operand)
+{
+	_fd = operand._fd;
+	_ret = operand._ret;
+	_line = operand._line;
+	_lastLineRead = operand._lastLineRead;
+	_lastLineSent = operand._lastLineSent;
+	_lineString = operand._lineString;
+	return (*this);
+}
+
+ConfigFile::~ConfigFile()
 {
 }
 

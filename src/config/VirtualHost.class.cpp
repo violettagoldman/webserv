@@ -6,11 +6,39 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/15 17:28:25 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:47:32 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "VirtualHost.class.hpp"
+
+VirtualHost::VirtualHost()
+{
+}
+
+VirtualHost::VirtualHost(const VirtualHost &copy) :
+	ABlock(copy),
+	_listenPort(copy._listenPort),
+	_listenHost(copy._listenHost),
+	_serverName(copy._serverName),
+	_locations(copy._locations),
+	_uploadStore(copy._uploadStore)
+{
+}
+
+VirtualHost &VirtualHost::operator=(const VirtualHost &operand)
+{
+	_listenPort = operand._listenPort;
+	_listenHost = operand._listenHost;
+	_serverName = operand._serverName;
+	_locations = operand._locations;
+	_uploadStore = operand._uploadStore;
+	return (*this);
+}
+
+VirtualHost::~VirtualHost()
+{
+}
 
 /*
 ** Constructor for VirtualHost.

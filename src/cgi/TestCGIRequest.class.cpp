@@ -1,16 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TestCGIRequest.cpp                                 :+:      :+:    :+:   */
+/*   TestCGIRequest.class.cpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 17:29:08 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/06 15:54:35 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:52:19 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TestCGIRequest.class.hpp"
+
+TestCGIRequest::TestCGIRequest()
+{
+}
+
+TestCGIRequest::TestCGIRequest(const TestCGIRequest &copy) :
+	Request(copy),
+	_method(copy._method),
+	_body(copy._body),
+	_headers(copy._headers),
+	_path(copy._path)
+{
+	
+}
+
+TestCGIRequest &TestCGIRequest::operator=(const TestCGIRequest &operand)
+{
+	_method = operand._method;
+	_body = operand._body;
+	_headers = operand._headers;
+	_path = operand._path;
+	return *this;
+}
+
+TestCGIRequest::~TestCGIRequest()
+{
+}
 
 TestCGIRequest::TestCGIRequest(
 	std::string method,

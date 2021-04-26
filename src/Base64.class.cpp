@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Base64.class.hpp                                   :+:      :+:    :+:   */
+/*   Base64.class.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/02/07 15:10:56 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:09:59 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,26 @@ const std::string sequence = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
 */
 Base64::Base64(std::string input) :
 	_content(input)
+{
+}
+
+Base64::Base64() :
+	_content("")
+{
+}
+
+Base64::Base64(const Base64 &copy)
+{
+	_content = copy._content;
+}
+
+Base64 &Base64::operator=(const Base64 &operand)
+{
+	_content = operand._content;
+	return (*this);
+}
+
+Base64::~Base64()
 {
 }
 

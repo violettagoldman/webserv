@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 12:10:39 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/15 17:28:53 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/25 17:43:54 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,48 @@ Location::Location(ConfigFile *confFile) :
 	rootSet(false),
 	cgiSet(false),
 	uploadStoreSet(false)
+{
+}
+
+Location::Location() :
+	pattern(""),
+	limitExcept(),
+	cgiPath(""),
+	uploadStore(""),
+	rootSet(false),
+	cgiSet(false),
+	uploadStoreSet(false),
+	cgiExtension()
+{
+}
+
+Location::Location(const Location &copy) :
+	ABlock(copy),
+	pattern(copy.pattern),
+	limitExcept(copy.limitExcept),
+	cgiPath(copy.cgiPath),
+	uploadStore(copy.uploadStore),
+	rootSet(copy.rootSet),
+	cgiSet(copy.cgiSet),
+	uploadStoreSet(copy.uploadStoreSet),
+	cgiExtension(copy.cgiExtension)
+{
+}
+
+Location &Location::operator=(const Location &operand)
+{
+	pattern = operand.pattern;
+	limitExcept = operand.limitExcept;
+	cgiPath = operand.cgiPath;
+	uploadStore = operand.uploadStore;
+	rootSet = operand.rootSet;
+	cgiSet = operand.cgiSet;
+	uploadStoreSet = operand.uploadStoreSet;
+	cgiExtension = operand.cgiExtension;
+	return (*this);
+}
+
+Location::~Location()
 {
 }
 
