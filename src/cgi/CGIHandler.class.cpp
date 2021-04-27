@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:56 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/27 18:35:34 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/27 18:38:07 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,11 +330,11 @@ char **create_envp(std::vector<std::string> mvars)
 	return ret;
 }
 
-bool fileExists(std::string path)
+bool canExecute(std::string path)
 {
 	struct stat fileStat;
 
-	return (stat(path.c_str(), &fileStat) == 0);
+	return (stat(path.c_str(), &fileStat) == 0 && fileStat.st_mode & S_IXUSR);
 }
 
 /*
@@ -354,8 +354,8 @@ void CGIHandler::launch_cgi()
 	// else
 	// {
 		// close(STDIN_FILENO);
-	if (!fileExists(_cgiRequest.pathToCGI.c_str()))
-		throw Exception("Couldn't find CGI executable");
+	if (!canExecute(_cgiRequest.pathToCGI.c_str()))
+		throw Exception("Couldn't find or execute CGI binary");
 	
 	_tempFileWriteFd = open("webservTmp",O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	close(_pipeIn[1]);
