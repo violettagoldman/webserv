@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/25 17:17:19 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/27 18:17:53 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 # include "Request.class.hpp"
 # include "Utility.hpp"
 # include "Base64.class.hpp"
+# include <sys/stat.h>
+
 
 /* A structure containing all information needed for CGI to be launched.
 ** Most member names correspond to meta-variables from the CGI spec.
