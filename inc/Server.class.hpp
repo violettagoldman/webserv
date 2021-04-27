@@ -8,7 +8,7 @@
 # include <vector>
 # include <unistd.h>
 # include "VirtualHost.class.hpp"
-
+# include "Response.class.hpp"
 class Server
 {
 	public:
@@ -22,7 +22,7 @@ class Server
 		int					setup(VirtualHost conf);
 		int					accept(void);
 		int					listen(void);
-		int					send(int fd, std::string message) const;
+		int					send(int fd, std::string message, Response *response);
 		int					close(void);
 		std::string			getHost(void) const;
 		std::string			getPort(void) const;

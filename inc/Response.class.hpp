@@ -40,9 +40,11 @@ class Response
 		int			checkPathExistance(std::string path);
 		void		setLastModified(int fd);
 		void		handleCGI(Location loc);
-		
+		std::string getResult(void) const;
+		int			getOffset(void) const;
+		void 		setOffset(int offset);
 
-		
+
 	private:
 		int									_statusCode;
 		std::string							_method;
@@ -53,6 +55,8 @@ class Response
 		Request								_req;
 		std::string							_fp;
 		std::map<int, std::string>			_errorPages;
+		std::string							_result;
+		int									_offset;
 };
 
 #endif

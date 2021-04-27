@@ -1,5 +1,7 @@
 #include "Response.class.hpp"
 
+Response::Response(void)
+{}
 Response::Response(Request req, Location loc, std::string fp)
 {
 	_fp = fp;
@@ -10,6 +12,11 @@ Response::Response(Request req, Location loc, std::string fp)
 	_headers["Date"] = getDate(getTime());
 	_headers["Server"] = "Webserv/1.0 (Unix)";
 	handleMethod(loc);
+}
+
+Response::Response(Response const &src)
+{
+	*this = src;
 }
 
 Response::Response(std::string cgi_response, Location loc) : _cgi_response(cgi_response)
@@ -54,6 +61,8 @@ Response &Response::operator=(Response const &src)
 	if (this != &src)
 	{
 		this->_req = src._req;
+		this->_result = src._result;
+		this->_offset = src._offset;
 		this->_body = src._body;
 		this->_headers = src._headers;
 		this->_method = src._method;
@@ -446,6 +455,21 @@ void Response::setLastModified(int fd)
 	_headers["Last-Modified"] = getDate(fileStat.st_mtime);
 }
 
+std::string Response::getResult(void) const
+{
+	return _result;
+}
+
+int Response::getOffset(void) const
+{
+	return _offset;
+}
+
+void Response::setOffset(int offset)
+{
+	_offset = offset;
+}
+
 std::string Response::serialize()
 {
 	std::string res;
@@ -464,6 +488,8 @@ std::string Response::serialize()
 	res += "\r\n";
 	if (_method != "HEAD")
 		res += _body;
+	_result = res;
+	_offset = 0;
 	return (res);
 }
 

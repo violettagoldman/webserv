@@ -86,8 +86,7 @@ int Server::accept(void)
 	int newSocket;
 
 	addrlen = sizeof(_address);
-	if ((newSocket = ::accept(_fd, (struct sockaddr *)&_address,
-														(socklen_t *)&addrlen)) == -1)
+	if ((newSocket = ::accept(_fd, (struct sockaddr *)&_address, (socklen_t *)&addrlen)) == -1)
 	{
 		std::cerr << "Couldn't accept the connection" << std::endl;
 		return (-1);
@@ -99,11 +98,24 @@ int Server::accept(void)
 * This method is used to write in the socket
 * @return int Error code
 */
-int Server::send(int fd, std::string message) const
+
+int Server::send(int fd, std::string message, Response *response)
 {
-	std::cout << message.size() << std::endl;
-	if (::send(fd, message.c_str(), message.size(), 0) <= 0)
+	int len = message.size();
+	int res;
+	int offset = response->getOffset();
+	std::cout << len << std::endl;
+	std::cout << offset << std::endl;
+	if ((res = ::send(fd, message.c_str() + offset, len - offset, 0)) <= 0)
+	{
 		std::cerr << "Could not send response" << std::endl;
+		return -1;
+	}
+	offset += res;
+	response->setOffset(offset);
+	std::cout << "of after" << offset << std::endl;
+	if (offset >= len)
+		return (1);
 	return (0);
 }
 
