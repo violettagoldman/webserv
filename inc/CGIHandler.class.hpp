@@ -6,7 +6,7 @@
 /*   By: ashishae <ashishae@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/30 20:21:51 by ashishae          #+#    #+#             */
-/*   Updated: 2021/04/27 18:17:53 by ashishae         ###   ########.fr       */
+/*   Updated: 2021/04/27 18:40:11 by ashishae         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ public:
 	// This constructor is mostly for testing. It allows you to set all the
 	// variables in the structure and pass the body directly.
 
+	CGIHandler();
+
 	CGIHandler(std::string body, CGIRequest cr);
 
 	CGIHandler(const CGIHandler &copy);
@@ -116,7 +118,6 @@ public:
 	static std::string urldecode(std::string encodedString);
 
 private:
-	CGIHandler();
 	std::string _cgiResponse;
 	CGIRequest _cgiRequest;
 	int _bodySize;

@@ -121,7 +121,19 @@ int		main(int argc, char **argv)
 								conf.getVirtualHostVector()[s].getServerName()[0],
 								loc.getFcgiPass()
 							};
-							CGIHandler handler(request, cr);
+
+							CGIHandler handler;
+							bool cgiFailed = false;
+							try
+							{
+								handler = CGIHandler(request, cr);
+							}
+							catch (Exception &e)
+							{
+								std::cout << "[CGI Exception]: " << e.what() << std::endl;
+								cgiFailed = true;
+							}
+
 							Response response(handler.getCgiResponse(), loc);
 							response.serialize();
 							resp[sd] = response;
