@@ -30,8 +30,12 @@ int		main(int argc, char **argv)
 	std::string	final_path;
 	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
 	std::map<int, Request> chunked_requests;
-	std::map<int, Request>::iterator chunked_pos;
 
+	std::map<int, Request>::iterator chunked_pos;
+	std::map<int, Response> resp;
+
+	std::map<int, Response>::iterator resp_pos;
+	std::vector<Response> response_vec;
 	if (argc == 2)
 	{
 		path_to_conf = argv[1];
@@ -119,14 +123,24 @@ int		main(int argc, char **argv)
 							};
 							CGIHandler handler(request, cr);
 							Response response(handler.getCgiResponse(), loc);
-							servers[s].send(sd, response.serialize());
+							response.serialize();
+							resp[sd] = response;
 						}
 						else if (request.getState() != "chunked")
 						{
 							Response response(request, loc, final_path);
-							if (FD_ISSET(sd, &fds_write))
-								servers[s].send(sd, response.serialize());
+							response.serialize();
+							resp[sd] = response;
+
 						}
+					}
+				}
+				if (FD_ISSET(sd, &fds_write))
+				{
+					if ((resp_pos = resp.find(sd)) != resp.end())
+					{
+						if (servers[s].send(sd, resp_pos->second.getResult(), &resp_pos->second))
+							resp.erase(sd);
 					}
 				}
 			}
