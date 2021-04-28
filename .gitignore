@@ -35,4 +35,6 @@
 *.iml
 *.idea
 
+# Tmp files
+webservTmp
 __pycache__
