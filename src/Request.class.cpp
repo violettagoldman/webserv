@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 22:09:36 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/28 14:25:55 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/28 15:39:40 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,28 +33,6 @@ std::vector<std::string> remove_spaces(std::vector<std::string> values)
 	}
 	return values;
 }
-
-// Header *header_split(std::string str)
-// {
-// 	std::string header_name;
-// 	size_t index = str.find_first_of(":");
-// 	header_name = str.substr(0, index);
-// 	if (header_name.find(" ") != std::string::npos)
-// 	/*
-// 	* A
-// 	* server MUST reject any received request message that contains
-// 	* whitespace between a header field-name and colon with a response code
-// 	* of 400 (Bad Request).
-// 	*/
-// 		return NULL;
-// 	std::string value = str.substr(index + 1);
-// 	value.erase(value.find('\n'));
-// 	std::vector<std::string> values = ft_split(value, ',');
-// 	values = remove_spaces(values);
-//
-// 	Header *new_header = new Header(header_name, values);
-// 	return new_header;
-// }
 
 std::vector<std::string> ft_split(std::string s, char c);
 
@@ -228,19 +206,12 @@ unsigned long Request::contentLengthChecker(std::vector<Header> headers)
 	for (std::vector<Header>::iterator it = headers.begin(); it < headers.end(); ++it)
 		if ((*it).getName() == "Content-Length")
 			values = (*it).getValue();
-	// std::cout << "val " << values[0] << std::endl;
 	if (values.size() > 1)
 	{
 		setError(400);
 		return 0;
 	}
 	unsigned long size = std::strtol(values[0].c_str(), NULL, 10);
-
-	// if (errno)
-	// {
-	// 	setError(400);
-	// 	return 0;
-	// }
 	return size;
 }
 
@@ -258,21 +229,16 @@ void Request::ChunkedInterpretation(std::string chunk)
 
 	while ((pos = chunk.find(CRLF)) != std::string::npos)
 	{
-		// std::cout << chunk.substr(0, pos) << std::endl;
 		size = ft_atoi_base(chunk.substr(0, pos).c_str(), "0123456789abcdef");
 		chunk.erase(0, pos + 2);
-		// std::cout << "Size of chunk: "<< size << std::endl;
-		// std::cout << "chunk again" << chunk << std::endl;
 		pos = chunk.find(CRLF);
 		info = chunk.substr(0, pos);
-		// std::cout << "k" <<  info << "k"  << info.size()<< std::endl;
 		if ((int)info.size() != size)
 		{
 			_error = 400;
 			return;
 		}
 		_body += info;
-		// std::cout << _body << std::endl;
 		chunk.erase(0, size + 2);
 	}
 }
@@ -283,7 +249,6 @@ std::string Request::getExtension(void)
 	pos = _path.find_last_of(".");
 	if (pos == std::string::npos)
 		return ("");
-	// std::cout << _path.substr(pos + 1) << std::endl;
 	return (_path.substr(pos + 1));
 }
 void Request::read_request(int sd)
@@ -303,15 +268,11 @@ void Request::read_request(int sd)
 		return;
 	}
 	std::string to_interpret(input);
-	std::cout << "read: ;" << to_interpret.substr(0, 200) << std::endl;
 	if (to_interpret.find("Transfer-Encoding: chunked") != std::string::npos)
 		_chunked = 1;
 	_buffer += to_interpret;
 	if (_buffer.find("\r\n\r\n") == std::string::npos || (_chunked && _buffer.find("0\r\n\r\n") == std::string::npos))
-	{
-		std::cout << "was in chunks" << std::endl;
 		_state = "processing";
-	}
 	else
 	{
 		_state = "read";

@@ -105,10 +105,7 @@ int main(int argc, char **argv)
 					}
 					else if (request.getState() == "read" || request.getState() == "error")
 					{
-						// request.print_headers();
 						final_path = handler(request, conf);
-						std::cout << "State of the error after handler" << request.getError() << std::endl;
-						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
 						if (loc.getFcgiPass() != "" && loc.getCgiExtension() == request.getExtension())
 						{
