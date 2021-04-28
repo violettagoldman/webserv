@@ -1,7 +1,8 @@
 #include "Response.class.hpp"
 
 Response::Response(void)
-{}
+{
+}
 Response::Response(Request req, Location loc, std::string fp)
 {
 	_fp = fp;
@@ -19,22 +20,21 @@ Response::Response(Response const &src)
 	*this = src;
 }
 
-Response::Response(std::string cgi_response, Location loc) : _cgi_response(cgi_response)
+Response::Response(std::string cgi_response, bool isCGIFailed) : _cgi_response(cgi_response)
 {
-	handleCGI(loc);
+	handleCGI(isCGIFailed);
 }
 
-void Response::handleCGI(Location loc)
+void Response::handleCGI(bool isCGIFailed)
 {
+	if (isCGIFailed)
+	{
+		error(500);
+		return;
+	}
 	std::string headers = _cgi_response.substr(0, _cgi_response.find("\r\n\r\n"));
 	std::string body = _cgi_response.substr(_cgi_response.find("\r\n\r\n") + 4);
-	std::cout << "Body_size in handlecgi" << body.size() << std::endl;
-	(void)loc;
-	// if (body.size() > static_cast<size_t>(loc.getClientMaxBodySize()))
-	// {
-	// 	error(413);
-	// 	return ;
-	// }
+	// std::cout << "Body_size in handlecgi" << body.size() << std::endl;
 	size_t current = 0;
 	while (_cgi_response.substr(current, _cgi_response.size()).find("\r\n") != std::string::npos)
 	{
@@ -475,7 +475,7 @@ std::string Response::serialize()
 	std::string res;
 	if (_req.isHeaderPresent("Accept-Language"))
 		_headers["Content-Language"] = _req.getHeaderByName("Accept-Language")->getValue()[0];
-	std::cout << "serialize" << ft_itoa(_body.length()) << std::endl;
+	// std::cout << "serialize" << ft_itoa(_body.length()) << std::endl;
 	if (_method != "CONNECT" && _statusCode != 201 && _statusCode != 204)
 		_headers["Content-Length"] = ft_itoa(_body.length());
 	if (_statusCode == 201 || _statusCode == 204)

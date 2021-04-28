@@ -6,11 +6,11 @@
 #include "Handler.hpp"
 #include "CGIHandler.class.hpp"
 
-Request		*read_request(int sd, Request *req);
+Request *read_request(int sd, Request *req);
 
 std::vector<Server> servers;
 
-void	shutdown(int signal)
+void shutdown(int signal)
 {
 	(void)signal;
 	std::cout << "Shutting down the server\n";
@@ -19,16 +19,16 @@ void	shutdown(int signal)
 	exit(0);
 }
 
-int		main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	size_t		i;
-	fd_set		fds;
-	fd_set		fds_read;
-	fd_set		fds_write;
-	int			new_socket;
-	int 		sd;
-	std::string	final_path;
-	std::string	path_to_conf("./tests/config/test_configs/nginx.conf");
+	size_t i;
+	fd_set fds;
+	fd_set fds_read;
+	fd_set fds_write;
+	int new_socket;
+	int sd;
+	std::string final_path;
+	std::string path_to_conf("./tests/config/test_configs/nginx.conf");
 	std::map<int, Request> chunked_requests;
 
 	std::map<int, Request>::iterator chunked_pos;
@@ -65,14 +65,15 @@ int		main(int argc, char **argv)
 	signal(SIGINT, shutdown);
 
 	FD_ZERO(&fds);
-	for (size_t i = 0; i < servers.size(); ++i) {
+	for (size_t i = 0; i < servers.size(); ++i)
+	{
 		FD_SET(servers[i].getFd(), &fds);
 	}
-	while(1)
+	while (1)
 	{
 		fds_read = fds;
 		fds_write = fds;
-		select(FD_SETSIZE, &fds_read , &fds_write , NULL , NULL);
+		select(FD_SETSIZE, &fds_read, &fds_write, NULL, NULL);
 
 		for (size_t s = 0; s < servers.size(); ++s)
 		{
@@ -86,7 +87,7 @@ int		main(int argc, char **argv)
 			for (i = 0; i < servers[s].getClients().size(); i++)
 			{
 				sd = servers[s].getClients()[i];
-				if (FD_ISSET(sd , &fds_read))
+				if (FD_ISSET(sd, &fds_read))
 				{
 					Request request;
 					if ((chunked_pos = chunked_requests.find(sd)) != chunked_requests.end())
@@ -95,32 +96,31 @@ int		main(int argc, char **argv)
 
 					if (request.getState() == "chunked")
 						chunked_requests[sd] = request;
-					if ((request.getState() == "read" || request.getState() == "end")&& request.isHeaderPresent("Transfer-Encoding", "chunked"))
+					if ((request.getState() == "read" || request.getState() == "end") && request.isHeaderPresent("Transfer-Encoding", "chunked"))
 						chunked_requests.erase(sd);
 					if (request.getState() == "end")
 					{
 						servers[s].removeClient(sd);
 						FD_CLR(sd, &fds);
-					 	close(sd);
+						close(sd);
 					}
 					else if (request.getState() == "read" || request.getState() == "error")
 					{
-						request.print_headers();
+						// request.print_headers();
 						final_path = handler(request, conf);
-						std::cout << "State of the error after handler" << request.getError() << std::endl;
-						std::cout << "State of path" << final_path << std::endl;
+						// std::cout << "State of the error after handler" << request.getError() << std::endl;
+						// std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
 						if (loc.getFcgiPass() != "" && loc.getCgiExtension() == request.getExtension())
 						{
 							CGIRequires cr =
-							{
-								final_path,
-								 (*(request.getHeaderByName("Host"))).getValue()[0],
-								"http://" + (*(request.getHeaderByName("Host"))).getValue()[0] + request.getPath(),
-								servers[s].getPort(),
-								conf.getVirtualHostVector()[s].getServerName()[0],
-								loc.getFcgiPass()
-							};
+									{
+											final_path,
+											(*(request.getHeaderByName("Host"))).getValue()[0],
+											"http://" + (*(request.getHeaderByName("Host"))).getValue()[0] + request.getPath(),
+											servers[s].getPort(),
+											conf.getVirtualHostVector()[s].getServerName()[0],
+											loc.getFcgiPass()};
 
 							CGIHandler handler;
 							bool cgiFailed = false;
@@ -134,7 +134,7 @@ int		main(int argc, char **argv)
 								cgiFailed = true;
 							}
 
-							Response response(handler.getCgiResponse(), loc);
+							Response response(handler.getCgiResponse(), cgiFailed);
 							response.serialize();
 							resp[sd] = response;
 						}
@@ -143,7 +143,6 @@ int		main(int argc, char **argv)
 							Response response(request, loc, final_path);
 							response.serialize();
 							resp[sd] = response;
-
 						}
 					}
 				}

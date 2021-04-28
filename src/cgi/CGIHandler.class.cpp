@@ -16,14 +16,13 @@ CGIHandler::CGIHandler()
 {
 }
 
-CGIHandler::CGIHandler(const CGIHandler &copy) :
-	_cgiResponse(copy._cgiResponse),
-	_cgiRequest(copy._cgiRequest),
-	_bodySize(copy._bodySize),
-	_envp(copy._envp),
-	_useTempFile(copy._useTempFile),
-	_tempFileWriteFd(copy._tempFileWriteFd),
-	_headers(copy._headers)
+CGIHandler::CGIHandler(const CGIHandler &copy) : _cgiResponse(copy._cgiResponse),
+																								 _cgiRequest(copy._cgiRequest),
+																								 _bodySize(copy._bodySize),
+																								 _envp(copy._envp),
+																								 _useTempFile(copy._useTempFile),
+																								 _tempFileWriteFd(copy._tempFileWriteFd),
+																								 _headers(copy._headers)
 {
 	_pipeIn[0] = copy._pipeIn[0];
 	_pipeIn[1] = copy._pipeIn[1];
@@ -62,7 +61,6 @@ bool isCgiPhpCgi(std::string pathToCGI)
 		return true;
 	return false;
 }
-
 
 /*
 ** Find a header in a vector of headers by key, and return all its values
@@ -152,7 +150,6 @@ CGIHandler::CGIHandler(Request icr, CGIRequires cr) : _useTempFile(false)
 
 	std::vector<Header> hds = icr.getHeaders();
 
-
 	// From Request headers
 
 	// Auth
@@ -209,7 +206,7 @@ void CGIHandler::pipeline(std::string body)
 	// 	_tempFileWriteFd = open("webservTmp", O_WRONLY|O_CREAT|O_TRUNC, 0666);
 	// }
 	openPipes();
-	
+
 	pid = fork();
 	if (pid == 0)
 	{
@@ -320,7 +317,7 @@ void CGIHandler::prepareEnvp(void)
 */
 char **create_envp(std::vector<std::string> mvars)
 {
-	char **ret = new char*[mvars.size()+1];
+	char **ret = new char *[mvars.size() + 1];
 	for (size_t i = 0; i < mvars.size(); i++)
 	{
 		std::cout << mvars[i] << std::endl;
@@ -353,11 +350,11 @@ void CGIHandler::launch_cgi()
 	// }
 	// else
 	// {
-		// close(STDIN_FILENO);
+	// close(STDIN_FILENO);
 	if (!canExecute(_cgiRequest.pathToCGI.c_str()))
 		throw Exception("Couldn't find or execute CGI binary");
-	
-	_tempFileWriteFd = open("webservTmp",O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+
+	_tempFileWriteFd = open("webservTmp", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	close(_pipeIn[1]);
 	dup2(_pipeIn[0], 0);
 	dup2(_tempFileWriteFd, 1);
@@ -368,7 +365,6 @@ void CGIHandler::launch_cgi()
 	// dup2(_pipeOut[1]);
 	execute_cgi();
 	close(0);
-
 }
 
 /*
@@ -388,16 +384,13 @@ void CGIHandler::execute_cgi()
 	// Php-cgi scheme: only launch php-cgi
 	// Apparently, php-cgi doesn't like the script name as argument
 	//if (isCgiPhpCgi(_cgiRequest.pathToCGI))
-//		argv[0] = cgiPath;
-//	else if () // tester scheme,
+	//		argv[0] = cgiPath;
+	//	else if () // tester scheme,
 
-
-
-//	if (_cgiRequest.pathToCGI == "")
-		// char *const argv[] = {reqfile, NULL};
-//	else
-		// char *const argv[] = {cgiPath, reqfile, NULL};
-
+	//	if (_cgiRequest.pathToCGI == "")
+	// char *const argv[] = {reqfile, NULL};
+	//	else
+	// char *const argv[] = {cgiPath, reqfile, NULL};
 
 	// Apparently this is not needed
 
@@ -464,7 +457,7 @@ pathResult CGIHandler::parsePath(std::string requestURI, std::string scriptName)
 	size_t queryStringStart = realURI.find("?");
 
 	if (queryStringStart != std::string::npos)
-		ret.queryString = realURI.substr(queryStringStart+1);
+		ret.queryString = realURI.substr(queryStringStart + 1);
 	else
 		ret.queryString = "";
 
@@ -501,16 +494,15 @@ int ft_find(const char *str, const char c)
 ** @param base The base in which the integer is in string
 ** @ret int The value of the said integer.
 */
-int	ft_atoi_base(const char *str, const char *base)
+int ft_atoi_base(const char *str, const char *base)
 {
-	int		nbr;
-	int		sign;
-	int		newval;
+	int nbr;
+	int sign;
+	int newval;
 
 	nbr = 0;
 	sign = 1;
-	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f'
-			|| (*str) == '\r' || (*str) == ' ')
+	while ((*str) == '\t' || (*str) == '\n' || (*str) == '\v' || (*str) == '\f' || (*str) == '\r' || (*str) == ' ')
 		str++;
 	if ((*str) == '-' || (*str) == '+')
 	{
@@ -539,11 +531,10 @@ char convert(std::string byte)
 	char res = 0;
 	const std::string capitals = "ABCDEF";
 	if (capitals.find(byte[0]) != std::string::npos || capitals.find(byte[1]) != std::string::npos)
-		res = (char) ft_atoi_base(byte.c_str(), "0123456789ABCDEF");
+		res = (char)ft_atoi_base(byte.c_str(), "0123456789ABCDEF");
 	else
-		res = (char) ft_atoi_base(byte.c_str(), "0123456789abcdef");
+		res = (char)ft_atoi_base(byte.c_str(), "0123456789abcdef");
 	return res;
-
 }
 
 /*
@@ -560,12 +551,11 @@ std::string CGIHandler::urldecode(std::string encodedString)
 
 	while ((pos = encodedString.find("%")) != std::string::npos)
 	{
-		encodedSection = encodedString.substr(pos+1, 2);
+		encodedSection = encodedString.substr(pos + 1, 2);
 		replacement = convert(encodedSection);
 		replacementString.clear();
 		replacementString.push_back(replacement);
 		encodedString.replace(pos, 3, replacementString);
-
 	}
 	return encodedString;
 }

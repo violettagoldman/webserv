@@ -17,18 +17,17 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "Request.class.hpp"
-# include <sys/stat.h>
+#include <sys/stat.h>
 int check_listen(VirtualHost host, Header host_header)
 {
 	std::string request_host;
-	std::vector<std::string>  server_names = host.getServerName();
+	std::vector<std::string> server_names = host.getServerName();
 	size_t pos;
 	int request_server_port;
 	std::string request_server_name;
 
-
 	request_host = host_header.getValue()[0];
-	std::cout << host.getListenIp() << std::endl;
+	// std::cout << host.getListenIp() << std::endl;
 	if ((pos = host_header.getValue()[0].find(':')) != std::string::npos)
 	{
 		request_server_name = host_header.getValue()[0].substr(0, pos);
@@ -42,10 +41,10 @@ int check_listen(VirtualHost host, Header host_header)
 	}
 	for (std::vector<std::string>::iterator it = server_names.begin(); it < server_names.end(); ++it)
 	{
-		std::cout << "Server name: " <<*it << std::endl;
+		// std::cout << "Server name: " << *it << std::endl;
 		if (*it == "" && host.getListenIp() == request_server_port)
 			return 1;
-		if (*it == request_server_name &&  host.getListenIp() == request_server_port)
+		if (*it == request_server_name && host.getListenIp() == request_server_port)
 			return 1;
 	}
 	return 0;
@@ -100,7 +99,6 @@ bool extensionCheck(std::string loc, std::string req)
 	// std::cout << loc << std::endl;
 	if (loc.substr(loc.find("*") + 1) == extension)
 	{
-		std::cout << "ok " << std::endl;
 		return 1;
 	}
 	return 0;
@@ -112,13 +110,12 @@ std::string preprocess(std::string request_path)
 	size_t sl_pos;
 	size_t dot_pos;
 
-
 	sl_pos = request_path.find_last_of('/');
 	to_compare = request_path.substr(0, sl_pos);
 	dot_pos = request_path.find_last_of('.');
 	sl_pos = request_path.find_last_of('/');
 	if (dot_pos != std::string::npos && dot_pos > sl_pos)
-		to_compare  = request_path.substr(0, sl_pos + 1);
+		to_compare = request_path.substr(0, sl_pos + 1);
 	else if (sl_pos == request_path.size() - 1 && request_path.size() != 1)
 		to_compare = request_path.substr(0, sl_pos + 1);
 	else if (request_path.size() != 1)
@@ -167,7 +164,6 @@ int count_match(std::string request, std::string location)
 	}
 	return count;
 }
-
 
 //
 // int count_match(std::string str1, std::string str2)
@@ -226,14 +222,14 @@ std::string create_final_path(Location loc, std::string request_path)
 	std::string root = loc.getRoot();
 	std::string location_pattern(loc.getPattern());
 	std::string request_path_f(request_path);
-	struct stat		fileStat;
-	int				fd;
+	struct stat fileStat;
+	int fd;
 	// std::cout << request_path << std::endl;
 	// std::cout << request_path << std::endl;
 	// std::cout << root << std::endl;
 	// std::cout << location_pattern << std::endl;
 	location_pattern = path_to_pattern(location_pattern);
-	if (request_path!= "/")
+	if (request_path != "/")
 	{
 		// if (location_pattern[location_pattern.size() - 1] == '/')
 		// 	location_pattern.erase(location_pattern.size() - 1);
@@ -262,15 +258,15 @@ bool LimitExceptCheck(std::vector<std::string> exceptions, std::string request_m
 
 std::string handler(Request &req, Config conf)
 {
-	 std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
-	 std::string final("");
-	 Header host_header = *(req.getHeaderByName("Host"));
+	std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
+	std::string final("");
+	Header host_header = *(req.getHeaderByName("Host"));
 
-	 for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
-	 {
-		 // std::cout << "Hae:" << check_listen(*it, host_header) << ";" << std::endl;
-		 if (check_listen(*it, host_header))
-		 {
+	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it < hosts.end(); ++it)
+	{
+		// std::cout << "Hae:" << check_listen(*it, host_header) << ";" << std::endl;
+		if (check_listen(*it, host_header))
+		{
 			std::string request_path = req.getPath();
 			// std::cout << "REQUEST PATH" << request_path << "\n\n" << std::endl;
 			// std::string request_pattern = path_to_pattern(request_path);
@@ -299,35 +295,32 @@ std::string handler(Request &req, Config conf)
 			{
 				if (((*it_best).getLimitExcept()).isEmpty() != true && LimitExceptCheck((*it_best).getLimitExcept().getMethods(), req.getMethod()) == false)
 				{
-					std::cout << "KEK" << std::endl;
 					req.setError(405);
 					return final;
 				}
 				if ((*it_best).getClientMaxBodySize() > 0 && (*it_best).getClientMaxBodySize() < req.getBodyLength())
 				{
-					std::cout << (*it_best).getClientMaxBodySize()  << std::endl;
-					std::cout << req.getBodyLength() << std::endl;
+					// std::cout << (*it_best).getClientMaxBodySize() << std::endl;
+					// std::cout << req.getBodyLength() << std::endl;
 					req.setError(413);
 					return final;
 				}
 				if ((*it_best).needsAuth() && !(*it_best).authenticate(req))
 				{
 					req.setError(401);
-					std::cout << "Auth" << std::endl;
 					return final;
 				}
-				std::cout << "good " << std::endl;
 				final = create_final_path(*it_best, request_path);
 				return final;
 			}
 			else
 				req.setError(404);
-		 }
-	 }
+		}
+	}
 	return final;
 }
 
-Location	handlerGetLocation(Request req, Config conf)
+Location handlerGetLocation(Request req, Config conf)
 {
 	Header host_header = *(req.getHeaderByName("Host"));
 	std::vector<VirtualHost> hosts(conf.getVirtualHostVector());
@@ -338,7 +331,7 @@ Location	handlerGetLocation(Request req, Config conf)
 	int count_cur;
 	std::vector<Location>::iterator it_best;
 	std::vector<Location> best_loc;
-	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it <  hosts.end(); ++it)
+	for (std::vector<VirtualHost>::iterator it = hosts.begin(); it < hosts.end(); ++it)
 	{
 		std::vector<Location> server_locations = it->getLocations();
 		for (std::vector<Location>::iterator it_loc = server_locations.begin(); it_loc < server_locations.end(); ++it_loc)
@@ -363,6 +356,5 @@ Location	handlerGetLocation(Request req, Config conf)
 	}
 	// std::cout << "get root " << (best).getPattern() << std::endl;
 	// std::cout << "get index " << best_index.size() << std::endl;
-	std::cout << "HERE kek" << std::endl;
 	return (best_loc[best_loc.size() - 1]);
 }

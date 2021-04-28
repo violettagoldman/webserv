@@ -104,8 +104,8 @@ int Server::send(int fd, std::string message, Response *response)
 	int len = message.size();
 	int res;
 	int offset = response->getOffset();
-	std::cout << len << std::endl;
-	std::cout << offset << std::endl;
+	// std::cout << len << std::endl;
+	// std::cout << offset << std::endl;
 	if ((res = ::send(fd, message.c_str() + offset, len - offset, 0)) <= 0)
 	{
 		std::cerr << "Could not send response" << std::endl;
@@ -113,7 +113,7 @@ int Server::send(int fd, std::string message, Response *response)
 	}
 	offset += res;
 	response->setOffset(offset);
-	std::cout << "of after" << offset << std::endl;
+	// std::cout << "of after" << offset << std::endl;
 	if (offset >= len)
 		return (1);
 	return (0);
