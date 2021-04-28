@@ -93,10 +93,9 @@ int main(int argc, char **argv)
 					if ((chunked_pos = chunked_requests.find(sd)) != chunked_requests.end())
 						request = chunked_pos->second;
 					request.read_request(sd);
-
-					if (request.getState() == "chunked")
+					if (request.getState() == "processing")
 						chunked_requests[sd] = request;
-					if ((request.getState() == "read" || request.getState() == "end") && request.isHeaderPresent("Transfer-Encoding", "chunked"))
+					if ((request.getState() == "read" || request.getState() == "end") && (chunked_pos = chunked_requests.find(sd)) != chunked_requests.end())
 						chunked_requests.erase(sd);
 					if (request.getState() == "end")
 					{
@@ -108,8 +107,8 @@ int main(int argc, char **argv)
 					{
 						// request.print_headers();
 						final_path = handler(request, conf);
-						// std::cout << "State of the error after handler" << request.getError() << std::endl;
-						// std::cout << "State of path" << final_path << std::endl;
+						std::cout << "State of the error after handler" << request.getError() << std::endl;
+						std::cout << "State of path" << final_path << std::endl;
 						Location loc = handlerGetLocation(request, conf); // use all virtual hosts
 						if (loc.getFcgiPass() != "" && loc.getCgiExtension() == request.getExtension())
 						{
@@ -138,7 +137,7 @@ int main(int argc, char **argv)
 							response.serialize();
 							resp[sd] = response;
 						}
-						else if (request.getState() != "chunked")
+						else
 						{
 							Response response(request, loc, final_path);
 							response.serialize();

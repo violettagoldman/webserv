@@ -6,7 +6,7 @@
 /*   By: ablanar <ablanar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 20:05:07 by ablanar           #+#    #+#             */
-/*   Updated: 2021/04/23 15:50:12 by ablanar          ###   ########.fr       */
+/*   Updated: 2021/04/28 14:01:48 by ablanar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,11 @@ class Request
 		std::string _path;
 		std::string _fragment;
 		int _error;
+
 		std::string _state;
 		std::string methods[8];
 		std::string _buffer;
+		int _chunked;
 };
 std::vector<std::string> split(std::string input, std::string word);
 #endif
