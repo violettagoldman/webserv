@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+*.vscode
+*.iml
+*.idea
+
+# Tmp files
+webservTmp
+__pycache__
